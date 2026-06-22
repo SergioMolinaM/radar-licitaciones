@@ -1,0 +1,46 @@
+name: Radar Licitaciones
+
+on:
+  schedule:
+    # 12:00 UTC = 09:00 Chile invierno / 08:00 Chile verano, lunes a viernes
+    - cron: '0 12 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write  # necesario para commitear state.json
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Ejecutar scanner
+        env:
+          MERCADO_PUBLICO_TOKEN: ${{ secrets.MERCADO_PUBLICO_TOKEN }}
+          RESEND_API_KEY:        ${{ secrets.RESEND_API_KEY }}
+          RADAR_TO_EMAIL:        ${{ secrets.RADAR_TO_EMAIL }}
+          RADAR_FROM_EMAIL:      ${{ secrets.RADAR_FROM_EMAIL }}
+        run: python -m src.scanner
+
+      - name: Commit state si cambió
+        run: |
+          git config user.name  "radar-bot"
+          git config user.email "radar-bot@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain data/state.json)" ]]; then
+            git add data/state.json
+            git commit -m "chore(state): actualización automática $(date -u +%FT%TZ)"
+            git push
+          else
+            echo "state.json sin cambios"
+          fi
