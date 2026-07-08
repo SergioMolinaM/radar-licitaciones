@@ -118,12 +118,8 @@ El sistema de deduplicación y notificación funciona automáticamente.
 - El `state.json` se commitea automáticamente con cada ejecución exitosa. Si la notificación falla, no se actualiza el state (reintenta al día siguiente).
 - IDs en `state.json` se purgan automáticamente tras 90 días.
 - Si el ticket de Mercado Público expira o el endpoint cambia, la API de PNUD sigue funcionando (degradación elegante).
+- **Heartbeat semanal.** Los viernes (12:00 UTC) el sistema envía un correo corto con métricas de estado aunque no haya oportunidades nuevas. Sirve para distinguir "esta semana no hubo licitaciones que hicieran match" de "el sistema está caído". Si algún viernes no llega el heartbeat, revisar Actions.
 
 ---
 
-## Roadmap sugerido
-
-- Fase 2: BID Consulting Opportunities (scraping del portal IDB).
-- Fase 2: Banco Mundial eConsultant2 (requiere login, evaluar costo/beneficio).
-- Fase 3: Resumen semanal con análisis de tendencias.
-- Fase 3: Clasificación por línea de negocio (Tercera Letra core / RADAR / Camino a la U).
+## Audi

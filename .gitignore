@@ -6,3 +6,5 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+# Auditorias locales (CSV con universo completo)
+data/audit-*.csv

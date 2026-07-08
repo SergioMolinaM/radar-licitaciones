@@ -104,3 +104,64 @@ def send_email(items: list[dict]) -> bool:
     except requests.RequestException as e:
         logger.error(f"Error enviando correo: {e}")
         return False
+
+
+def _render_heartbeat_html(stats: dict) -> str:
+    """Cuerpo del heartbeat semanal - corto, sin ruido visual."""
+    fecha = datetime.now().strftime("%d/%m/%Y")
+    return f"""
+    <html><body style="font-family:-apple-system,Segoe UI,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#222;">
+        <h1 style="font-size:18px;margin:0 0 4px;">Radar de Licitaciones - Reporte semanal</h1>
+        <p style="color:#666;margin:0 0 20px;font-size:13px;">
+            Viernes {fecha} - confirmacion de que el sistema esta corriendo
+        </p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+            <tr><td style="padding:8px 0;color:#666;">Licitaciones activas en Mercado Publico</td>
+                <td style="padding:8px 0;text-align:right;font-weight:600;">{stats['universo_mp']:,}</td></tr>
+            <tr><td style="padding:8px 0;color:#666;">Entradas escaneadas en PNUD</td>
+                <td style="padding:8px 0;text-align:right;font-weight:600;">{stats['universo_undp']:,}</td></tr>
+            <tr><td style="padding:8px 0;color:#666;border-top:1px solid #eee;">Matches con keywords hoy</td>
+                <td style="padding:8px 0;text-align:right;font-weight:600;border-top:1px solid #eee;">{stats['matches_totales_hoy']}</td></tr>
+            <tr><td style="padding:8px 0;color:#666;">Nuevas oportunidades notificadas esta semana</td>
+                <td style="padding:8px 0;text-align:right;font-weight:600;color:#0a4d8c;">{stats['nuevos_semana']}</td></tr>
+            <tr><td style="padding:8px 0;color:#666;">Total IDs en memoria (ventana 90 dias)</td>
+                <td style="padding:8px 0;text-align:right;font-weight:600;">{stats['total_seen']:,}</td></tr>
+        </table>
+        <p style="color:#666;font-size:12px;margin:24px 0 0;line-height:1.5;">
+            Si este correo deja de llegar un viernes, el sistema podria estar caido -
+            revisar <a href="https://github.com/SergioMolinaM/radar-licitaciones/actions" style="color:#0a4d8c;">GitHub Actions</a>.
+        </p>
+        <hr style="border:none;border-top:1px solid #eee;margin:20px 0 12px;">
+        <p style="color:#999;font-size:11px;">Tercera Letra SpA - monitoreo institucional</p>
+    </body></html>
+    """
+
+
+def send_heartbeat(stats: dict) -> bool:
+    """Envia el reporte semanal. Retorna False si Resend no configurado o falla."""
+    api_key = os.getenv("RESEND_API_KEY")
+    destinatario = os.getenv("RADAR_TO_EMAIL")
+    remitente = os.getenv("RADAR_FROM_EMAIL", "radar@terceraletra.cl")
+
+    if not api_key or not destinatario:
+        logger.warning("Heartbeat no enviado - falta RESEND_API_KEY o RADAR_TO_EMAIL")
+        return False
+
+    fecha = datetime.now().strftime("%d/%m")
+    payload = {
+        "from": remitente,
+        "to": [destinatario],
+        "subject": f"Radar Licitaciones - reporte semanal ({fecha})",
+        "html": _render_heartbeat_html(stats),
+    }
+    try:
+        resp = requests.post(
+            RESEND_URL, json=payload,
+            headers={"Authorization": f"Bearer {api_key}"}, timeout=TIMEOUT,
+        )
+        resp.raise_for_status()
+        logger.info(f"Heartbeat enviado a {destinatario}")
+        return True
+    except requests.RequestException as e:
+        logger.error(f"Error enviando heartbeat: {e}")
+        return False

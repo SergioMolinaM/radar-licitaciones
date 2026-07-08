@@ -3,39 +3,86 @@
 # Keywords de inclusión: si una licitación contiene alguno, entra al match.
 # Match case-insensitive sobre Nombre + Descripcion.
 KEYWORDS_INCLUDE = [
-    # Núcleo Tercera Letra
+    # Núcleo comunicaciones
     "comunicación estratégica",
     "comunicación institucional",
     "comunicación de riesgo",
     "comunicación pública",
+    "campaña comunicacional",
+    "campañas comunicacionales",
+    "plan de comunicaciones",
+    "plan comunicacional",
+    "plan de medios",
+    "gestión de medios",
+    "marketing digital",
+    # Consultoría (específica, no "consultoría" a secas — trae mucho ruido)
+    "consultoría comunicacional",
+    "consultoría estratégica",
+    "consultoría en comunicación",
+    "consultoría en comunicaciones",
+    "asesoría estratégica",
+    "asesoría comunicacional",
+    "asesoría en comunicación",
+    "vocería",
+    # Estudios e investigación
     "estudio cualitativo",
     "estudio cuantitativo",
     "estudio de percepción",
     "estudio de opinión",
     "investigación social",
-    "consultoría",
-    "asesoría estratégica",
-    "asesoría comunicacional",
+    "encuesta",
+    "encuestas",
+    "clima organizacional",
+    "análisis de datos",
+    "inteligencia de datos",
+    # Evaluación y diagnóstico
     "evaluación de programa",
     "evaluación de política",
+    "evaluación de políticas",
+    "evaluación de impacto",
     "diagnóstico institucional",
     "diseño metodológico",
     "metodología cualitativa",
-    "análisis de datos",
-    "inteligencia de datos",
     "monitoreo y evaluación",
     "diseño de instrumento",
+    # Facilitación y formación
     "facilitación",
+    "relatoría",
+    "relator",
     "participación ciudadana",
     "consulta ciudadana",
     "diálogo social",
-    "vocería",
+    "capacitación en género",
+    "capacitación en materia de género",
+    "perspectiva de género",
+    "enfoque de género",
+    # Editorial (Tercera Letra core)
+    "edición de libro",
+    "publicación de libro",
+    "corrección de estilo",
+    "corrección ortotipográfica",
+    "redacción",
+    "diagramación",
+    "diseño editorial",
+    "guía metodológica",
+    "guía didáctica",
+    "manual pedagógico",
+    "material educativo",
+    "cuenta pública",
+    "memoria institucional",
+    "memoria anual",
+    "cápsulas radiales",
+    "cápsulas educativas",
+    "cápsulas informativas",
+    "podcast institucional",
+    "infografía",
     # RADAR / Radar Circular
     "economía circular",
     "responsabilidad extendida",
     "ley rep",
     "gestión de residuos",
     "valorización",
+    "cambio climático",
     # Educación (Radar Educativo / Camino a la U)
     "convivencia escolar",
     "educación superior",
@@ -104,19 +151,39 @@ KEYWORDS_EXCLUDE = [
     "consultoría apoyo técnico",
     "fiscalización de",
     "escrituras",
+    # Salud clínica y técnica (no perfil TL — atrapa "insumos médicos", "quirúrgico")
+    "quirúrgic",
+    "radiológic",
+    "hemodinamia",
+    "gastroenterolog",
+    "psicolabor",
+    "arterial",
+    "sellador",
+    # Técnico / ingeniería / geociencias
+    "topográfic",
+    "topografic",
+    "geológic",
+    "geofísic",
+    "fitoplancton",
+    "zoobentos",
+    "físico químic",
+    "fisicoquímic",
+    "modelación",
+    "radiocomunicaciones",
+    # Otros bienes/servicios anchos que no aplican
+    "insumos",
+    "kit ",
+    "servicio de transporte",
+    "vehículos fiscales",
 ]
 
 # Estados de Mercado Público a incluir (publicada = abierta para postular)
 MP_ESTADOS_INTERES = ["publicada", "activa"]
 
 # Monto mínimo estimado (en CLP) para filtrar ruido. None = sin filtro.
-# MP no siempre entrega monto; cuando no, se incluye igual.
 MONTO_MINIMO_CLP = None
 
 # Feeds RSS de PNUD a consultar.
-# PNUD usa códigos propietarios (no ISO3). Chile, Uruguay y Paraguay no tienen
-# feed propio (sin oficina con compras suficientes). Para Chile, la fuente
-# institucional es Mercado Público. El feed global atrapa el resto.
 UNDP_FEEDS = {
     "Bolivia": "https://procurement-notices.undp.org/rss_feeds/BOL.xml",
     "Perú": "https://procurement-notices.undp.org/rss_feeds/PER.xml",
@@ -126,17 +193,11 @@ UNDP_FEEDS = {
     "México": "https://procurement-notices.undp.org/rss_feeds/MEX.xml",
 }
 
-# Feed global PNUD: red de seguridad para licitaciones regionales/multipaís
-# que no aparecen en feeds país. Mayor volumen, mismo filtro de keywords.
 UNDP_GLOBAL_FEED = "https://procurement-notices.undp.org/rss_feeds/rss.xml"
 
-# Si el feed global trae muchas entradas internacionales irrelevantes,
-# limitar por país en el título/descripción (case-insensitive).
-# Vacío = sin filtro geográfico adicional.
 UNDP_GLOBAL_PAIS_FILTRO = [
     "chile", "bolivia", "perú", "peru", "colombia", "argentina",
     "ecuador", "méxico", "mexico", "latin america", "regional",
 ]
 
-# Endpoint API Mercado Público (correcto, verificado)
 MP_API_URL = "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json"

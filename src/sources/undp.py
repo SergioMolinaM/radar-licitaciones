@@ -47,15 +47,19 @@ def _entry_to_item(entry, fuente: str) -> dict | None:
     }
 
 
-def _fetch_feed(url: str, fuente: str, pais_filtro: list[str] | None = None) -> list[dict]:
-    """Descarga y parsea un feed RSS. Opcionalmente filtra por país en título."""
+def _fetch_feed(url: str, fuente: str, pais_filtro: list[str] | None = None) -> tuple[list[dict], int]:
+    """Descarga y parsea un feed RSS. Opcionalmente filtra por país en título.
+
+    Retorna (matches, total_entries_del_feed). El segundo valor alimenta el
+    universo total para el heartbeat.
+    """
     try:
         resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=TIMEOUT)
         resp.raise_for_status()
         feed = feedparser.parse(resp.content)
     except requests.RequestException as e:
         logger.error(f"{fuente}: error de red — {e}")
-        return []
+        return [], 0
 
     entries = feed.entries or []
     logger.info(f"{fuente}: {len(entries)} entradas en feed")
@@ -72,26 +76,35 @@ def _fetch_feed(url: str, fuente: str, pais_filtro: list[str] | None = None) -> 
         if item:
             resultados.append(item)
 
-    return resultados
+    return resultados, len(entries)
 
 
-def fetch_undp_notices() -> list[dict]:
-    """Consulta todos los feeds PNUD (país + global) y dedupea por ID interno."""
+def fetch_undp_notices() -> tuple[list[dict], int]:
+    """Consulta todos los feeds PNUD (país + global) y dedupea por ID interno.
+
+    Retorna (matches, universo_total). `universo_total` es la suma de entradas
+    en todos los feeds (antes de filtro keywords), útil para el heartbeat.
+    """
     resultados: dict[str, dict] = {}
+    universo_total = 0
 
     # Feeds por país
     for pais, url in UNDP_FEEDS.items():
-        for item in _fetch_feed(url, f"PNUD {pais}"):
+        matches, universo = _fetch_feed(url, f"PNUD {pais}")
+        universo_total += universo
+        for item in matches:
             resultados[item["id"]] = item
 
     # Feed global con filtro geográfico
     if UNDP_GLOBAL_FEED:
-        for item in _fetch_feed(
+        matches, universo = _fetch_feed(
             UNDP_GLOBAL_FEED, "PNUD Global", pais_filtro=UNDP_GLOBAL_PAIS_FILTRO
-        ):
+        )
+        universo_total += universo
+        for item in matches:
             # No sobrescribir si ya vino por feed país
             resultados.setdefault(item["id"], item)
 
     items = list(resultados.values())
     logger.info(f"PNUD: {len(items)} matches únicos tras filtro keywords")
-    return items
+    return items, universo_total
