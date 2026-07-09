@@ -75,4 +75,16 @@ def fetch_licitaciones_dia() -> tuple[list[dict], int]:
         if not match:
             continue
 
-   
+        resultados.append({
+            "fuente": "Mercado Público",
+            "id": f"MP::{codigo}",
+            "codigo": codigo,
+            "titulo": nombre,
+            "estado": "Activa",
+            "fecha_cierre": lic.get("FechaCierre", ""),
+            "link": f"https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion={codigo}",
+            "keywords_match": kws,
+        })
+
+    logger.info(f"Mercado Público: {len(resultados)} matches tras filtro keywords")
+    return resultados, universo
