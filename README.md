@@ -143,4 +143,28 @@ El sistema de deduplicación y notificación funciona automáticamente.
 
 ---
 
-## Audi
+## Auditoría de keywords
+
+Las keywords no se tocan a ojo: se auditan contra el universo real y se decide sobre el CSV.
+
+```powershell
+$env:MERCADO_PUBLICO_TOKEN = "tu-ticket"
+python -m src.audit                  # licitaciones activas de Mercado Público
+python -m src.audit_compra_agil 100  # Compras Ágiles (muestra de 100 detalles)
+```
+
+Ninguno envía correo ni escribe en `data/state.json`. Cada uno deja un CSV en `data/`:
+
+- `audit-YYYY-MM-DD.csv` — todas las licitaciones activas, marcadas como `MATCH` / `EXCLUIDA` / `SIN_MATCH`. Se revisa filtrando `SIN_MATCH` para cazar formulaciones que se escapan ("asesoría comunicacional integral" en vez de "comunicación estratégica"). Así se calibraron las exclusiones tras auditar los 34 matches del 22-06-2026.
+- `audit-compra-agil-YYYY-MM-DD.csv` — Compras Ágiles de la ventana, con su descripción (que el listado de la API no entrega: hay que pedir el detalle, 1 request por Compra Ágil; de ahí el tope `MAX_DETALLES`). Sirve para responder si conviene matchear la descripción además del nombre — ver "Pregunta abierta" en Personalización.
+
+El log de cada auditoría imprime el ranking de keywords que atraparon y las que descartaron.
+
+---
+
+## Roadmap sugerido
+
+- Fase 2: BID Consulting Opportunities (scraping del portal IDB).
+- Fase 2: Banco Mundial eConsultant2 (requiere login, evaluar costo/beneficio).
+- Fase 3: Resumen semanal con análisis de tendencias.
+- Fase 3: Clasificación por línea de negocio (Tercera Letra core / RADAR / Camino a la U).
