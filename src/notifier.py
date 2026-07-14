@@ -118,6 +118,8 @@ def _render_heartbeat_html(stats: dict) -> str:
         <table style="width:100%;border-collapse:collapse;font-size:14px;">
             <tr><td style="padding:8px 0;color:#666;">Licitaciones activas en Mercado Publico</td>
                 <td style="padding:8px 0;text-align:right;font-weight:600;">{stats['universo_mp']:,}</td></tr>
+            <tr><td style="padding:8px 0;color:#666;">Compras Agiles publicadas recorridas</td>
+                <td style="padding:8px 0;text-align:right;font-weight:600;">{stats.get('universo_ca', 0):,}</td></tr>
             <tr><td style="padding:8px 0;color:#666;">Entradas escaneadas en PNUD</td>
                 <td style="padding:8px 0;text-align:right;font-weight:600;">{stats['universo_undp']:,}</td></tr>
             <tr><td style="padding:8px 0;color:#666;border-top:1px solid #eee;">Matches con keywords hoy</td>

@@ -2,7 +2,8 @@
 
 Monitoreo diario automatizado de oportunidades institucionales en:
 
-- **Mercado Público (ChileCompra)** — API oficial. Única fuente para Chile.
+- **Mercado Público (ChileCompra)** — API oficial de licitaciones.
+- **Compra Ágil (ChileCompra)** — API v2 (`api2.mercadopublico.cl`, ticket por header). Compras bajo 100 UTM, publicadas en los últimos 3 días. Ojo: su listado no trae descripción, así que el match es por nombre.
 - **PNUD Procurement Notices** — RSS feeds por país (Bolivia, Perú, Colombia, Argentina, Ecuador, México) más feed global con filtro geográfico. **Chile no tiene feed PNUD propio**; las oportunidades chilenas vienen exclusivamente vía Mercado Público.
 
 Filtrado por keywords alineadas al perfil de Tercera Letra (comunicación estratégica, estudios cualitativos, evaluación de políticas, economía circular, educación). Deduplicación persistente. Notificación por correo vía Resend.
@@ -22,8 +23,11 @@ radar-licitaciones/
 │   ├── state.py                    # Persistencia de IDs ya notificados
 │   ├── notifier.py                 # Envío correo vía Resend
 │   ├── scanner.py                  # Orquestador
+│   ├── audit.py                    # Auditoría de keywords vs. Mercado Público
+│   ├── audit_compra_agil.py        # Auditoría de keywords vs. Compra Ágil (manual)
 │   └── sources/
-│       ├── mercado_publico.py      # API ChileCompra
+│       ├── mercado_publico.py      # API ChileCompra (licitaciones)
+│       ├── compra_agil.py          # API ChileCompra v2 (Compra Ágil)
 │       └── undp.py                 # RSS PNUD
 ├── data/state.json                 # IDs vistos (commiteado automáticamente)
 ├── requirements.txt
@@ -77,6 +81,23 @@ python -m src.scanner
 
 - `KEYWORDS_INCLUDE` — añadir términos relevantes (case-insensitive, match por substring).
 - `KEYWORDS_EXCLUDE` — descarta licitaciones que contengan estos términos. Útil para evitar ruido recurrente.
+
+Ambas listas se matchean **solo contra el nombre/título**, en las dos fuentes chilenas. No se tocan sin auditar primero contra el universo real:
+
+```powershell
+$env:MERCADO_PUBLICO_TOKEN = "tu-ticket"
+python -m src.audit                 # licitaciones de Mercado Público
+python -m src.audit_compra_agil     # Compras Ágiles (pide el detalle: trae la descripción)
+```
+
+Ninguno de los dos envía correo ni toca `data/state.json`; escriben un CSV en `data/` para revisar en Excel.
+
+**Pregunta abierta — ¿matchear también la descripción?** El listado de Compra Ágil solo trae el nombre, y los nombres son genéricos ("COMPRA INSUMOS 114219"): la sustancia está en la descripción, que solo entrega el endpoint de detalle. Pero matchear descripciones tiene dos problemas medibles con `audit_compra_agil`:
+
+1. Las exclusiones están calibradas contra títulos y aparecen en casi cualquier descripción ("compra de", "insumos"). Peor: un nombre genérico suele caer por exclusión **antes** de que la descripción alcance a salvarlo (categoría `EXCLUIDA_NOMBRE` con keyword en descripción).
+2. Las inclusiones anchas ("redacción", "encuesta", "infografía") son señal en un título y ruido cuando aparecen de pasada en un párrafo (categoría `NUEVO_POR_DESCRIPCION`).
+
+La auditoría cuantifica ambas. Decidir con ese CSV, no de memoria.
 
 **Países PNUD** — `UNDP_FEEDS` en `config.py`. Importante: PNUD usa códigos propietarios, **no ISO3 estándar** (ej: BHU no BTN para Bután). La lista canónica está en https://procurement-notices.undp.org/proc_notices_rss_feed.cfm. Países sin oficina PNUD activa (Chile, Uruguay, Paraguay) no tienen feed.
 

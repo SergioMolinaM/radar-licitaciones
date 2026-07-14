@@ -201,3 +201,21 @@ UNDP_GLOBAL_PAIS_FILTRO = [
 ]
 
 MP_API_URL = "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json"
+
+# --- Compra Ágil (API v2, api2.mercadopublico.cl) ---
+# OJO: base distinta (api2) y auth por HEADER `ticket`, no query param.
+COMPRA_AGIL_API_URL = "https://api2.mercadopublico.cl/v2/compra-agil"
+
+# Estados a incluir. "publicada" = abierta recibiendo cotizaciones (oportunidad
+# real para postular). Admite múltiples separados por coma.
+COMPRA_AGIL_ESTADOS = "publicada"
+
+# Ventana de días hacia atrás sobre fecha de publicación. 3 cubre el fin de
+# semana en la corrida del lunes. El dedupe por state.json evita repetir.
+COMPRA_AGIL_DIAS_VENTANA = 3
+
+# Ficha pública de la Compra Ágil. La guía de la API no la documenta (solo expone
+# links.detalle, que apunta de vuelta a la API y exige ticket). Este patrón se
+# verificó a mano el 14-07-2026 abriendo 5627-188-COT26 desde el buscador
+# público: carga sin sesión. El {codigo} tiene formato 1057539-228-COT26.
+COMPRA_AGIL_WEB_URL_TEMPLATE = "https://buscador.mercadopublico.cl/ficha?code={codigo}"

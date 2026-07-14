@@ -15,6 +15,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 from .sources.mercado_publico import fetch_licitaciones_dia
+from .sources.compra_agil import fetch_compra_agil
 from .sources.undp import fetch_undp_notices
 from .state import load_state, save_state, is_new, mark_seen, prune_state, _parse_iso
 from .notifier import send_email, send_heartbeat
@@ -28,7 +29,7 @@ logger = logging.getLogger(__name__)
 HEARTBEAT_WEEKDAY = 4  # 0=lunes ... 4=viernes (UTC). Cron corre 12:00 UTC L-V.
 
 
-def _weekly_stats(state, universo_mp, universo_undp, matches_totales_hoy, nuevos_hoy):
+def _weekly_stats(state, universo_mp, universo_ca, universo_undp, matches_totales_hoy, nuevos_hoy):
     hace_7d = datetime.utcnow() - timedelta(days=7)
     seen = state.get("seen", {})
     nuevos_semana = 0
@@ -38,6 +39,7 @@ def _weekly_stats(state, universo_mp, universo_undp, matches_totales_hoy, nuevos
             nuevos_semana += 1
     return {
         "universo_mp": universo_mp,
+        "universo_ca": universo_ca,
         "universo_undp": universo_undp,
         "matches_totales_hoy": matches_totales_hoy,
         "nuevos_hoy": nuevos_hoy,
@@ -50,10 +52,11 @@ def run() -> int:
     state = load_state()
 
     matches_mp, universo_mp = fetch_licitaciones_dia()
+    matches_ca, universo_ca = fetch_compra_agil()
     matches_undp, universo_undp = fetch_undp_notices()
-    todos = matches_mp + matches_undp
+    todos = matches_mp + matches_ca + matches_undp
 
-    logger.info(f"Universo escaneado: MP={universo_mp}, PNUD={universo_undp}")
+    logger.info(f"Universo escaneado: MP={universo_mp}, CA={universo_ca}, PNUD={universo_undp}")
     logger.info(f"Total tras filtro keywords: {len(todos)}")
 
     nuevos = [item for item in todos if is_new(state, item["id"])]
@@ -74,7 +77,7 @@ def run() -> int:
     # Heartbeat semanal (viernes UTC): confirma que el sistema respira aunque
     # no haya oportunidades nuevas. Distingue "silencio real" de "sistema roto".
     if datetime.now(timezone.utc).weekday() == HEARTBEAT_WEEKDAY:
-        stats = _weekly_stats(state, universo_mp, universo_undp, len(todos), len(nuevos))
+        stats = _weekly_stats(state, universo_mp, universo_ca, universo_undp, len(todos), len(nuevos))
         send_heartbeat(stats)
 
     return 0
