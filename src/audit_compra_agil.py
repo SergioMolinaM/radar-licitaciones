@@ -99,7 +99,7 @@ def run(limite: int = MAX_DETALLES) -> int:
     logger.info(
         f"Descargando Compras Ágiles publicadas (ventana {COMPRA_AGIL_DIAS_VENTANA} días)…"
     )
-    items = fetch_raw_publicadas()
+    items, _completo = fetch_raw_publicadas()
     if not items:
         logger.error("No se recibió listado (revisa MERCADO_PUBLICO_TOKEN y la API v2)")
         return 1

@@ -24,9 +24,18 @@ INSTITUCIONAL», CNR, $13M, cierre 14-10). Las de envases MMA 608897-60-LE26 (30
    heartbeat, state guardado y `exit 3` → corrida roja en Actions (GitHub avisa por correo).
    `scanner.yml`: paso de commit con `if: always()`.
 
+5. **Tras el verificador (FALLA leve, 7 hallazgos):** barrido de CA cortado a mitad (caso 18-sep)
+   ahora cuenta como caída (`fetch_raw_publicadas` devuelve `(items, completo)`); exclusiones
+   compuestas que el borde de palabra dejó de cubrir se agregan explícitas (televigilancia,
+   videovigilancia, remodelación, electroquirúrgic, cardioquirúrgic, hidrogeológic); «rediseño»
+   suelto → «rediseño web/del portal/del sitio/de la página» (dejaba pasar «rediseño de red de agua
+   potable»); `save_state` atómico (tmp + `os.replace`); `timeout-minutes: 30` en el job y
+   presupuesto de 15 min para el barrido de CA. No corregidos: doble log del 5xx final (cosmético) y
+   fatiga de alarma si CA cae a diario (decisión: preferible rojo diario a silencio).
+
 ### Verificado
 
-Test offline (scratchpad, 19/19): títulos reales de las tres licitaciones, reintentos 504/red/429
+Test offline (scratchpad, 25/25 tras los arreglos del verificador; antes 19/19): títulos reales de las tres licitaciones, reintentos 504/red/429
 con mocks, scanner con CA caída → exit 3 con state guardado y banner. Contra el universo de
 julio (`audit-2026-07-08.csv`, 4.029 títulos): antes 43 matches, **entran 20, salen 0**.
 De esos 20, ~10 son ruido de `digital` (plataformas escolares, biopsia digital, libro de obras).

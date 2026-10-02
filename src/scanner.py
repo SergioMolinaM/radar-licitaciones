@@ -52,7 +52,7 @@ def run() -> int:
     state = load_state()
 
     matches_mp, universo_mp = fetch_licitaciones_dia()
-    matches_ca, universo_ca = fetch_compra_agil()
+    matches_ca, universo_ca, ca_completo = fetch_compra_agil()
     matches_undp, universo_undp = fetch_undp_notices()
     todos = matches_mp + matches_ca + matches_undp
 
@@ -65,6 +65,8 @@ def run() -> int:
     caidas = [nombre for nombre, universo in
               (("Mercado Público", universo_mp), ("Compra Ágil", universo_ca), ("PNUD", universo_undp))
               if universo == 0]
+    if universo_ca and not ca_completo:
+        caidas.append(f"Compra Ágil (barrido cortado tras {universo_ca} registros)")
     if caidas:
         logger.error(f"Fuentes caídas en esta corrida: {', '.join(caidas)}")
 

@@ -12,6 +12,7 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # los reintentos de Compra Ágil no pueden comerse las 6 h de GitHub
     steps:
       - name: Checkout
         uses: actions/checkout@v4

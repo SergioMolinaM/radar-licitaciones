@@ -1,6 +1,7 @@
 """Persistencia del estado: IDs de licitaciones ya notificadas."""
 
 import json
+import os
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -20,10 +21,14 @@ def load_state() -> dict:
 
 
 def save_state(state: dict) -> None:
-    """Guarda el state.json en disco."""
+    """Guarda el state.json en disco, atómico: escribe a un temporal y lo
+    reemplaza. El workflow commitea con if: always(); un JSON a medio escribir
+    se cargaría como vacío y reenviaría 90 días de avisos."""
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with STATE_PATH.open("w", encoding="utf-8") as f:
+    tmp = STATE_PATH.with_suffix(".json.tmp")
+    with tmp.open("w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2, sort_keys=True)
+    os.replace(tmp, STATE_PATH)
 
 
 def is_new(state: dict, item_id: str) -> bool:

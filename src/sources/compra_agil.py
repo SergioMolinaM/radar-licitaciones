@@ -44,6 +44,7 @@ TIMEOUT = 60
 TAMANO_PAGINA = 50          # máximo permitido por la API (default 15)  [guía §5.1 Grupo 6]
 MAX_PAGINAS = 80            # tope de seguridad (80 * 50 = 4.000 registros/corrida)
 REINTENTOS_ESPERA_S = (20, 60)  # esperas entre intentos ante 5xx/red: 3 intentos en total
+PRESUPUESTO_BARRIDO_S = 15 * 60  # tope del barrido completo; el job tiene timeout-minutes: 30
 
 
 def _get_ticket() -> str | None:
@@ -151,24 +152,30 @@ def _item_to_dict(item: dict) -> dict | None:
     }
 
 
-def fetch_raw_publicadas(dias_ventana: int = COMPRA_AGIL_DIAS_VENTANA) -> list[dict]:
-    """Recorre el listado paginado y retorna los items crudos, sin filtrar.
+def fetch_raw_publicadas(dias_ventana: int = COMPRA_AGIL_DIAS_VENTANA) -> tuple[list[dict], bool]:
+    """Recorre el listado paginado y retorna (items crudos sin filtrar, completo).
 
     Uso: fuente para fetch_compra_agil y para la auditoría de keywords
-    (src/audit_compra_agil.py). Retorna [] si el ticket falla o la API responde
-    mal. Ante 429 retorna lo acumulado hasta ese punto.
+    (src/audit_compra_agil.py). Retorna ([], False) si el ticket falla o la API
+    responde mal. Ante 429 o una página caída retorna lo acumulado con
+    completo=False: un barrido cortado en la pág. 23 de 28 (18-sep) no es éxito.
     """
     ticket = _get_ticket()
     if not ticket:
-        return []
+        return [], False
 
     desde = datetime.now(timezone.utc) - timedelta(days=dias_ventana)
     publicado_desde = desde.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     items: list[dict] = []
     numero_pagina = 1
+    completo = False
 
+    inicio = time.monotonic()
     while numero_pagina <= MAX_PAGINAS:
+        if time.monotonic() - inicio > PRESUPUESTO_BARRIDO_S:
+            logger.error(f"Compra Ágil: se agotó el presupuesto de {PRESUPUESTO_BARRIDO_S} s en la pág {numero_pagina}")
+            break
         payload = _fetch_pagina(ticket, publicado_desde, numero_pagina)
         if payload is None:
             break
@@ -178,6 +185,7 @@ def fetch_raw_publicadas(dias_ventana: int = COMPRA_AGIL_DIAS_VENTANA) -> list[d
         paginacion = payload.get("paginacion") or {}
         total_paginas = paginacion.get("total_paginas", numero_pagina)
         if numero_pagina >= total_paginas:
+            completo = True
             break
         numero_pagina += 1
     else:
@@ -186,7 +194,9 @@ def fetch_raw_publicadas(dias_ventana: int = COMPRA_AGIL_DIAS_VENTANA) -> list[d
             "El barrido quedó truncado — revisar si el universo creció."
         )
 
-    return items
+    if not completo:
+        logger.error(f"Compra Ágil: barrido incompleto ({len(items)} items antes de cortar)")
+    return items, completo
 
 
 def fetch_detalle(codigo: str) -> dict | None:
@@ -222,13 +232,14 @@ def fetch_detalle(codigo: str) -> dict | None:
     return data.get("payload") or None
 
 
-def fetch_compra_agil() -> tuple[list[dict], int]:
+def fetch_compra_agil() -> tuple[list[dict], int, bool]:
     """Consulta Compras Ágiles publicadas recientes y filtra por keywords.
 
-    Retorna (matches, universo_total). `universo_total` es el nº de Compras
-    Ágiles recorridas (antes del filtro), para el heartbeat semanal.
+    Retorna (matches, universo_total, completo). `universo_total` es el nº de
+    Compras Ágiles recorridas (antes del filtro), para el heartbeat semanal;
+    `completo` es False si el barrido se cortó antes de la última página.
     """
-    items = fetch_raw_publicadas()
+    items, completo = fetch_raw_publicadas()
     universo = len(items)
 
     resultados: list[dict] = []
@@ -241,4 +252,4 @@ def fetch_compra_agil() -> tuple[list[dict], int]:
         f"Compra Ágil: {universo} publicadas recorridas, "
         f"{len(resultados)} matches tras filtro keywords"
     )
-    return resultados, universo
+    return resultados, universo, completo
