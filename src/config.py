@@ -1,7 +1,8 @@
 """Configuración central del radar de licitaciones."""
 
 # Keywords de inclusión: si una licitación contiene alguno, entra al match.
-# Match case-insensitive sobre Nombre + Descripcion.
+# Match case-insensitive y sin acentos sobre el NOMBRE (las fuentes no pasan la
+# descripción). Cada keyword debe empezar al inicio de una palabra del título.
 KEYWORDS_INCLUDE = [
     # Núcleo comunicaciones
     "comunicación estratégica",
@@ -76,6 +77,28 @@ KEYWORDS_INCLUDE = [
     "cápsulas informativas",
     "podcast institucional",
     "infografía",
+    # Web y comunicación digital. "portal" a secas no: trae "portal de acceso"
+    # (obra vial) y "portal de pagos". Medido contra audit-2026-07-08.csv.
+    "portal institucional",
+    "portal web",
+    "sitio web",
+    "sitios web",
+    "página web",
+    "páginas web",
+    "diseño web",
+    "desarrollo web",
+    "rediseño",
+    "aula virtual",
+    "plataforma web",
+    "redes sociales",
+    "contenidos digitales",
+    "comunicación digital",
+    "producción audiovisual",
+    "video institucional",
+    "identidad visual",
+    "imagen corporativa",
+    "transformación digital",
+    "inteligencia artificial",
     # RADAR / Radar Circular
     "economía circular",
     "responsabilidad extendida",
@@ -91,6 +114,16 @@ KEYWORDS_INCLUDE = [
     "deserción",
     "slep",
     "servicios locales de educación",
+]
+
+# Keywords de inclusión que deben calzar como PALABRA COMPLETA (no prefijo).
+# "ia" como prefijo trae "IaaS"; "digital" trae "digitalización" (archivos,
+# fotocopiado); "web" trae "webpay". Medido contra audit-2026-07-08.csv: web 6,
+# digital ~15 (incluye ruido: plataformas escolares, "biopsia... digital"), ia 2.
+KEYWORDS_INCLUDE_PALABRA = [
+    "web",
+    "digital",
+    "ia",
 ]
 
 # Keywords de exclusión: si aparecen, descarta (ruido típico observado).

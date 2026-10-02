@@ -44,17 +44,15 @@ def _classify(nombre: str) -> tuple[str, str, str]:
     if not nombre:
         return "SIN_MATCH", "", ""
 
-    from .filters import _normalize, _EXCLUDE_NORM, _INCLUDE_NORM
+    from .filters import _normalize, _EXCLUDE_RE, _INCLUDE_RE
     t = _normalize(nombre)
 
-    # Detectar exclusión primero (mismo orden que matches_keywords)
-    for kw_norm in _EXCLUDE_NORM:
-        if kw_norm in t:
-            # Recuperar la forma original
-            idx = _EXCLUDE_NORM.index(kw_norm)
+    # Detectar exclusión primero (mismo orden y mismos patrones que matches_keywords)
+    for idx, patron in enumerate(_EXCLUDE_RE):
+        if patron.search(t):
             return "EXCLUIDA", "", KEYWORDS_EXCLUDE[idx]
 
-    encontradas = [kw_orig for kw_orig, kw_norm in _INCLUDE_NORM if kw_norm in t]
+    encontradas = [kw_orig for kw_orig, patron in _INCLUDE_RE if patron.search(t)]
     if encontradas:
         return "MATCH", "; ".join(encontradas), ""
     return "SIN_MATCH", "", ""

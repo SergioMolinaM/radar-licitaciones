@@ -34,6 +34,9 @@ jobs:
         run: python -m src.scanner
 
       - name: Commit state si cambió
+        # always(): el scanner sale con error si una fuente se cayó, pero ya
+        # guardó state.json con lo notificado; hay que commitearlo igual.
+        if: always()
         run: |
           git config user.name  "radar-bot"
           git config user.email "radar-bot@users.noreply.github.com"

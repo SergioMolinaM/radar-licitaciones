@@ -44,7 +44,7 @@ from pathlib import Path
 
 from .sources.compra_agil import fetch_raw_publicadas, fetch_detalle
 from .config import KEYWORDS_EXCLUDE, COMPRA_AGIL_WEB_URL_TEMPLATE, COMPRA_AGIL_DIAS_VENTANA
-from .filters import _normalize, _EXCLUDE_NORM, _INCLUDE_NORM
+from .filters import _normalize, _EXCLUDE_RE, _INCLUDE_RE
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,8 +59,8 @@ MAX_DETALLES = 300  # tope de requests de detalle por corrida
 def _exclusion(texto: str) -> str:
     """Primera keyword de exclusión que aparece en el texto, o '' si ninguna."""
     t = _normalize(texto)
-    for i, kw_norm in enumerate(_EXCLUDE_NORM):
-        if kw_norm in t:
+    for i, patron in enumerate(_EXCLUDE_RE):
+        if patron.search(t):
             return KEYWORDS_EXCLUDE[i]
     return ""
 
@@ -68,7 +68,7 @@ def _exclusion(texto: str) -> str:
 def _inclusiones(texto: str) -> list[str]:
     """Keywords de inclusión presentes en el texto (sin aplicar exclusiones)."""
     t = _normalize(texto)
-    return [kw_orig for kw_orig, kw_norm in _INCLUDE_NORM if kw_norm in t]
+    return [kw_orig for kw_orig, patron in _INCLUDE_RE if patron.search(t)]
 
 
 def _clasificar(nombre: str, descripcion: str) -> tuple[str, list[str], list[str], str]:

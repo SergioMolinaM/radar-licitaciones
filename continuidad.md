@@ -1,5 +1,51 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-02 (viernes)
+
+### Hecho
+
+Disparador: no llegó la licitación FUCOA **1108660-10-LE26** («SERVICIO DE REDISEÑO DEL PORTAL
+INSTITUCIONAL», CNR, $13M, cierre 14-10). Las de envases MMA 608897-60-LE26 (30-sep) y USACH
+867990-99-L126 (02-10) sí llegaron: verificado en el `data/state.json` remoto.
+
+1. **Keywords web, digital e IA** (`config.py`). Frases: portal institucional/web, sitio(s) web,
+   página(s) web, diseño/desarrollo web, rediseño, aula virtual, plataforma web, redes sociales,
+   contenidos digitales, comunicación digital, producción audiovisual, video institucional,
+   identidad visual, imagen corporativa, transformación digital, inteligencia artificial.
+   Lista nueva `KEYWORDS_INCLUDE_PALABRA` (palabra completa): `web`, `digital`, `ia`.
+   "portal" a secas se descartó (trae "portal de acceso", obra vial).
+2. **Bug de exclusión por subcadena** (`filters.py`): "erp" excluía "interpretación" y "cuerpos";
+   "sap" excluía "ssap". Ahora toda keyword calza desde inicio de palabra (regex). Los prefijos
+   ("quirúrgic") siguen funcionando. `audit.py` y `audit_compra_agil.py` alineados.
+3. **Compra Ágil caída desde mediados de agosto**: 504 Gateway Timeout (~29 s) en la página 1 casi
+   todos los días (muestras: 21-08 a 02-10; 07-08 funcionó; 18-09 cayó en la pág. 23). Se informaba
+   como "0 recorridas" sin alarma. Ahora: 3 intentos con esperas 20/60 s ante 5xx/red.
+4. **Fuente caída ya no es silenciosa**: universo 0 en MP, CA o PNUD → banner en correo y
+   heartbeat, state guardado y `exit 3` → corrida roja en Actions (GitHub avisa por correo).
+   `scanner.yml`: paso de commit con `if: always()`.
+
+### Verificado
+
+Test offline (scratchpad, 19/19): títulos reales de las tres licitaciones, reintentos 504/red/429
+con mocks, scanner con CA caída → exit 3 con state guardado y banner. Contra el universo de
+julio (`audit-2026-07-08.csv`, 4.029 títulos): antes 43 matches, **entran 20, salen 0**.
+De esos 20, ~10 son ruido de `digital` (plataformas escolares, biopsia digital, libro de obras).
+
+### Pendiente
+
+1. **No verificado: que los reintentos recuperen Compra Ágil.** Sin token en local. Mirar la
+   corrida del lunes 05-10. Si sigue 504 en pág. 1, probar `tamano_pagina` menor o sin
+   `ordenar_por` (hipótesis, no medida).
+2. **Auditar el ruido de `digital`** tras una semana de correos; si molesta, pasar a frases.
+3. Pendientes 2-4 de la sesión 14-07 siguen abiertos (auditoría CA por descripción,
+   `utcnow()` deprecado, organismo/monto en el correo).
+
+### Estado del repo
+
+Rama `main`. Modificados: `src/config.py`, `src/filters.py`, `src/audit.py`,
+`src/audit_compra_agil.py`, `src/sources/compra_agil.py`, `src/scanner.py`, `src/notifier.py`,
+`.github/workflows/scanner.yml`, `continuidad.md`. Sin dependencias nuevas. Sin deploy (Action).
+
 ## Sesión 2026-07-14 (martes)
 
 ### Hecho

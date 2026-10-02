@@ -24,6 +24,7 @@ seguridad. Ante 429 se detiene y retorna lo acumulado (no revienta la corrida).
 """
 
 import os
+import time
 import logging
 from datetime import datetime, timedelta, timezone
 
@@ -42,6 +43,7 @@ logger = logging.getLogger(__name__)
 TIMEOUT = 60
 TAMANO_PAGINA = 50          # máximo permitido por la API (default 15)  [guía §5.1 Grupo 6]
 MAX_PAGINAS = 80            # tope de seguridad (80 * 50 = 4.000 registros/corrida)
+REINTENTOS_ESPERA_S = (20, 60)  # esperas entre intentos ante 5xx/red: 3 intentos en total
 
 
 def _get_ticket() -> str | None:
@@ -49,6 +51,37 @@ def _get_ticket() -> str | None:
     if not ticket:
         logger.error("MERCADO_PUBLICO_TOKEN no configurado (Compra Ágil)")
     return ticket
+
+
+def _get_con_reintentos(ticket: str, params: dict, numero_pagina: int) -> requests.Response | None:
+    """GET con reintentos ante 5xx y errores de red.
+
+    Desde mediados de agosto 2026 la API responde 504 (Gateway Timeout, ~29 s)
+    en casi todas las corridas, casi siempre en la página 1; el 18-sep llegó a
+    la 23 antes de caer. Es intermitente, así que se reintenta con espera.
+    """
+    for intento, espera in enumerate((*REINTENTOS_ESPERA_S, None), start=1):
+        try:
+            resp = requests.get(
+                COMPRA_AGIL_API_URL,
+                headers={"ticket": ticket},
+                params=params,
+                timeout=TIMEOUT,
+            )
+            if resp.status_code < 500:
+                return resp
+            motivo = f"HTTP {resp.status_code}"
+        except requests.RequestException as e:
+            resp, motivo = None, f"error de red — {e}"
+
+        if espera is None:
+            logger.error(f"Compra Ágil: {motivo} (pág {numero_pagina}), sin más reintentos")
+            return resp
+        logger.warning(
+            f"Compra Ágil: {motivo} (pág {numero_pagina}, intento {intento}); reintento en {espera} s"
+        )
+        time.sleep(espera)
+    return None
 
 
 def _fetch_pagina(ticket: str, publicado_desde: str, numero_pagina: int) -> dict | None:
@@ -60,15 +93,8 @@ def _fetch_pagina(ticket: str, publicado_desde: str, numero_pagina: int) -> dict
         "tamano_pagina": TAMANO_PAGINA,
         "numero_pagina": numero_pagina,
     }
-    try:
-        resp = requests.get(
-            COMPRA_AGIL_API_URL,
-            headers={"ticket": ticket},
-            params=params,
-            timeout=TIMEOUT,
-        )
-    except requests.RequestException as e:
-        logger.error(f"Compra Ágil: error de red (pág {numero_pagina}) — {e}")
+    resp = _get_con_reintentos(ticket, params, numero_pagina)
+    if resp is None:
         return None
 
     if resp.status_code == 429:

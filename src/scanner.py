@@ -59,10 +59,19 @@ def run() -> int:
     logger.info(f"Universo escaneado: MP={universo_mp}, CA={universo_ca}, PNUD={universo_undp}")
     logger.info(f"Total tras filtro keywords: {len(todos)}")
 
+    # Universo 0 nunca es real (MP ronda 4.000 activas, CA ~800 en 3 días, PNUD
+    # siempre trae entradas): es una fuente caída. Antes se informaba como
+    # "0 recorridas" y Compra Ágil pasó de agosto a octubre de 2026 muerta sin aviso.
+    caidas = [nombre for nombre, universo in
+              (("Mercado Público", universo_mp), ("Compra Ágil", universo_ca), ("PNUD", universo_undp))
+              if universo == 0]
+    if caidas:
+        logger.error(f"Fuentes caídas en esta corrida: {', '.join(caidas)}")
+
     nuevos = [item for item in todos if is_new(state, item["id"])]
     logger.info(f"Nuevos (no notificados previamente): {len(nuevos)}")
 
-    enviado = send_email(nuevos)
+    enviado = send_email(nuevos, caidas)
     if not enviado:
         logger.error("Notificacion fallo - no se actualiza state")
         return 1
@@ -78,8 +87,13 @@ def run() -> int:
     # no haya oportunidades nuevas. Distingue "silencio real" de "sistema roto".
     if datetime.now(timezone.utc).weekday() == HEARTBEAT_WEEKDAY:
         stats = _weekly_stats(state, universo_mp, universo_ca, universo_undp, len(todos), len(nuevos))
+        stats["caidas"] = caidas
         send_heartbeat(stats)
 
+    # State ya guardado: salir con error deja la corrida en rojo en GitHub
+    # Actions (que avisa por correo) sin perder lo notificado.
+    if caidas:
+        return 3
     return 0
 
 

@@ -15,7 +15,18 @@ RESEND_URL = "https://api.resend.com/emails"
 TIMEOUT = 15
 
 
-def render_html(items: list[dict]) -> str:
+def _render_aviso_caidas(caidas) -> str:
+    if not caidas:
+        return ""
+    return f"""
+        <div style="background:#fdecea;border-left:4px solid #c62828;padding:10px 12px;margin:0 0 16px;font-size:13px;color:#7f1d1d;">
+            <strong>Fuente caída:</strong> {', '.join(caidas)}. Esta corrida no revisó esa fuente;
+            lo que haya publicado ahí no aparece en este correo.
+        </div>
+    """
+
+
+def render_html(items: list[dict], caidas=()) -> str:
     """Construye el cuerpo HTML del correo, agrupado por fuente."""
     fecha = datetime.now().strftime("%d/%m/%Y")
     por_fuente: dict[str, list[dict]] = {}
@@ -56,6 +67,7 @@ def render_html(items: list[dict]) -> str:
         <p style="color:#666;margin:0 0 16px;font-size:13px;">
             {fecha} · {len(items)} nueva{'s' if len(items) != 1 else ''} oportunidad{'es' if len(items) != 1 else ''}
         </p>
+        {_render_aviso_caidas(caidas)}
         {''.join(bloques_html)}
         <hr style="border:none;border-top:1px solid #eee;margin:32px 0 12px;">
         <p style="color:#999;font-size:11px;">
@@ -65,8 +77,12 @@ def render_html(items: list[dict]) -> str:
     """
 
 
-def send_email(items: list[dict]) -> bool:
-    """Envía resumen. Retorna True si se envió o no había qué enviar."""
+def send_email(items: list[dict], caidas=()) -> bool:
+    """Envía resumen. Retorna True si se envió o no había qué enviar.
+
+    Sin ítems nuevos no se envía, aunque haya fuentes caídas: ese caso lo
+    avisa GitHub Actions, porque el scanner sale con error.
+    """
     if not items:
         logger.info("Sin nuevas oportunidades — no se envía correo")
         return True
@@ -88,7 +104,7 @@ def send_email(items: list[dict]) -> bool:
         "from": remitente,
         "to": [destinatario],
         "subject": f"Radar Licitaciones — {len(items)} nuevas oportunidades ({datetime.now().strftime('%d/%m')})",
-        "html": render_html(items),
+        "html": render_html(items, caidas),
     }
 
     try:
@@ -115,6 +131,7 @@ def _render_heartbeat_html(stats: dict) -> str:
         <p style="color:#666;margin:0 0 20px;font-size:13px;">
             Viernes {fecha} - confirmacion de que el sistema esta corriendo
         </p>
+        {_render_aviso_caidas(stats.get('caidas'))}
         <table style="width:100%;border-collapse:collapse;font-size:14px;">
             <tr><td style="padding:8px 0;color:#666;">Licitaciones activas en Mercado Publico</td>
                 <td style="padding:8px 0;text-align:right;font-weight:600;">{stats['universo_mp']:,}</td></tr>
