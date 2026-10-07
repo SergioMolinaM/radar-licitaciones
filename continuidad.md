@@ -1,5 +1,28 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-07 (miércoles) — desde la raíz, sesión «Varios»
+
+### Hecho
+
+1. **Keywords de Radar Construcción Industrializada** (`config.py`, commit `62f39ac`): «construcción
+   industrializada», «industrialización de la construcción», «plantas industrializadoras», «paneles sip».
+   Salen de la evaluación de posibilidades del 7-oct (`marca/POSIBILIDADES-2026-10-07.md`, fila 6).
+   Probadas con `matches_keywords`: entra el estudio SIP del Minvu (587-45-L125); quedan fuera «Arriendo
+   de oficinas modulares» y «Adquisición de paneles solares». **No entra** la consultoría de
+   fiscalización de plantas del Serviu IX (712307-38-LE26): la bloquean las exclusiones «fiscalización de»
+   y «consultoría apoyo técnico», que se dejaron como estaban. «vivienda(s) industrializada(s)» no se
+   agregó porque la exclusión «vivienda» gana siempre.
+2. Corrida del 6-oct verde con 21 oportunidades; **Compra Ágil sigue caída** (el correo lo avisa).
+
+### Pendiente
+
+- Sin cambios: Compra Ágil en 504 (probar página más chica); auditar el ruido de `digital`; pendientes 2-4 del 14-07.
+- Mirar en una semana si las keywords nuevas trajeron algo o ruido.
+
+### Estado del repo
+
+`main` con push el 7-oct (autorizado por Sergio: «si sube»).
+
 ## Sesión 2026-10-02 (viernes)
 
 ### Hecho
