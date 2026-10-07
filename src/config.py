@@ -117,6 +117,16 @@ KEYWORDS_INCLUDE = [
     "deserción",
     "slep",
     "servicios locales de educación",
+    # Radar Construcción Industrializada (7-oct-2026): estudios, no compra de
+    # módulos. "modular" y "paneles" a secas no: traen arriendo de oficinas
+    # modulares y paneles solares. "vivienda(s) industrializada(s)" no sirve:
+    # la exclusión "vivienda" gana siempre. La consultoría de fiscalización de
+    # plantas (712307-38-LE26) igual queda fuera por "fiscalización de" y
+    # "consultoría apoyo técnico"; caza el estudio SIP (587-45-L125).
+    "construcción industrializada",
+    "industrialización de la construcción",
+    "plantas industrializadoras",
+    "paneles sip",
 ]
 
 # Keywords de inclusión que deben calzar como PALABRA COMPLETA (no prefijo).
