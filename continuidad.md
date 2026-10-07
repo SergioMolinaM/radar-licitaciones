@@ -1,5 +1,45 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-07 (miércoles, tarde) — triage de los correos del Radar, desde la raíz
+
+### Hecho
+
+1. Leídos los correos del escáner (remitente `onboarding@resend.dev`, etiqueta Licitaciones) del 1, 2, 6 y
+   7-oct. Lista corta por título y cierre; bases leídas por dos subagentes en Chrome (pdf.js en memoria):
+   - 1177296-23-LP26 Familias de Acogida ($270,7 MM, agencia creativa + ≥70 % pauta, 3 cotizaciones de
+     productoras admisibilidad, garantía ~5 %): NO.
+   - 584105-39-LE26 plan de medios Energía ($35 MM, ≥90 % pauta, experiencia en compra de medios): NO.
+   - 558869-62-LE26 capacitación IA Antofagasta ($55 MM SEP): NO — solo «personas naturales o jurídicas
+     sin fines de lucro» con Registro ATE (frase leída en el texto de las bases, dos lugares).
+   - 1111089-21-LE26 monitoreo de prensa ANID ($8,5 MM/12 meses): NO — exige captura de radio y TV,
+     cobertura 30 %, mínimo 60 puntos.
+   - 591-34-LE26 curso IA FONASA ($3 MM): NO — 45 % experiencia certificada en sector público; prohíbe
+     subcontratar.
+   - 1209-12-L126 curso IA SEREMI Educación Antofagasta ($4,11 MM, online 30 h, 19-30 oct): única viva,
+     solo con relator con título TI o certificación IA (sin él da 1,75 contra mínimo 2). Recomendación:
+     soltar salvo relator el mismo día (cierra mar 13 15:05, igual que Llanquihue; consultas jue 8 15:05).
+2. Descarte por título del resto (encuestas de campo, licencias SLEP Puelche, PRCC, capacitaciones SLEP
+   Chiloé, medios radiales).
+3. Ruido de `KEYWORDS_INCLUDE_PALABRA` `digital` visto en la corrida del 6-oct: radio portátil VHF SAMU,
+   termógrafo digital, sistema radiográfico odontológico, ampliación laboratorio de imagen digital.
+4. Correo «ROJO: backend de Gestión de dotación» (13:38 UTC): era una de cinco corridas **manuales** del
+   keepalive de `SergioMolinaM/dotacion` (13:15–13:38, 3 fallas, 2 éxitos; la última verde). Ninguna
+   corrida programada todavía.
+
+### Pendiente
+
+- Sergio decide la 1209-12-L126 (relator o soltar) antes del jue 8 15:05 si quiere consultar en el foro.
+- Auditar el ruido de `digital` (evidencia arriba): probable exclusión de «radio portátil», «termógrafo»,
+  «radiográfico», «imagen digital» o exigir co-ocurrencia.
+- Compra Ágil sigue en 504: probar página más chica. Sin eso el triage no ve ese canal.
+- `dotacion`: confirmar el jue 8 que el keepalive corrió por horario (todas las de hoy son manuales).
+- Siguen los pendientes 2-4 del 14-07 y mirar en una semana las keywords de Radar Construcción.
+
+### Estado del repo
+
+`main` sin cambios de código en esta sesión; solo esta entrada. Bases de 558869 en
+`Descargas\LIC558869_RES1269_bases.pdf` (fuera del repo).
+
 ## Sesión 2026-10-07 (miércoles) — desde la raíz, sesión «Varios»
 
 ### Hecho
