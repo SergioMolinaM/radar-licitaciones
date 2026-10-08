@@ -1,5 +1,35 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-08 (jueves) — correo tarde y cierre del PNUD, desde la raíz
+
+### Hecho
+
+1. **Correo tarde, medido:** las 15 últimas corridas programadas (18-sep a 8-oct) partieron entre 3,5 y 8 h
+   después de las 12:00 UTC (hoy 18:28 UTC). GitHub no garantiza la hora del `schedule`.
+   Arreglo (`ff2c636`, decisión de Sergio: cron-job.org): cron-job.org dispara `workflow_dispatch` a las
+   09:00 America/Santiago L-V con un token fine-grained (solo este repo, Actions read/write) que Sergio pega
+   allá y no pasa por Claude. El `schedule` queda de respaldo y se salta si ya hubo un `workflow_dispatch`
+   ese día (paso `respaldo`, `gh run list --created`); `concurrency` evita dos corridas juntas.
+   La consulta del respaldo se probó a mano (control: 1 schedule hoy, 0 dispatch desde el 1-oct).
+2. **PNUD:** el correo mostraba como «Cierre» el `dc:date` del RSS (publicación). El cierre real viene en la
+   descripción («Application Deadline: 23-Oct-26») y ahora se lee de ahí (`_deadline`, probado contra el feed
+   de COL: 50471 → 2026-10-23). Claude le había dicho a Sergio que esa licitación estaba cerrada: falso.
+3. Triage del correo del 8-oct: 2122-34-LE26 (IA para el Registro de Cáncer, Seremi Salud Antofagasta,
+   $26 MM con IVA, cierre 20-oct 15:00, preguntas hasta lun 12 18:00) le interesa a Sergio con modelo
+   local. Juicio: técnica factible; riesgo en codificación CIE-O-3 y experiencia (20 %); ir solo con un
+   registrador de tumores. Las otras tres, no.
+
+### Pendiente
+
+- Sergio configura cron-job.org (dio 404 en la primera prueba: token no llegaba). Al dar 204: confirmar que
+  la corrida manual sale y que el `schedule` del día se salta.
+- 2122-34-LE26: preguntas al foro (subcontratación, hardware de la Seremi, anexos válidos) antes del lun 12 18:00.
+- Siguen: ruido de `digital`, Compra Ágil en 504, pendientes 2-4 del 14-07.
+
+### Estado del repo
+
+`main` con `ff2c636` + esta entrada; push autorizado por Sergio el 8-oct.
+
 ## Sesión 2026-10-07 (miércoles, tarde) — triage de los correos del Radar, desde la raíz
 
 ### Hecho
