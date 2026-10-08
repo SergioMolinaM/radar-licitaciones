@@ -21,8 +21,10 @@
 
 ### Pendiente
 
-- Sergio configura cron-job.org (dio 404 en la primera prueba: token no llegaba). Al dar 204: confirmar que
-  la corrida manual sale y que el `schedule` del día se salta.
+- cron-job.org (job 8607281) **funcionando: Test run 204** tras corregir método (GET→POST), body, falta de
+  `Authorization`, horario (`*/15 9`→`0 9 * * 1-5`). Corridas dispatch de prueba 19:27 y 19:30 UTC completas
+  (MP 4.806, PNUD 574; rojas solo por Compra Ágil). **Vie 9: confirmar que el dispatch de las 09:00 salió y
+  que el `schedule` del día se saltó** (paso «Respaldo»). Token fine-grained vence en 1 año (oct-2027).
 - 2122-34-LE26: preguntas al foro (subcontratación, hardware de la Seremi, anexos válidos) antes del lun 12 18:00.
 - Siguen: ruido de `digital`, Compra Ágil en 504, pendientes 2-4 del 14-07.
 
