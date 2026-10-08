@@ -19,6 +19,10 @@
    local. Juicio: técnica factible; riesgo en codificación CIE-O-3 y experiencia (20 %); ir solo con un
    registrador de tumores. Las otras tres, no.
 
+4. Corrida de prueba 19:30 UTC trajo **585893-11-LE26** (INDAP Tarapacá, manual Plan Camélido, $20 MM con IVA, cierre 22-10 15:30; foro hasta 15-10 16:00). Bases leídas por subagente: trayectoria en manuales de **camélidos** 17 % (AFIPA no sirve), equipo con veterinario/agrónomo de camélidos del norte, mínimo 70 puntos para adjudicar, diseño/diagramación no subcontratable, ~5 semanas reales para un plan de 11. Recomendación: **no solos**; solo con un especialista en camélidos que aporte la trayectoria. Sergio no decidió.
+5. 2122-34-LE26: citas textuales verificadas por subagente; temeraria = menos del 50 % del siguiente (§11.5). Consultas al foro en `postulaciones/seremi-salud-2122-34-ia-cancer/consultas-foro.md` (`270dc4b`); análisis «solos + subcontratar una persona» en las notas internas de ese archivo.
+6. Valle Diguillín descartada por Sergio (ver su repo).
+
 ### Pendiente
 
 - cron-job.org (job 8607281) **funcionando: Test run 204** tras corregir método (GET→POST), body, falta de
