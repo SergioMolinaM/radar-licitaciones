@@ -8,6 +8,9 @@ Formato: RSS 1.0 (RDF), actualizado cada hora.
 """
 
 import logging
+import re
+from datetime import datetime
+
 import feedparser
 import requests
 
@@ -18,6 +21,17 @@ logger = logging.getLogger(__name__)
 
 TIMEOUT = 30
 USER_AGENT = "RadarLicitaciones-TerceraLetra/1.0 (+https://terceraletra.cl)"
+
+
+def _deadline(descripcion: str) -> str:
+    """'Application Deadline: 23-Oct-26' -> '2026-10-23'. Vacío si no se reconoce."""
+    m = re.search(r"Deadline:\s*(\d{1,2}-[A-Za-z]{3}-\d{2})", descripcion)
+    if not m:
+        return ""
+    try:
+        return datetime.strptime(m.group(1), "%d-%b-%y").date().isoformat()
+    except ValueError:
+        return ""
 
 
 def _entry_to_item(entry, fuente: str) -> dict | None:
@@ -41,7 +55,10 @@ def _entry_to_item(entry, fuente: str) -> dict | None:
         "codigo": uid.split("/")[-1] if "/" in uid else uid,
         "titulo": titulo,
         "estado": "Publicada",
-        "fecha_cierre": entry.get("updated", "") or entry.get("published", ""),
+        # El RSS no tiene campo de cierre: viene en la descripción ("Application
+        # Deadline: 23-Oct-26"). dc:date es la publicación; hasta el 8-oct-2026 se
+        # mostraba como cierre y una licitación abierta parecía vencida.
+        "fecha_cierre": _deadline(descripcion),
         "link": link,
         "keywords_match": kws,
     }

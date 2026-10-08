@@ -1,32 +1,54 @@
 name: Radar Licitaciones
 
 on:
+  # El disparo a la hora lo hace cron-job.org (workflow_dispatch, 09:00 America/Santiago L-V):
+  # GitHub larga el schedule entre 3,5 y 8 h tarde (medido 18-sep a 8-oct-2026).
+  # El schedule queda de respaldo por si cron-job.org falla.
   schedule:
-    # 12:00 UTC = 09:00 Chile invierno / 08:00 Chile verano, lunes a viernes
     - cron: '0 12 * * 1-5'
   workflow_dispatch:
 
 permissions:
   contents: write  # necesario para commitear state.json
+  actions: read    # el respaldo consulta si ya hubo corrida hoy
+
+concurrency:
+  group: radar-scanner
+  cancel-in-progress: false
 
 jobs:
   scan:
     runs-on: ubuntu-latest
     timeout-minutes: 30  # los reintentos de Compra Ágil no pueden comerse las 6 h de GitHub
     steps:
+      - name: Respaldo - saltar si cron-job.org ya disparó hoy
+        id: respaldo
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          hoy=$(date -u +%F)
+          n=$(gh run list -R "$GITHUB_REPOSITORY" --event workflow_dispatch --created ">=$hoy" --json databaseId --jq length)
+          echo "Corridas por workflow_dispatch hoy: $n"
+          if [ "$n" -gt 0 ]; then echo "saltar=1" >> "$GITHUB_OUTPUT"; fi
+
       - name: Checkout
+        if: steps.respaldo.outputs.saltar != '1'
         uses: actions/checkout@v4
 
       - name: Setup Python
+        if: steps.respaldo.outputs.saltar != '1'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
 
       - name: Instalar dependencias
+        if: steps.respaldo.outputs.saltar != '1'
         run: pip install -r requirements.txt
 
       - name: Ejecutar scanner
+        if: steps.respaldo.outputs.saltar != '1'
         env:
           MERCADO_PUBLICO_TOKEN: ${{ secrets.MERCADO_PUBLICO_TOKEN }}
           RESEND_API_KEY:        ${{ secrets.RESEND_API_KEY }}
@@ -37,7 +59,7 @@ jobs:
       - name: Commit state si cambió
         # always(): el scanner sale con error si una fuente se cayó, pero ya
         # guardó state.json con lo notificado; hay que commitearlo igual.
-        if: always()
+        if: always() && steps.respaldo.outputs.saltar != '1'
         run: |
           git config user.name  "radar-bot"
           git config user.email "radar-bot@users.noreply.github.com"
