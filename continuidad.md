@@ -1,5 +1,71 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-12 (lunes) — diseño del agente de oportunidades, desde la raíz
+
+**Leer primero `docs/DISENO-AGENTE-2026-10-12.md` entero.** Su §10 cuenta la conversación en orden, con las citas
+de Sergio y lo que se atacó y corrigió; su §11 dice por dónde retomar. Esta entrada es el resumen.
+
+### Hecho
+
+1. **Pedido de Sergio:** un espacio agéntico aislado (puede ser otra máquina) que cada noche seleccione
+   licitaciones con mirada más amplia que el Radar, prepare las presentaciones y en la mañana diga si nos
+   presentamos o no, para que él autorice. Después lo amplió dos veces: que se abra a lo que no sabemos hacer si
+   deja ingresos, y que no se cierre a una empresa nueva con otra gente («necesitamos circular dinero»).
+2. **Diseño escrito, nada construido** (`docs/DISENO-AGENTE-2026-10-12.md`, 12 secciones): repo privado nuevo
+   `licitaciones-agente` en GitHub Actions, aislado del Gmail/Drive/`~/.claude` de Sergio; noche = escaneo amplio →
+   clasificación con modelo barato → lectura de bases con navegador headless (mismo POST por archivo de la memoria
+   `mercado-publico-bajar-bases`) → contraste con el perfil de TL → evaluador adversarial → carpeta por candidata;
+   mañana = correo con cuatro categorías (descartada con página / consultar al foro / presentar / solo con socio) e
+   issue por candidata con comandos `/foro` `/presentar` `/socio` `/no`; tope de ofertas abiertas; **el agente no
+   tiene Clave Única ni credenciales de Mercado Público, por diseño**.
+3. **Seis carriles** (§4), cada uno entra al correo solo con su hecho habilitante verificado: lo que sabemos; con
+   socio o UTP; TL como la EMT que necesita una UTP grande; venderle al que ganó (OCDS); Convenios Marco; comercio en
+   Compra Ágil (solo con margen medido).
+4. **Lo que se atacó y sobrevivió** (§2): encontrar no es el cuello de botella (de ~15 bases leídas del 1 al 8-oct
+   se presentó 1; las demás murieron por experiencia, títulos, ATE/sin fines de lucro, medios o socio ausente); el
+   agente no arregla la experiencia acreditable; la decisión del 3-oct de concentrar se respeta con el tope de
+   ofertas.
+5. **Investigación** (3 subagentes `investigador`/`claude-code-guide`): Licitalab es lo más cercano en Chile (lee
+   bases con IA citando el punto; 2,2/3,2/5 UF/mes + IVA; 14 días gratis); suites RFP extranjeras no calzan; Banco
+   Mundial tiene API gratis; opciones de Claude comparadas (Actions, `claude -p`, rutinas en la nube con allowlist,
+   Managed Agents); ley y reglamento: Compra Ágil ≤ 100 UTM va por defecto a EMT y locales, no se adjudica solo por
+   precio, pago a 30 días; **subcontratación tope 30 %**; UTP con solidaridad y escritura desde 1.000 UTM; nota de
+   comportamiento contractual; OCDS trae adjudicaciones pero excluye Compra Ágil. Ficha del investigador en
+   `~/.claude/agent-memory/investigador/ref_compras_publicas_ds661_api.md`.
+6. **Convenio Marco TI 2239-2-LR26 (100-25.000 UTM) cerró el 9-oct sin pasar por el Radar** (ausente en
+   `data/state.json`, búsqueda con control positivo). Causa probable la exclusión `mantención de`
+   (`src/config.py:173`) o falta de «software» en las inclusiones; **no verificada** (falta el título exacto). Tamaño:
+   convenio anterior 321 adjudicados y solo 124 vendiendo (USD 21,5 M entre todos, dic-22 a may-24); el de 2024 446
+   adjudicados, 30 meses. Se perdió un canal, no un ingreso seguro.
+7. **Universo de julio medido** (`data/audit-2026-07-08.csv`): 4.029 licitaciones, 36 pasaban el filtro (0,9 %);
+   heurística por título: ~1.365 bienes, ~617 obras, ~350 servicios, ~1.700 sin clasificar.
+8. **Socios con nombre** (§5.1): Solución Integral SpA (solintegral.cl, Jorge Salinas M., RUT 76.376.518-0,
+   herramientas industriales para minería desde 2014, Unilink y Ariba; «vende al estado.. de eso vive», según
+   Sergio) como operador del carril de comercio; Dialoga Consultores (d-aloga, Kena Fernández, RUT 78.484.769-1) para
+   UTP de participación y consulta indígena. Borradores de correo a los dos en Gmail TL, verificados (FALLA→PASA en
+   el de Jorge).
+9. Incumplimiento propio: `cd` encadenado por novena vez (memoria `cd-encadenado-cambia-el-directorio`); propuesto
+   a Sergio un hook que lo bloquee, sin respuesta.
+
+### Pendiente
+
+- **Sergio:** enviar los borradores a Jorge y a Kena (en el de Kena decide antes si cierra la ronda del 13-08 del
+  sitio de d-aloga, trabajada sin encuadre comercial); responder si se agrega el hook contra el `cd` encadenado.
+- **Sergio decide §9 del diseño:** clave de API con tope (recomendado) o token de suscripción; prueba de Licitalab
+  en paralelo (recomendado); tope de ofertas abiertas (propuesta: dos); nombres de socios operadores.
+- **Claude, con la respuesta de Jorge:** su código de proveedor y sus OC por la API `BuscarProveedor`.
+- **F0 después del 15-oct** (§7): perfil de TL + casillero de los ~15 casos leyendo cada carpeta de `postulaciones/`
+  y las continuidades de los SLEP; lector de bases en Actions sin Chrome; aceptación 14/15; mediciones por carril y
+  de margen (empezar por las líneas de Solintegral); Licitalab 14 días; título exacto de 2239-2-LR26 contra las
+  exclusiones.
+- **01-12-2026:** vence la habilidad de TL en Mercado Público (renovar) y rige la Ley 21.719.
+- Siguen los del 8-oct: Compra Ágil en 504, ruido de `digital`, pendientes 2-4 del 14-07.
+
+### Estado del repo
+
+`main`. Commit de esta sesión: `docs/DISENO-AGENTE-2026-10-12.md` (nuevo) y esta entrada. Sin cambios de código.
+Push autorizado por Sergio («haz el cierre»).
+
 ## Sesión 2026-10-08 (jueves) — correo tarde y cierre del PNUD, desde la raíz
 
 ### Hecho
