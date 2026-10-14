@@ -52,6 +52,13 @@
 - 22-10 18:00: respuestas del foro de 622-64-L126.
 - Siguen los del 12-oct.
 
+### Estado del repo
+
+`main`, todo commiteado y pusheado: sonda `7176d77`/`fec7560` (workflow manual `probe-compra-agil.yml`, se puede
+volver a correr), búsqueda q `20943e8`, esta entrada en el commit de cierre. Sin deploy (es un Action). Bases
+leídas hoy en `Descargas\` (fuera del repo): `Bases_765-25-L126.pdf`, `Bases_622-64-L126.pdf`,
+`PDF3337-21-LE26.pdf` (ficha, no bases).
+
 ## Sesión 2026-10-12 (lunes) — diseño del agente de oportunidades, desde la raíz
 
 **Leer primero `docs/DISENO-AGENTE-2026-10-12.md` entero.** Su §10 cuenta la conversación en orden, con las citas
