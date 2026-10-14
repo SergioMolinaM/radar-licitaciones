@@ -1,0 +1,25 @@
+name: Sonda Compra Ágil
+
+# Manual. Prueba variantes de la consulta a la API de Compra Ágil y registra
+# código y tiempo de cada una. No envía correo ni commitea nada.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - name: Sonda
+        env:
+          MERCADO_PUBLICO_TOKEN: ${{ secrets.MERCADO_PUBLICO_TOKEN }}
+        run: python -m src.probe_compra_agil

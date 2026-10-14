@@ -1,5 +1,32 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-14 (miércoles) — triage de correos del 8 al 14-oct y sonda de Compra Ágil, desde la raíz
+
+### Hecho
+
+1. Triage de los correos del Radar del 8 (dos), 12, 13 y 14-oct: 20 avisos; 11 descartados por título, 2122-34
+   ya en curso, 9 fichas leídas por subagente. Bases leídas a mano:
+   - **765-25-L126 CONADI** ($6 MM con IVA, L1): SIMPLE + Clave Única + PISEE (~20 interoperaciones) + migración
+     de los registros indígenas a SQL Server AWS con alta disponibilidad, CDC, auditoría y respaldos WORM, hasta
+     el 28-dic, SLA 6 meses (1 h crítico), subcontratación prohibida, 30 % experiencia por OC en SIMPLE/CU/PISEE.
+     **NO.**
+   - **622-64-L126 TGR**, curso IA generativa 16 h para dirigentes AET ($5 MM con IVA, cierre 27-10 15:00,
+     respuestas 22-10 18:00): experiencia del oferente 20 % (TL 0), Sello Mujer 5 % (TL 0), relator 25 %,
+     metodología 20 % sobre «4 módulos» que no vienen en el PDF. **Sergio subió hoy dos preguntas al foro**
+     (dónde están los módulos y bases generales; si cuenta la experiencia del socio único como persona natural).
+     Decidir con las respuestas.
+   - 3337-21-LE26 (plataforma psicométrica, DGMN): no calza. Camélido 585893-11: sigue sin socio.
+2. **Compra Ágil:** la corrida del 14-oct cayó otra vez con 504 en la pág. 1 en los tres intentos. Sonda nueva
+   `src/probe_compra_agil.py` + workflow manual `probe-compra-agil.yml`: siete variantes de parámetros (tamaño
+   50/15, con y sin `ordenar_por`, ventana 3 d/1 d, sin filtros), dos rondas, código y tiempo; sin correo ni
+   commit. Subagente buscando el endpoint del buscador público como fuente alternativa.
+
+### Pendiente
+
+- Correr la sonda y, según qué variante responda, cambiar `_fetch_pagina` (o pasar a la fuente pública).
+- 22-10 18:00: respuestas del foro de 622-64-L126.
+- Siguen los del 12-oct.
+
 ## Sesión 2026-10-12 (lunes) — diseño del agente de oportunidades, desde la raíz
 
 **Leer primero `docs/DISENO-AGENTE-2026-10-12.md` entero.** Su §10 cuenta la conversación en orden, con las citas
