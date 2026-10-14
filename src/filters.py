@@ -32,6 +32,19 @@ _INCLUDE_RE = [(kw, _patron(n)) for kw, n in _INCLUDE_NORM] + \
 _EXCLUDE_RE = [_patron(n) for n in _EXCLUDE_NORM]
 
 
+def keywords_incluidas(text: str) -> list[str]:
+    """Keywords de inclusión presentes en el texto, sin mirar exclusiones."""
+    t = _normalize(text or "")
+    return [kw for kw, patron in _INCLUDE_RE if patron.search(t)]
+
+
+def excluido(text: str, omitir=()) -> bool:
+    """True si el texto calza alguna keyword de exclusión, salvo las de `omitir`."""
+    t = _normalize(text or "")
+    omitir_norm = {_normalize(kw) for kw in omitir}
+    return any(patron.search(t) for n, patron in zip(_EXCLUDE_NORM, _EXCLUDE_RE) if n not in omitir_norm)
+
+
 def matches_keywords(text: str) -> tuple[bool, list[str]]:
     """
     Evalúa si un texto cumple criterios de inclusión y no incluye exclusiones.

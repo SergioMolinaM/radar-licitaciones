@@ -19,7 +19,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # los reintentos de Compra Ágil no pueden comerse las 6 h de GitHub
+    timeout-minutes: 40  # la búsqueda de Compra Ágil tiene 20 min de presupuesto; no puede comerse las 6 h de GitHub
     steps:
       - name: Respaldo - saltar si cron-job.org ya disparó hoy
         id: respaldo

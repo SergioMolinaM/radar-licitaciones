@@ -25,10 +25,30 @@
    El buscador público (`api.buscador.mercadopublico.cl/compra-agil`, x-api-key pública en su JS) tiene el mismo
    tope de 29 s: no sirve de respaldo. La guía oficial (§5.1 Grupo 5) tiene `q` = palabras clave en
    nombre/descripción filtradas en el servidor; segunda sonda con q para medir si responde rápido.
+   **Segunda sonda (run 38570157442):** q tampoco es rápido (5-29 s; «capacitación» 504 ×2). Barrer 110 términos
+   no cabe.
+3. **Opción 1 implementada (decisión de Sergio: «dale con la opción 1»):** el radar diario ya no barre el
+   listado. Busca con `q` 15 términos diarios (`COMPRA_AGIL_TERMINOS_DIARIOS`) con segundo intento, y con el
+   tiempo que sobra rota los otros 92 de `KEYWORDS_INCLUDE` desde `state["ca_cursor"]` (pedido de Sergio: «hacer
+   otras búsquedas por otro lado con las palabras que falten»). Cada término busca desde su última búsqueda
+   exitosa y no truncada (`state["ca_ultima"]`, piso 3 d, techo 14 d). Sobre resultados q no se aplican las
+   exclusiones «adquisición», «compra de», «suministro» (casi todo título CA empieza así: botaban los 9 de IA).
+   Si el nombre no trae keyword, el match se rotula «(en descripción, sin verificar)». Caída (rojo) solo si ningún
+   diario responde, y entonces no rota; diarios fallidos, corte por 429 y términos >250 resultados van como aviso
+   amarillo «Revisión parcial» sin rojo. `web`, `digital`, `ia` no se buscan con q (declarado en config).
+   Presupuesto 20 min, job 40 min. Verificador: FALLA (8 hallazgos) → FALLA (2 menores) → **PASA**. Arnés offline
+   43/43 en el scratchpad de la sesión (no versionado). **No probado aún contra la API real:** primera corrida
+   real = cron-job.org del jue 15-oct 09:00.
+4. **Borrador a ChileCompra en Gmail TL** (sin destinatario; asunto «API Compra Ágil (v2): consultas de listado
+   cortan a los 29 segundos (504) desde agosto 2026»), verificado (hash 305083f79499a0ba, 3 pasadas). No hay correo
+   de soporte de la API verificado: el canal oficial es el formulario de requerimientos de ChileCompra con
+   ClaveÚnica (ChileAtiende). Lo envía o pega Sergio.
 
 ### Pendiente
 
-- Correr la sonda y, según qué variante responda, cambiar `_fetch_pagina` (o pasar a la fuente pública).
+- **Jue 15-oct:** mirar la corrida de las 09:00 (log «Compra Ágil: diarios X/15 ok, rotativos Y/92») y el
+  correo: cuántos «en descripción» trae y si son ruido. Si un término trunca seguido, subir `MAX_PAGINAS_TERMINO`.
+- Sergio: enviar el borrador a ChileCompra por el formulario.
 - 22-10 18:00: respuestas del foro de 622-64-L126.
 - Siguen los del 12-oct.
 

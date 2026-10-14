@@ -266,6 +266,42 @@ COMPRA_AGIL_ESTADOS = "publicada"
 # semana en la corrida del lunes. El dedupe por state.json evita repetir.
 COMPRA_AGIL_DIAS_VENTANA = 3
 
+# Búsqueda por palabra clave en el servidor (`q`, guía §5.1 Grupo 5) en vez de
+# barrer el listado. Medido el 14-oct-2026: cada consulta tarda 5-29 s y la API
+# corta a los 29 s (504), sea cual sea el tamaño de página; 3 días de
+# publicadas eran 5.400 registros (108 páginas lentas). Barrer todo ya no cabe.
+# Estos términos se buscan en TODAS las corridas; deben estar en KEYWORDS_INCLUDE.
+COMPRA_AGIL_TERMINOS_DIARIOS = [
+    "inteligencia artificial",
+    "sitio web",
+    "página web",
+    "plataforma web",
+    "portal web",
+    "diseño web",
+    "redes sociales",
+    "marketing digital",
+    "producción audiovisual",
+    "encuesta",
+    "redacción",
+    "diagramación",
+    "infografía",
+    "relator",
+    "economía circular",
+]
+# Exclusiones que NO se aplican a los resultados de la búsqueda q: en Compra
+# Ágil casi todo título empieza con «Adquisición de…» o «Compra de…» (14-oct:
+# los 9 resultados de «inteligencia artificial» caían por «adquisición»), y el
+# servidor ya filtró por tema. El resto de KEYWORDS_EXCLUDE sí se aplica.
+COMPRA_AGIL_EXCLUSIONES_OMITIDAS = ["adquisición", "compra de", "suministro"]
+# El resto de KEYWORDS_INCLUDE rota: cada corrida sigue desde donde quedó la
+# anterior (state["ca_cursor"]) con el tiempo que sobre del presupuesto. Cada
+# término (diario o rotativo) busca desde su última búsqueda exitosa y no
+# truncada (state["ca_ultima"]), así una vuelta de varios días o una racha de
+# fallas no deja huecos; tope COMPRA_AGIL_DIAS_MAX_ROTATIVO.
+# KEYWORDS_INCLUDE_PALABRA (web, digital, ia) NO se buscan con q: como palabra
+# suelta en nombre y descripción traerían cientos de resultados sin relación.
+COMPRA_AGIL_DIAS_MAX_ROTATIVO = 14
+
 # Ficha pública de la Compra Ágil. La guía de la API no la documenta (solo expone
 # links.detalle, que apunta de vuelta a la API y exige ticket). Este patrón se
 # verificó a mano el 14-07-2026 abriendo 5627-188-COT26 desde el buscador

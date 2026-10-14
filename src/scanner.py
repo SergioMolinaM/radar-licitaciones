@@ -52,28 +52,45 @@ def run() -> int:
     state = load_state()
 
     matches_mp, universo_mp = fetch_licitaciones_dia()
-    matches_ca, universo_ca, ca_completo = fetch_compra_agil()
+    matches_ca, resumen_ca = fetch_compra_agil(cursor=state.get("ca_cursor", 0), ultima=state.get("ca_ultima"))
+    state["ca_cursor"] = resumen_ca["cursor"]
+    state["ca_ultima"] = resumen_ca["ultima"]
+    universo_ca = resumen_ca["devueltas"]
     matches_undp, universo_undp = fetch_undp_notices()
     todos = matches_mp + matches_ca + matches_undp
 
-    logger.info(f"Universo escaneado: MP={universo_mp}, CA={universo_ca}, PNUD={universo_undp}")
+    logger.info(f"Universo escaneado: MP={universo_mp}, CA devueltas={universo_ca}, PNUD={universo_undp}")
     logger.info(f"Total tras filtro keywords: {len(todos)}")
 
-    # Universo 0 nunca es real (MP ronda 4.000 activas, CA ~800 en 3 días, PNUD
-    # siempre trae entradas): es una fuente caída. Antes se informaba como
-    # "0 recorridas" y Compra Ágil pasó de agosto a octubre de 2026 muerta sin aviso.
+    # Universo 0 nunca es real en MP (~4.000 activas) ni en PNUD: es una fuente
+    # caída. Compra Ágil se busca por término (`q`) y una búsqueda puede volver
+    # vacía de verdad: se da por caída solo si ningún término diario respondió.
     caidas = [nombre for nombre, universo in
-              (("Mercado Público", universo_mp), ("Compra Ágil", universo_ca), ("PNUD", universo_undp))
+              (("Mercado Público", universo_mp), ("PNUD", universo_undp))
               if universo == 0]
-    if universo_ca and not ca_completo:
-        caidas.append(f"Compra Ágil (barrido cortado tras {universo_ca} registros)")
+    if not resumen_ca["diarios_ok"]:
+        caidas.append("Compra Ágil" + (f" ({resumen_ca['cortado']})" if resumen_ca["cortado"] else ""))
+    # Cobertura parcial: va en el aviso del correo, pero no pone la corrida en
+    # rojo (con la API lenta pasaría casi todos los días y el rojo dejaría de avisar).
+    parciales = []
+    if resumen_ca["diarios_ok"]:
+        if resumen_ca["diarios_fallidos"]:
+            parciales.append("Compra Ágil sin respuesta para: " + ", ".join(resumen_ca["diarios_fallidos"])
+                             + " (lo que calce solo con esos términos no aparece hoy; se busca de nuevo"
+                               " en la próxima corrida desde la última búsqueda exitosa)")
+        if resumen_ca["cortado"]:
+            parciales.append(f"Compra Ágil cortada ({resumen_ca['cortado']}): los términos rotativos"
+                             " que faltaban se buscan en la próxima corrida")
+    if resumen_ca["truncados"]:
+        parciales.append("Compra Ágil con más de 250 resultados para: " + ", ".join(resumen_ca["truncados"])
+                         + " (aparecen los primeros 250; pueden faltar los siguientes)")
     if caidas:
         logger.error(f"Fuentes caídas en esta corrida: {', '.join(caidas)}")
 
     nuevos = [item for item in todos if is_new(state, item["id"])]
     logger.info(f"Nuevos (no notificados previamente): {len(nuevos)}")
 
-    enviado = send_email(nuevos, caidas)
+    enviado = send_email(nuevos, caidas, parciales)
     if not enviado:
         logger.error("Notificacion fallo - no se actualiza state")
         return 1
@@ -90,6 +107,11 @@ def run() -> int:
     if datetime.now(timezone.utc).weekday() == HEARTBEAT_WEEKDAY:
         stats = _weekly_stats(state, universo_mp, universo_ca, universo_undp, len(todos), len(nuevos))
         stats["caidas"] = caidas
+        stats["parciales"] = parciales
+        stats["ca_terminos"] = (
+            f"{len(resumen_ca['diarios_ok'])}/{len(resumen_ca['diarios_ok']) + len(resumen_ca['diarios_fallidos'])} diarios, "
+            f"{len(resumen_ca['rotativos_ok'])} de {resumen_ca['rotativos_total']} rotativos"
+        )
         send_heartbeat(stats)
 
     # State ya guardado: salir con error deja la corrida en rojo en GitHub
