@@ -19,7 +19,12 @@
 2. **Compra Ágil:** la corrida del 14-oct cayó otra vez con 504 en la pág. 1 en los tres intentos. Sonda nueva
    `src/probe_compra_agil.py` + workflow manual `probe-compra-agil.yml`: siete variantes de parámetros (tamaño
    50/15, con y sin `ordenar_por`, ventana 3 d/1 d, sin filtros), dos rondas, código y tiempo; sin correo ni
-   commit. Subagente buscando el endpoint del buscador público como fuente alternativa.
+   commit. **Resultado (run 38568890090):** toda variante tarda 23-29 s y da 504 al pasar 29 s (tope de API
+   Gateway), sin importar tamaño, orden ni ventana; los 200 son las que alcanzan a terminar. 3 días publicadas =
+   5.400 resultados (no ~800 como en julio): barrer todo no cabe ni con la API sana. `tamano_pagina` mínimo 10.
+   El buscador público (`api.buscador.mercadopublico.cl/compra-agil`, x-api-key pública en su JS) tiene el mismo
+   tope de 29 s: no sirve de respaldo. La guía oficial (§5.1 Grupo 5) tiene `q` = palabras clave en
+   nombre/descripción filtradas en el servidor; segunda sonda con q para medir si responde rápido.
 
 ### Pendiente
 
