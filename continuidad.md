@@ -34,9 +34,18 @@
    WhatsApp), Los Ríos 5418-72 (16-oct 22:00; ojo: la sesión raíz también lo trabaja), CNE 610-20 (foro hasta
    16-oct 17:00), SLEP Iquique 1233607-3 y AGCID 1606-35 (foros 17 y 19-oct), EPCO Coquimbo 1317954-9 (20-oct).
 
+7. **Resultado de las ofertas (tarde):** SEC v3 (con socio/OTEC recomendado; $2.490.000; falta coordinador
+   técnico; reexportar PDF desde el Word v3), Los Ríos v2 en dos variantes «solo Sergio» y «con Fernandez»
+   ($6.902.000 aprobado por Sergio; Kena entra, debe mandar papeles antes del 16-oct 18:00; DDLS va: «la parte
+   informática es mía»), EPCO v3 (psicólogo 21 h por $400.000 brutos; precio $900.000), foros listos en
+   `PEGAR-EN-FORO.txt` de CNE, SLEP Iquique y AGCID. **Illapel pasó a la sesión radar-licitaciones-34** a pedido de
+   Sergio (subagente detenido; dejó v4 sin verificar y el CV de Lorena Escalona sin datos personales). Todas las
+   propuestas con el formato de la edición de Sergio del CFT v5 (memoria `estilo-propuestas-de-sergio`).
+
 ### Pendiente
 
-- Resultados de los subagentes: veredicto, precio y `SUBIR.md` de cada oferta para Sergio.
+- Vie 16: SEC antes de 10:00; foro CNE antes de 17:00; Los Ríos antes de 22:00 (papeles de Kena a las 18:00).
+  Sáb 17 18:00 foro SLEP Iquique; lun 19 12:00 foro AGCID; mar 20 EPCO (CV y respaldos del psicólogo).
 - Vie 16 09:00: mirar la corrida (log «diarios X/15», sección por palabra suelta al final).
 - Sergio: carta de la abogada para Illapel; subir ofertas y pegar foros según el calendario.
 - Otra sesión: CV maestro, un solo respaldo de experiencia, traer `marca/experiencia/` al kit; F0 del agente.
