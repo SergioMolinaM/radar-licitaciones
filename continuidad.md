@@ -1,5 +1,55 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-15 (jueves, tarde) — ofertas del 16-oct: Illapel, SEC, Los Ríos y EPCO
+
+Sesión `radar-licitaciones-34`. A media tarde Sergio cerró la otra sesión («Ajuste del agente»), que llevaba las
+mismas ofertas: desde ahora todo vive acá. Detalle de cada oferta en `../postulaciones/<carpeta>/continuidad.md` y
+`SUBIR.md`.
+
+### Hecho
+
+1. **Illapel 3512-182-COT26** (`postulaciones/illapel-3512-182-plan-seguridad/`), vigente **v11**
+   (`entregables/… Plan de Seguridad Illapel v11.pdf`). Decisiones de Sergio: abogada **Lorena Escalona González**
+   (CV en `equipo/`, versión sin datos personales en `entregables/`), $500.000 brutos, la oferta muestra solo **12
+   horas**, trabajo remoto; precio $5.200.000; **plazo 20 días** («baja al mínimo los plazos»; el criterio vale 20 %);
+   la encuesta va en **Vecindato** (nombre elegido tras búsqueda rápida; DataVecinal/Vecindatos chocan con «Dato
+   Vecino» del INE), módulo de encuesta cerrada que **se construye** sobre DDLS desde el 16-oct; la difusión y el
+   alcance son del municipio; papel solo como el Word/PDF del producto 2 (lo exigen las bases). Datos de seguridad
+   desde `agoralab/ddls/data/seguridad-comunal.json` (CEAD 2025): incivilidades 62 % sobre la tasa del país, robos
+   violentos un cuarto. §4.4 «tres miradas» (vecinos, Consejo Comunal, cifras). Verificador: FALLA ×3 → PASA (v10);
+   revisor: FALLA ×3 → PASA con umbral de 5 personas repuesto (v11).
+2. **DDLS es de Tercera Letra** (código y plataforma); de David y Pablo es solo la metodología VLR/ISO-ODS
+   (Sergio). Memoria `ddls-propiedad`.
+3. **SEC 1614-61-COT26**, vigente **v5** (`Propuesta tecnica - Curso IA Directivos SEC v5.pdf`): Sergio relator
+   único (opción C, §11 declara los tres requisitos del §4 que no cumple); coordinadora técnica **Viviana Rivera
+   Barrientos** (no es co-relatora: no tiene docencia en IA); plataformas de TL con URL verificadas (200); tablero en
+   vivo con datos públicos en sesiones 6 y 8. Verificador PASA.
+4. **Los Ríos 5418-72**: honorario de **Kena $1.800.000** brutos (25/50/25, ~60 h); Sergio le envió el WhatsApp.
+5. **EPCO 1317954-9**: psicólogo **Sebastián Rodríguez Gómez de la Torre** (`Downloads\CV SR 2026.docx`), rol
+   acotado ~6 h, $200.000; se le pidió la lista de estudios de clima.
+6. Investigador: el DS 661 no fija plazo para aceptar la OC ni desde cuándo corre el plazo; aceptar el mismo día.
+7. Nombres de archivo: «<Pieza> - <tema> vN» (pedido de Sergio; KIT.md §4 y memoria `nombres-archivos-oferta`).
+8. Incumplimiento propio: `cd` encadenado una vez (lo frenó el guardia).
+
+### Pendiente
+
+- **Vie 16:** 09:00 corrida del Radar (log «diarios X/15»). 10:00 SEC: aceptación de Viviana, fecha del CV (1991),
+  ficha de proveedor, subir v5. 16:00 Illapel: carta firmada de Lorena (llega la noche del 15), CV de Sergio (dice
+  2019 y CUECH de TL), firmar oferta, subir v11. 17:00 foro CNE 610-20-LE26 (`PEGAR-EN-FORO.txt`). Los Ríos:
+  papeles de Kena antes de 18:00 → variante «con Fernandez» (tachar, revisor, generar); si no, «solo Sergio»; 22:00.
+- Sáb 17 foro SLEP Iquique 1233607-3-LE26; lun 19 foro AGCID 1606-35-LE26 y lista de Sebastián → ajustar EPCO
+  (21 h → ~6 h); mar 20 23:55 cierra EPCO.
+- **Construir Vecindato** (encuesta cerrada sobre DDLS: sector, sexo, edad, ítems de victimización, cuentas de
+  digitación, consentimiento, umbrales) desde el 16-oct; pasa por el revisor antes de abrir.
+- Revisar en INAPI y nic.cl «Vecindato» antes de usarlo fuera de Illapel.
+- `postulaciones/` tiene carpetas nuevas sin commitear (Illapel, SEC, EPCO, Los Ríos, foros, `_kit/`) con CV y
+  respaldos de terceros: commitear solo tras revisar qué entra al índice.
+
+### Estado del repo
+
+`main`, sin cambios de código en esta sesión; solo esta entrada. Push autorizado por Sergio («haz el cierre y push»,
+15-oct). La próxima sesión se abre en `radar-licitaciones`.
+
 ## Sesión 2026-10-15 (jueves) — triage para ganar, kit de postulación, ajustes de Compra Ágil
 
 ### Hecho
