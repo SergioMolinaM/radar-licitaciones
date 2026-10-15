@@ -1,5 +1,51 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-15 (jueves) — triage para ganar, kit de postulación, ajustes de Compra Ágil
+
+### Hecho
+
+1. **Primera corrida real de la búsqueda q (09:00, run 38731386940):** diarios 7/15, rotativos 8 de 34 intentados,
+   20 min de presupuesto agotados; 57 Compras Ágiles en el correo, 45 con «(en descripción, sin verificar)».
+   Medido: `q` calza palabras sueltas, no la frase («economía circular» trajo una aguja circular), así que la
+   etiqueta era falsa; pero de esas 45 salieron 10 de las 19 candidatas del triage (Los Ríos, CFT, Illapel). El
+   reintento inmediato de 9 diarios recuperó 1 y costó ~4 min.
+2. **Ajustes (sin commitear hasta el cierre):** ítems sin keyword en el nombre van a la sección
+   `FUENTE_PALABRA_SUELTA` («Compra Ágil · por palabra suelta»), al final del correo, con match «búsqueda «término»»;
+   el segundo intento de los diarios fallidos va después de los rotativos, que dejan 30 s por fallido + un TIMEOUT
+   de reserva; si ningún diario respondió en la primera pasada, el reintento va de inmediato. Verificador: FALLA
+   (regresión: con todos los diarios recuperados en el reintento no corrían rotativos) → corregido; arneses en
+   `%TEMP%\radar-test-15oct\` 10/10, 17/17 y 9/9 reintentos con rotativo de 60 s. Prueba real: corrida del 16-oct.
+3. **Pedido de Sergio: triage para ganar.** «me dice que no a todo… debe evaluar para presentarse y ganar».
+   Skill global nueva `~/.claude/skills/tercera-letra-licitaciones/SKILL.md`: abrir todo, leer adjuntos sin
+   preguntar, «cómo ganamos» por candidata, NO solo con requisito textual + página + sin forma de cubrirlo, ordenar
+   por plata y plazo. `CLAUDE.md` nuevo en este repo que la apunta. `triage/bases-*/` fuera de git.
+4. **Kit de postulación** `postulaciones/_kit/KIT.md` (pedido: «agrupe toda la memoria de presentaciones en un solo
+   lugar»): papeles de la empresa copiados de Descargas a `_kit/empresa/` (fuera de git), datos fijos, alertas y
+   versión buena de cada pieza. Inventario por subagente. Verificador FALLA (12 puntos) → PASA; revisor PASA (5
+   archivos con datos de terceros sacados del índice de git de `postulaciones`, siguen en disco; reescribir el
+   historial lo decide Sergio).
+5. **Ficha de Mercado Público:** se vio una vez «Proveedor sin inicio de actividades» en `/ficha/idoneidad/` mientras
+   la sección SII daba error de servidor; no se reprodujo. Carpeta tributaria del 15-oct 13:20 y la DJ de inicio de
+   actividades del SII (folio 18745554101, en el kit) dicen 08-10-2020. Llanquihue no se afecta (§8.6.1 pp. 11-12
+   pide RUT de la sociedad y cédula; §13.2.2 c pide a sociedades Ley 20.659 vigencia y estatuto). Si adjudica:
+   cédula legalizada ante notario (§13.2.2 f).
+6. **«Vamos con todo»:** subagentes preparando ofertas en `postulaciones/`: SEC 1614-61 (curso IA, cierra 16-oct
+   10:00), Illapel 3512-182 (plan seguridad, 16-oct 16:00; Sergio pidió carta de compromiso a una amiga abogada por
+   WhatsApp), Los Ríos 5418-72 (16-oct 22:00; ojo: la sesión raíz también lo trabaja), CNE 610-20 (foro hasta
+   16-oct 17:00), SLEP Iquique 1233607-3 y AGCID 1606-35 (foros 17 y 19-oct), EPCO Coquimbo 1317954-9 (20-oct).
+
+### Pendiente
+
+- Resultados de los subagentes: veredicto, precio y `SUBIR.md` de cada oferta para Sergio.
+- Vie 16 09:00: mirar la corrida (log «diarios X/15», sección por palabra suelta al final).
+- Sergio: carta de la abogada para Illapel; subir ofertas y pegar foros según el calendario.
+- Otra sesión: CV maestro, un solo respaldo de experiencia, traer `marca/experiencia/` al kit; F0 del agente.
+
+### Estado del repo
+
+`main`. Commit de cierre con `.gitignore`, `CLAUDE.md`, `src/config.py`, `src/notifier.py`,
+`src/sources/compra_agil.py`, `triage/2026-10-15-*.md` y esta entrada. Push autorizado por Sergio («push», 15-oct).
+
 ## Sesión 2026-10-14 (miércoles) — triage de correos del 8 al 14-oct y sonda de Compra Ágil, desde la raíz
 
 ### Hecho

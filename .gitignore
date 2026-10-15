@@ -8,3 +8,5 @@ venv/
 .vscode/
 # Auditorias locales (CSV con universo completo)
 data/audit-*.csv
+# Bases y adjuntos bajados en el triage (documentos de terceros, 15-oct-2026)
+triage/bases-*/

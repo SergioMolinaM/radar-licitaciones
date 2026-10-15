@@ -307,3 +307,6 @@ COMPRA_AGIL_DIAS_MAX_ROTATIVO = 14
 # verificó a mano el 14-07-2026 abriendo 5627-188-COT26 desde el buscador
 # público: carga sin sesión. El {codigo} tiene formato 1057539-228-COT26.
 COMPRA_AGIL_WEB_URL_TEMPLATE = "https://buscador.mercadopublico.cl/ficha?code={codigo}"
+# Sección del correo para lo que la búsqueda q trajo sin keyword en el nombre
+# (q calza palabras sueltas, no la frase; 15-oct).
+FUENTE_PALABRA_SUELTA = "Compra Ágil · por palabra suelta"

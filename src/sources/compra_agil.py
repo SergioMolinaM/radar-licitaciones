@@ -41,6 +41,7 @@ from ..config import (
     COMPRA_AGIL_EXCLUSIONES_OMITIDAS,
     COMPRA_AGIL_TERMINOS_DIARIOS,
     COMPRA_AGIL_WEB_URL_TEMPLATE,
+    FUENTE_PALABRA_SUELTA,
     KEYWORDS_INCLUDE,
 )
 from ..filters import excluido, keywords_incluidas
@@ -54,6 +55,7 @@ MAX_PAGINAS_TERMINO = 5     # una búsqueda q trae 1-19 resultados (medido 14-oc
 REINTENTOS_ESPERA_S = (20, 60)  # barrido completo: esperas entre intentos ante 5xx/red
 PRESUPUESTO_BARRIDO_S = 15 * 60  # tope del barrido completo (auditoría)
 PRESUPUESTO_BUSQUEDA_S = 20 * 60  # tope de la búsqueda diaria; el job tiene timeout-minutes: 40
+RESERVA_POR_REINTENTO_S = 30  # un 504 tarda ~29 s; se aparta este tiempo por diario fallido
 
 
 def _get_ticket() -> str | None:
@@ -266,17 +268,24 @@ def _buscar_termino(ticket: str, termino: str, publicado_desde: str) -> tuple[li
 def _item_de_busqueda(item: dict, termino: str) -> dict | None:
     """Item ya filtrado por `q` en el servidor, al esquema interno.
 
-    `q` busca en nombre y descripción, y el listado no trae la descripción: si
-    el nombre no contiene ninguna keyword de inclusión, el match se rotula
-    «en descripción». Las exclusiones se aplican sobre el nombre, salvo
-    COMPRA_AGIL_EXCLUSIONES_OMITIDAS.
+    `q` calza cualquiera de las palabras del término, no la frase (corrida del
+    15-oct: «economía circular» trajo «aguja circular»), y el listado no trae
+    la descripción. Si el nombre no contiene ninguna keyword de inclusión, el
+    ítem va a la sección aparte FUENTE_PALABRA_SUELTA: ahí salieron 10 de las
+    19 candidatas del triage del 15-oct, así que no se descarta. Las
+    exclusiones se aplican sobre el nombre, salvo COMPRA_AGIL_EXCLUSIONES_OMITIDAS.
     """
     nombre = item.get("nombre", "") or ""
     codigo = item.get("codigo")
     if not codigo or excluido(nombre, omitir=COMPRA_AGIL_EXCLUSIONES_OMITIDAS):
         return None
     d = _item_to_dict_sin_filtro(item)
-    d["keywords_match"] = keywords_incluidas(nombre) or [f"{termino} (en descripción, sin verificar)"]
+    en_titulo = keywords_incluidas(nombre)
+    if en_titulo:
+        d["keywords_match"] = en_titulo
+    else:
+        d["fuente"] = FUENTE_PALABRA_SUELTA
+        d["keywords_match"] = [f"búsqueda «{termino}»"]
     return d
 
 
@@ -325,9 +334,13 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
                       presupuesto_s: float = PRESUPUESTO_BUSQUEDA_S) -> tuple[list[dict], dict]:
     """Busca en el servidor cada término (`q`) entre las Compras Ágiles publicadas.
 
-    Orden: (1) una pasada por COMPRA_AGIL_TERMINOS_DIARIOS; (2) un segundo
-    intento de los diarios que fallaron; (3) si respondió al menos un diario,
-    con el tiempo que quede, los rotativos desde `cursor`. Cada término, diario
+    Orden: (1) una pasada por COMPRA_AGIL_TERMINOS_DIARIOS; (2) si respondió al
+    menos un diario, los rotativos desde `cursor`, dejando
+    RESERVA_POR_REINTENTO_S por diario fallido más un TIMEOUT; (3) un segundo
+    intento de los diarios fallidos al final. Si en (1) no respondió ninguno,
+    el segundo intento va antes de (2), porque decide si hay rotativos. El reintento inmediato del 15-oct recuperó 1 de 9
+    y costó ~4 min de rotación; al final, la API tuvo más tiempo para
+    recuperarse. Cada término, diario
     o rotativo, busca desde su última búsqueda exitosa y no truncada (`ultima`,
     término → ISO UTC), con piso de COMPRA_AGIL_DIAS_VENTANA días. Retorna (matches, resumen); el resumen trae
     `cursor` y `ultima` actualizados para guardarlos en state.json.
@@ -351,8 +364,8 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
     por_codigo: dict[str, dict] = {}
     devueltos: set[str] = set()
 
-    def queda_tiempo() -> bool:
-        return time.monotonic() - inicio < presupuesto_s
+    def queda_tiempo(reserva_s: float = 0) -> bool:
+        return time.monotonic() - inicio < presupuesto_s - reserva_s
 
     def procesar(termino: str) -> bool:
         r = _buscar_termino(ticket, termino, _desde_rotativo(ultima.get(termino), ahora))
@@ -380,17 +393,24 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
                 resumen["diarios_ok"].append(termino)
             else:
                 pendientes.append(termino)
-        for termino in pendientes:
-            if queda_tiempo() and procesar(termino):
-                resumen["diarios_ok"].append(termino)
-            else:
-                resumen["diarios_fallidos"].append(termino)
+
+        # Si ningún diario respondió en la primera pasada, el reintento va de
+        # inmediato: de él depende si se corren los rotativos.
+        if not resumen["diarios_ok"]:
+            for termino in pendientes:
+                if queda_tiempo() and procesar(termino):
+                    resumen["diarios_ok"].append(termino)
+                else:
+                    resumen["diarios_fallidos"].append(termino)
+            pendientes = []
 
         # Si ningún diario respondió la API está caída: no se gastan los
         # rotativos y el aviso «no revisó esa fuente» del correo es exacto.
+        # La reserva suma un TIMEOUT por el rotativo que esté en vuelo.
+        reserva = len(pendientes) * RESERVA_POR_REINTENTO_S + (TIMEOUT if pendientes else 0)
         if rotativos and resumen["diarios_ok"]:
             for _ in range(len(rotativos)):
-                if not queda_tiempo():
+                if not queda_tiempo(reserva):
                     break
                 termino = rotativos[pos]
                 # Un rotativo que falla se salta; conserva su `ultima`, así la
@@ -398,6 +418,12 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
                 if procesar(termino):
                     resumen["rotativos_ok"].append(termino)
                 pos = (pos + 1) % len(rotativos)
+
+        for termino in pendientes:
+            if queda_tiempo() and procesar(termino):
+                resumen["diarios_ok"].append(termino)
+            else:
+                resumen["diarios_fallidos"].append(termino)
     except _CuotaAgotada as e:
         logger.error(f"Compra Ágil: {e}. Se detiene la búsqueda.")
         resumen["cortado"] = str(e)

@@ -9,6 +9,8 @@ import logging
 from datetime import datetime
 import requests
 
+from .config import FUENTE_PALABRA_SUELTA
+
 logger = logging.getLogger(__name__)
 
 RESEND_URL = "https://api.resend.com/emails"
@@ -40,8 +42,14 @@ def render_html(items: list[dict], caidas=(), parciales=()) -> str:
     for it in items:
         por_fuente.setdefault(it["fuente"], []).append(it)
 
+    # Lo que la búsqueda de Compra Ágil trajo por una palabra suelta va al
+    # final: trae ruido, pero también candidatas reales (15-oct: 10 de 19).
+    def _orden(par):
+        fuente = par[0]
+        return (fuente == FUENTE_PALABRA_SUELTA, fuente)
+
     bloques_html = []
-    for fuente, lista in sorted(por_fuente.items()):
+    for fuente, lista in sorted(por_fuente.items(), key=_orden):
         filas = []
         for it in lista:
             kws = ", ".join(it.get("keywords_match", []))
