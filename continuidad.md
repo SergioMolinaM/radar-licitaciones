@@ -1,5 +1,52 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-16 (viernes) — tres ofertas enviadas: SEC, Illapel y Los Ríos
+
+Sesión `radar-licitaciones-35` (abrió el 15-oct en la noche). Detalle de cada oferta en
+`../postulaciones/<carpeta>/continuidad.md` (entrada «⇢ 16-oct-2026 — Cotización enviada»).
+
+### Hecho
+
+1. **SEC 1614-61-COT26, enviada antes de las 10:00:** $2.490.000 IVA incluido (el precio de `como-ganamos.md` §4; una v6 a
+   $2.963.100 fue un error de lectura y quedó renombrada «NO SUBIR»), vigencia 15-11-2026, propuesta v5, CV de Sergio
+   corregido en el PDF (`sec-…/CV Sergio Molina 2026-10 (corregido).pdf`: especialización 1991, contacto@terceraletra.cl) y
+   título de doctor.
+2. **Illapel 3512-182-COT26, enviada ~09:50:** $5.200.000 (se mantuvo tras el análisis: con 20 días el plazo ya hace el
+   trabajo que hacía la rebaja), despacho $0, vigencia 15-12-2026. Propuesta **v16**: Sergio la editó en Word (v14/v15) y
+   encima van las correcciones del verificador; resumen ejecutivo con producto principal, cuadro «lo que pide la
+   Municipalidad» y cuadro «más allá de las bases» (plazo, Vecindato©, tres miradas, dashboard, acompañamiento en SIRECC);
+   §1 «Comprensión del requerimiento»; §8 Experiencia con las plataformas de TL (URL verificadas 200 hoy). Oferta económica
+   con firma escaneada (autorizada); carta de Lorena firmada a mano (llegó 08:10). Verificador PASA.
+3. **Los Ríos 5418-72-COT26, enviada ~11:30, variante «con Fernandez»:** $7.170.940 (al tope; $6.026.000 neto), **60 días
+   19/26/15**, **sin encuestadores**, 4 días de terreno, firma escaneada. Respaldos de Kena desde fuentes públicas (~9 años con
+   documento: Seremi DS 33/2014 y BGI 2017, actas de Peñalolén 2018-2022, Decreto 148/2025 SENAME); su CV sin contacto ni el
+   diplomado ODCA; Kena aceptó por WhatsApp. Propuesta v4 editada por Sergio en Word. Viaje cotizado: $1,12-1,43 MM. 16
+   adjuntos desde `SUBIR-HOY/`. Verificador PASA tras tres rondas; revisor PASA.
+4. **Criterio de redacción de Sergio aplicado a las tres:** nada de «DDLS» ni jerga ante el evaluador («herramienta digital
+   de participación ciudadana de Tercera Letra»), «dashboard» en vez de «tablero», resumen que se lee de un vistazo, sin
+   lenguaje de IA. Memorias nuevas: `aprobar-antes-de-generar` (incumplí una vez: generé el resumen sin mostrarlo) y
+   `compra-agil-formulario` (detalle ≤255 caracteres, despacho, sin campo de plazo, vigencia = validez de la oferta).
+
+### Pendiente
+
+- **Hoy 17:00:** foro CNE 610-20-LE26 (`postulaciones/cne-610-20-demanda-ia/PEGAR-EN-FORO.txt`). No se tocó en esta sesión.
+- Comprobantes de envío de las tres en el correo; captura del «acepto» de Kena; «sí» de Viviana Rivera (SEC).
+- **CV maestro de Sergio:** sigue diciendo TL «desde 2019» y CORFO «Coordinador General» (debe ser «apoyo en la coordinación
+  general»); no hay fuente Word, solo PDF.
+- Sáb 17 foro SLEP Iquique 1233607-3; lun 19 foro AGCID 1606-35 y lista de Sebastián → EPCO (cierra mar 20 23:55).
+- **Construir Vecindato©** antes del día 3 si Illapel adjudica (prometido en futuro en la propuesta); revisar «Vecindato» en
+  INAPI y nic.cl.
+- `postulaciones/` sigue con carpetas sin commitear (Illapel, SEC, Los Ríos, EPCO, foros, `_kit/`) con CV y respaldos de
+  terceros: commitear solo tras revisar qué entra al índice. `respaldos/kena-fuentes/` trae el decreto con su RUN visible.
+- Si adjudican: Los Ríos acepta OC en 24 h hábiles; Illapel, el mismo día; renovar la habilidad en Mercado Público antes del
+  01-12-2026.
+
+### Estado del repo
+
+`main`. Esta sesión solo agrega esta entrada. Quedan sin commitear cuatro triages del 16-oct
+(`triage/2026-10-16-ca-hoy.md`, `-ca-semana.md`, `-fuera-del-radar.md`, `-licitaciones.md`) que no son de esta sesión: no se
+tocaron ni se incluyen; los commitea la sesión que los escribió.
+
 ## Sesión 2026-10-15 (jueves, tarde) — ofertas del 16-oct: Illapel, SEC, Los Ríos y EPCO
 
 Sesión `radar-licitaciones-34`. A media tarde Sergio cerró la otra sesión («Ajuste del agente»), que llevaba las
