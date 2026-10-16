@@ -20,7 +20,11 @@ Detalle de cada oferta en `../postulaciones/<carpeta>/continuidad.md`.
    falta revisor). Análisis listos: 553368-111-COT26 UTA, 1375754-80-COT26 Los Parques, 696713-81-COT26 Fiscalía,
    4732-27-LE26 Codegua, 1782-17-LE26 GORE Antofagasta, 1113265-17-LE26 CFT Antofagasta.
 5. **Descartadas por Sergio:** 2460-1011, 721703-140, 1238111-118 (Claude Team sin margen), 2296-633 (sin
-   certificados), 2320-147, 1891-13.
+   certificados), 2320-147, 1891-13; en la noche, 553368-111-COT26 UTA (sin videos con IA acreditables) y
+   696713-81-COT26 Fiscalía (exige Comunicador Audiovisual titulado). 1375754-80-COT26 Los Parques: se suelta para
+   no quitarle horas a 2122-34-LE26 Antofagasta (Sergio: «sí vamos, por supuesto»), salvo que el lunes temprano lleguen
+   sin esfuerzo tres certificados; pedirlos igual a AFIPA, País Circular y d-aloga (sirven para Tralka y GORE).
+   Ñuñoa: medición en Modal (US$0,35) deja $3,2-4,4 MM para TL → presentar.
 6. Kit: `postulaciones/_kit/propuesta_compra_agil.py` (generador con el formato EDEVAL v7). `marca/PRODUCTOS.md`:
    URL de Firulais confirmada por Sergio.
 7. Memorias nuevas: `codigos-completos`, `una-cosa-a-la-vez`, `honestos-sin-desnudarse`. Incumplimiento: abrí
