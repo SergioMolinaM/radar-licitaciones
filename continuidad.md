@@ -12,13 +12,25 @@
    regresiones (licencias Claude Pro siguen entrando). Verificador FALLA («licencia» global, «ley rep» con
    conectores) → PASA. Siguen fuera: 1113265-17-LE26 (título «Adquisición…», cierra 06-nov, buscar a mano) y
    1261-37-LR26 (humedales, a propósito). Rotativos de Compra Ágil: 92 → 121.
-2. **Sonda de semántica de `q`** en `probe_compra_agil.py`: si «web» contiene a las cinco frases web diarias, se
-   reemplazan por una consulta (la API hoy respondió 7/15 diarios).
+2. **Semántica de `q` medida** (sonda `probe_compra_agil.py`, run 38938450758): calza CUALQUIER palabra, «sitio web»
+   = «sitio» ∪ «web» exacto; también busca fuera del nombre. Diarios de Compra Ágil 15 → 11: salen «sitio web»,
+   «página web», «portal web», «plataforma web» (las cubre «diseño web», que trae todo «web»; siguen rotando, 125
+   rotativos). Primer intento («web» y «audiovisual» solas) dio FALLA en el verificador: perdía la cobertura diaria
+   de «diseño» y «producción», por la que llegaban el folleto de Antuco 4027-283 (PRESENTAR) y 4066-425. Versión
+   final PASA. Log ahora «diarios X/11».
+3. **Pedido de Sergio: «que el agente no pregunte y cambie todo cada sesión... formatos, forma de ver las cosas».**
+   Skill `tercera-letra-licitaciones` §4 nueva: esqueleto fijo del triage (H1, Resumen con 9 columnas fijas, Cómo se
+   leyó, Candidatas con veredicto en el título, Ruido), cinco veredictos, qué no se pregunta y qué se confirma, y
+   regla de estabilidad (proponer en una línea, seguir con lo vigente; cambia solo si Sergio lo pide). Guardia
+   `~/.claude/hooks/guard-formato-triage.py` (PostToolUse, triages desde el 17-oct) con arnés 14/14, sumado a
+   `test-guardias.ps1` (todos pasan) y control positivo en vivo. Memoria `criterio-estable-entre-sesiones`.
 
 ### Pendiente
 
-- Mirar en los correos de la semana el ruido de «software» y «plataforma» y si algún término de una palabra trunca
-  (>250) en el log.
+- **Lun 19, primera corrida con todo esto:** log «diarios X/11», términos truncados (>250) en «diseño web»,
+  «producción audiovisual» y las keywords de una palabra (plataforma, software, indicadores, convivencia); ruido de
+  «software» y «plataforma» en el correo.
+- Los triages del 16-oct no siguen el formato nuevo (son anteriores al guardia); no se reescriben.
 
 ### Estado del repo
 

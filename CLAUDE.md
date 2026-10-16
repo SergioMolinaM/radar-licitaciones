@@ -11,7 +11,8 @@ se abre todo servicio vigente y se leen los adjuntos sin preguntar; un «no» so
 su página y sin forma de cubrirlo; decide Sergio. Los papeles y piezas repetidas de toda oferta están en
 `../postulaciones/_kit/KIT.md`.
 
-Los triages del día van en `triage/AAAA-MM-DD-*.md`; las bases bajadas en `triage/bases-AAAA-MM-DD/<código>/`
+Los triages del día van en `triage/AAAA-MM-DD-<fuente>.md` con el formato fijo de la skill §4 (lo vigila
+`guard-formato-triage.py`; formato y criterio no se cambian por sesión); las bases bajadas en `triage/bases-AAAA-MM-DD/<código>/`
 (fuera de git: son documentos de terceros).
 
 ## Verificación

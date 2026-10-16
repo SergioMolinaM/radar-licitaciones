@@ -328,12 +328,15 @@ COMPRA_AGIL_DIAS_VENTANA = 3
 # corta a los 29 s (504), sea cual sea el tamaño de página; 3 días de
 # publicadas eran 5.400 registros (108 páginas lentas). Barrer todo ya no cabe.
 # Estos términos se buscan en TODAS las corridas; deben estar en KEYWORDS_INCLUDE.
+# `q` calza CUALQUIER palabra del término (sonda run 38938450758, 16-oct: «sitio
+# web» = «sitio» ∪ «web»). «diseño web» ya trae todo lo de «web», así que «sitio
+# web», «página web», «portal web» y «plataforma web» sobraban como diarios: cuatro
+# consultas menos, con la API dando 504 a la mitad. «diseño web» y «producción
+# audiovisual» se quedan porque además traen «diseño» y «producción» (el folleto
+# de Antuco 4027-283-COT26, PRESENTAR el 16-oct, solo llegaba por «diseño»). Las
+# cuatro frases siguen en la rotación.
 COMPRA_AGIL_TERMINOS_DIARIOS = [
     "inteligencia artificial",
-    "sitio web",
-    "página web",
-    "plataforma web",
-    "portal web",
     "diseño web",
     "redes sociales",
     "marketing digital",
@@ -355,8 +358,9 @@ COMPRA_AGIL_EXCLUSIONES_OMITIDAS = ["adquisición", "compra de", "suministro"]
 # término (diario o rotativo) busca desde su última búsqueda exitosa y no
 # truncada (state["ca_ultima"]), así una vuelta de varios días o una racha de
 # fallas no deja huecos; tope COMPRA_AGIL_DIAS_MAX_ROTATIVO.
-# KEYWORDS_INCLUDE_PALABRA (web, digital, ia) NO se buscan con q: como palabra
-# suelta en nombre y descripción traerían cientos de resultados sin relación.
+# KEYWORDS_INCLUDE_PALABRA no se buscan con q. «web» sola dio 8 en 7 días (no los
+# cientos que se temían), pero «diseño web» ya la cubre; «digital» e «ia» no se
+# midieron.
 COMPRA_AGIL_DIAS_MAX_ROTATIVO = 14
 
 # Ficha pública de la Compra Ágil. La guía de la API no la documenta (solo expone
