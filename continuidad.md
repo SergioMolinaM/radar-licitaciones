@@ -1,5 +1,30 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-16 (viernes, tarde) — huecos del Radar y formato estable de triage
+
+### Hecho
+
+1. **Keywords (`56b4dd2`):** de las 17 que `triage/2026-10-16-fuera-del-radar.md` encontró fuera del Radar, 15 entran
+   ahora. Conectores opcionales en inclusión cuando la keyword los trae («ESTUDIO PERCEPCIÓN» calza «estudio de
+   percepción»); 28 keywords nuevas (audiovisual, software, plataforma, indicadores, convivencia, plan municipal de
+   cultura, diseño gráfico, intranet, e-learning, datos…), «video» como palabra; exclusiones de ruido medido
+   (licencias de software, pav., laringoscop, endoscop…). Julio: 63 → +30, salen 0; triages 15-16 oct: 0
+   regresiones (licencias Claude Pro siguen entrando). Verificador FALLA («licencia» global, «ley rep» con
+   conectores) → PASA. Siguen fuera: 1113265-17-LE26 (título «Adquisición…», cierra 06-nov, buscar a mano) y
+   1261-37-LR26 (humedales, a propósito). Rotativos de Compra Ágil: 92 → 121.
+2. **Sonda de semántica de `q`** en `probe_compra_agil.py`: si «web» contiene a las cinco frases web diarias, se
+   reemplazan por una consulta (la API hoy respondió 7/15 diarios).
+
+### Pendiente
+
+- Mirar en los correos de la semana el ruido de «software» y «plataforma» y si algún término de una palabra trunca
+  (>250) en el log.
+
+### Estado del repo
+
+`main`. Push autorizado por Sergio («haz todo lo necesario para que esto funcione», 16-oct). Los cinco triages del
+16-oct sin commitear son de otra sesión: no se tocan.
+
 ## Sesión 2026-10-16 (viernes) — tres ofertas enviadas: SEC, Illapel y Los Ríos
 
 Sesión `radar-licitaciones-35` (abrió el 15-oct en la noche). Detalle de cada oferta en
