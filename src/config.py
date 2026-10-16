@@ -127,6 +127,42 @@ KEYWORDS_INCLUDE = [
     "industrialización de la construcción",
     "plantas industrializadoras",
     "paneles sip",
+    # Huecos del triage «fuera del radar» del 16-oct-2026 (triage/2026-10-16-
+    # fuera-del-radar.md): servicios afines que se publicaron y el Radar no vio.
+    # Ruido medido contra audit-2026-07-08.csv; el que apareció tiene exclusión
+    # propia («licencias de software», «pavimentos», «equipos audiovisuales», «plataforma
+    # elevadora»). "datos" a secas no: trae enlaces y redes de datos (7 de 7).
+    # "humedales" no: estrategia ambiental, TL solo entraría con socio.
+    "audiovisual",
+    # "documental" a secas no: 3 de 4 en julio eran gestión documental.
+    "serie documental",
+    "realización de documental",
+    "producción de documental",
+    "microserie",
+    "podcast",
+    "vodcast",
+    "spot publicitario",
+    "diseño gráfico",
+    "piezas gráficas",
+    "maquetación",
+    "software",
+    "intranet",
+    "plataforma",
+    "e-learning",
+    "elearning",
+    "moodle",
+    "dashboard",
+    "inteligencia territorial",
+    "gobernanza de datos",
+    "gestión de datos",
+    "ciencia de datos",
+    "visualización de datos",
+    "datos abiertos",
+    "indicadores",
+    "convivencia",
+    "plan municipal de cultura",
+    "participativo",
+    "participativa",
 ]
 
 # Keywords de inclusión que deben calzar como PALABRA COMPLETA (no prefijo).
@@ -137,6 +173,10 @@ KEYWORDS_INCLUDE_PALABRA = [
     "web",
     "digital",
     "ia",
+    # 16-oct: «VIDEO PARA CUENTA PÚBLICA» (696713-81-COT26). Como prefijo traería
+    # videoconferencia y videovigilancia.
+    "video",
+    "videos",
 ]
 
 # Keywords de exclusión: si aparecen, descarta (ruido típico observado).
@@ -227,6 +267,23 @@ KEYWORDS_EXCLUDE = [
     "kit ",
     "servicio de transporte",
     "vehículos fiscales",
+    # Ruido de las keywords del 16-oct, medido en audit-2026-07-08.csv
+    # 7 de las 12 de «software» eran licencias de terceros. «licencia» a secas no:
+    # botaba «Licencias Claude Pro» y «licencias ChatGPT» (reventa, triage 15-oct).
+    "licencias de software",
+    "licencia de software",
+    "licencias software",
+    "licencia software",
+    "pavimentos",             # «pavimentos participativos» (obra)
+    "pav.",                   # «CONST. PROG. PAV. PARTICIPATIVOS»
+    "equipos audiovisuales",
+    "plataforma elevadora",
+    "laringoscop",            # «video» como palabra: equipos médicos y de seguridad
+    "endoscop",
+    "video portero",
+    "videoportero",
+    "cámara de video",
+    "cámaras de video",
 ]
 
 # Estados de Mercado Público a incluir (publicada = abierta para postular)

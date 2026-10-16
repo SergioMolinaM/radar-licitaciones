@@ -24,10 +24,28 @@ def _patron(kw_norm: str, palabra_completa: bool = False) -> re.Pattern:
     return re.compile(r"(?<![a-z0-9])" + re.escape(kw_norm) + fin)
 
 
+# Conectores que los títulos se comen: «ESTUDIO PERCEPCIÓN SOBRE…» (1003780-1-LE26,
+# 16-oct) no calzaba «estudio de percepción». Solo para inclusión: en exclusión
+# «compra de» o «construcción de» pasarían a excluir «compra» y «construcción».
+_CONECTORES = {"de", "del", "la", "las", "el", "los", "en", "y", "e", "para", "a", "al", "un", "una"}
+_SEP_CONECTORES = r"(?:\s+(?:" + "|".join(sorted(_CONECTORES)) + r"))*\s+"
+
+
+def _patron_inclusion(kw_norm: str) -> re.Pattern:
+    """Como _patron, pero los conectores entre palabras son opcionales y se
+    aceptan otros: «estudio de percepción» calza «estudio percepción» y
+    «estudio de la percepción». Solo si la keyword trae conectores: «ley rep»
+    con conectores opcionales calzaba «Ley de la República»."""
+    palabras = [p for p in kw_norm.split(" ") if p not in _CONECTORES]
+    if len(palabras) < 2 or len(palabras) == len(kw_norm.split(" ")):
+        return _patron(kw_norm)
+    return re.compile(r"(?<![a-z0-9])" + _SEP_CONECTORES.join(re.escape(p) for p in palabras))
+
+
 # Pre-normalizar keywords una sola vez al importar
 _INCLUDE_NORM = [(kw, _normalize(kw)) for kw in KEYWORDS_INCLUDE]
 _EXCLUDE_NORM = [_normalize(kw) for kw in KEYWORDS_EXCLUDE]
-_INCLUDE_RE = [(kw, _patron(n)) for kw, n in _INCLUDE_NORM] + \
+_INCLUDE_RE = [(kw, _patron_inclusion(n)) for kw, n in _INCLUDE_NORM] + \
               [(kw, _patron(_normalize(kw), palabra_completa=True)) for kw in KEYWORDS_INCLUDE_PALABRA]
 _EXCLUDE_RE = [_patron(n) for n in _EXCLUDE_NORM]
 
