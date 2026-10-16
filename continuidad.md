@@ -1,5 +1,49 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-16 (viernes) — «Otros»: triage del día, fuera del Radar y seis ofertas
+
+Detalle de cada oferta en `../postulaciones/<carpeta>/continuidad.md`.
+
+### Hecho
+
+1. **Triage del correo del 16-oct** (39 avisos) y **búsqueda fuera del Radar** (términos caídos de la API):
+   `triage/2026-10-16-{ca-hoy,ca-semana,licitaciones,fuera-del-radar,859378-388}.md`. La otra sesión corrigió los
+   huecos del Radar con ese archivo.
+2. **Enviadas por Sergio hoy:** 859378-388-COT26 EDEVAL/UV ($2.899.160 neto; web $1.100.000 + video $1.799.160;
+   45 días en el detalle; con Ramón Badillo, $1,2 MM brutos + $150.000 traslados; propuesta v5) y 757-457-COT26
+   Minsal DIPOL ($1.168.067 neto; propuesta v2 + CV).
+3. **Foros subidos por Sergio:** 1469-284-L126 Tralka (7 de 8), 610-20-LE26 CNE (12), 1233607-3-LE26 SLEP Iquique,
+   4732-27-LE26 Codegua (17).
+4. **Preparadas sin subir:** 1469-284-L126 Tralka (Anexo 3 v2, verificador PASA; $1.850.000 neto; cierra 21-oct
+   16:00); 1224957-658-COT26 Ñuñoa (propuesta v3 + ficha técnica v1; modelos abiertos en servidores de TL;
+   $483/h neto = $6.897.240 con IVA; 30 % al mes 1 + 11 cuotas; costos en `costos.md`, medición en Modal en curso;
+   falta revisor). Análisis listos: 553368-111-COT26 UTA, 1375754-80-COT26 Los Parques, 696713-81-COT26 Fiscalía,
+   4732-27-LE26 Codegua, 1782-17-LE26 GORE Antofagasta, 1113265-17-LE26 CFT Antofagasta.
+5. **Descartadas por Sergio:** 2460-1011, 721703-140, 1238111-118 (Claude Team sin margen), 2296-633 (sin
+   certificados), 2320-147, 1891-13.
+6. Kit: `postulaciones/_kit/propuesta_compra_agil.py` (generador con el formato EDEVAL v7). `marca/PRODUCTOS.md`:
+   URL de Firulais confirmada por Sergio.
+7. Memorias nuevas: `codigos-completos`, `una-cosa-a-la-vez`, `honestos-sin-desnudarse`. Incumplimiento: abrí
+   demasiados frentes en paralelo (Sergio: «vamos en orden… si pones todo a la vez hacemos doble trabajo»); además
+   dos subagentes encadenaron `cd` (frenado por el guardia, anotado).
+
+### Pendiente
+
+- **Lun 19:** 1224957-658-COT26 Ñuñoa 15:00 (medición, revisor, subir); 4027-283-COT26 Antuco 11:00 (sin
+  empezar); 553368-111-COT26 UTA 12:00 (sin videos con IA acreditables: soltar); foro 1606-35-LE26 AGCID 12:00;
+  foro 1113265-17-LE26 CFT Antofagasta 23:59; 19:00 respuestas Tralka → anexos 1, 2, 4 y difusión de integridad.
+- **Mar 20:** 1233607-3-LE26 SLEP Iquique 15:00 (oferta sin armar); 2122-34-LE26 Seremi Antofagasta 15:00
+  ($26 MM; foro leído el 16-oct: subcontratación prohibida, sin profesionales de salud exigidos, producción 100 %
+  local sin GPU en el RPC —el hardware puede ir en la oferta—, instalación presencial; veredicto PRESENTAR solos;
+  Sergio decide hardware con GPU y precio; ver su continuidad); 1317954-9 EPCO 23:55; 1375754-80-COT26 Los Parques
+  12:00 solo con 3 certificados; 696713-81-COT26 Fiscalía: soltar salvo comunicador audiovisual titulado.
+- **Mié 21:** subir Tralka. **Jue 22:** 1725-219-COT26 ENPCCL (sin empezar), foro 1782-17-LE26 GORE Antofagasta.
+- Si adjudican EDEVAL: confirmar por escrito los 45 días antes de aceptar la OC (la ficha decía 1 día).
+
+### Estado del repo
+
+`main`: esta entrada y los cinco triages del 16-oct. Push autorizado por Sergio («cerramos», 16-oct).
+
 ## Sesión 2026-10-16 (viernes, tarde) — huecos del Radar y formato estable de triage
 
 ### Hecho
