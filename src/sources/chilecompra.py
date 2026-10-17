@@ -45,11 +45,13 @@ _MESES["setiembre"] = 9
 
 # Códigos de Mercado Público: organismo-número-tipo+año. Vistos en las notas: LE126 y
 # LP26 (plataforma nueva), LR26 (convenio marco y compra coordinada), RFIPRI26,
-# RFIPUB26, RFI26, COT26 (Compra Ágil).
-_ID = re.compile(r"(?<![\w-])(\d{1,8}-\d{1,5}-(?:RFIPRI|RFIPUB|RFI|COT|LE|LP|LQ|LR|L1|E2|CO|B2|H2|I2|O1|SE)1?\d{2})(?![\w-])")
+# RFIPUB26, RFI26, COT26 (Compra Ágil). El tipo se acepta genérico: una lista cerrada
+# perdía tipos no vistos (LS, R1), y LS son justo servicios especializados (verificador, 17-oct).
+_ID = re.compile(r"(?<![\w-])(\d{1,8}-\d{1,5}-[A-Z]{1,6}1?\d{2})(?![\w-])")
 
 _FECHA = re.compile(r"(?:(?:lunes|martes|miercoles|jueves|viernes|sabado|domingo)\s+)?"
                     r"(\d{1,2})\s+de\s+(" + "|".join(_MESES) + r")(?:\s+(?:de|del)\s+(\d{4}))?")
+_FECHA_NUM = re.compile(r"(\d{1,2})[/-](\d{1,2})[/-](\d{4})")  # «Cierre: 30/10/2026 a las 15:00»
 _HORA = re.compile(r"(\d{1,2})[:.](\d{2})\s*(?:horas|hrs|h\b)")
 # Dónde una nota dice hasta cuándo se puede ofertar o responder.
 # «extiende/amplía/recibe» cubren «el plazo, que vencía el 16, se extiende al 30».
@@ -104,16 +106,22 @@ def extraer_cierre(texto: str, publicada: datetime):
     candidatos = []
     for a in _ANCLA_CIERRE.finditer(t):
         ventana = t[a.start(): a.start() + _VENTANA_CIERRE]
-        f = _FECHA.search(ventana)
-        if not f:
+        f, fn = _FECHA.search(ventana), _FECHA_NUM.search(ventana)
+        if fn and (not f or fn.start() < f.start()):
+            f, dia, mes, anio_txt = fn, int(fn.group(1)), int(fn.group(2)), fn.group(3)
+        elif f:
+            dia, mes, anio_txt = int(f.group(1)), _MESES[f.group(2)], f.group(3)
+        else:
             continue
-        dia, mes = int(f.group(1)), _MESES[f.group(2)]
-        anio = int(f.group(3)) if f.group(3) else publicada.year
+        # «El plazo de adjudicación es hasta el 30 de noviembre» no es el cierre de ofertas.
+        if "adjudic" in t[max(0, a.start() - 60): a.start() + f.end()]:
+            continue
+        anio = int(anio_txt) if anio_txt else publicada.year
         try:
             fecha = datetime(anio, mes, dia)
         except ValueError:
             continue
-        if not f.group(3) and fecha < publicada.replace(tzinfo=None) - timedelta(days=60):
+        if not anio_txt and fecha < publicada.replace(tzinfo=None) - timedelta(days=60):
             fecha = fecha.replace(year=anio + 1)  # nota de diciembre que dice «hasta el 5 de enero»
         h = _HORA.search(ventana)
         con_hora = bool(h and 0 <= int(h.group(1)) <= 23 and 0 <= int(h.group(2)) <= 59)
@@ -156,7 +164,7 @@ def es_aviso_de_proceso(post: dict, titulo: str, texto: str, ids: list[str]) -> 
         return False
     if not _ES_PROCESO.search(tn + " " + _norm(texto[:600])):
         return False
-    return bool(ids) or bool(re.search(r"licitaci|consultas? al mercado", tn))
+    return bool(ids) or bool(re.search(r"licita|consultas? al mercado", tn))
 
 
 def _publicada(post: dict) -> datetime:

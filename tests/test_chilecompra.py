@@ -126,6 +126,24 @@ class CasosSinteticos(unittest.TestCase):
                        "Los proveedores que participaron en la licitación ID 1122317-5-LR26 ofertaron...")
         self.assertIsNone(cc.post_a_item(p, AHORA))
 
+    def test_tipo_de_codigo_no_visto_y_titulo_licita(self):
+        # Segunda pasada del verificador: LS y R1 se perdían; «licita» no calzaba con «licitaci».
+        for codigo in ("869591-7-LS26", "869591-8-R126"):
+            p = _sintetica("ChileCompra licita asesoría jurídica especializada",
+                           f"El proceso ID {codigo} recibe ofertas hasta el 30 de octubre, a las 15:00 horas.")
+            it = cc.post_a_item(p, AHORA)
+            self.assertIsNotNone(it, codigo)
+            self.assertEqual(it["codigo"], codigo)
+
+    def test_fecha_de_adjudicacion_no_es_cierre(self):
+        p = _sintetica("Oferta en la licitación de aseo de ChileCompra",
+                       "ID 869591-9-LE126. Cierre de ofertas: 10 de octubre. El plazo de adjudicación es hasta el 30 de noviembre.")
+        self.assertIsNone(cc.post_a_item(p, AHORA))
+
+    def test_cierre_en_formato_numerico(self):
+        p = _sintetica("Oferta en la licitación de aseo de ChileCompra", "ID 869591-9-LE126. Cierre: 30/10/2026 a las 15:00 horas.")
+        self.assertEqual(cc.post_a_item(p, AHORA)["fecha_cierre"], "30/10/2026 15:00")
+
 
 class ExtraerIds(unittest.TestCase):
     def test_formatos(self):
