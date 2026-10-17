@@ -1,5 +1,35 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-17 (sábado) — sesión raíz: Ñuñoa enviada, descartes y foros
+
+Detalle de cada oferta en `../postulaciones/<carpeta>/continuidad.md`.
+
+### Hecho
+
+- **ENVIADA 1224957-658-COT26 Ñuñoa** (17-oct 10:12; $420/h, $5.997.600 con IVA). Cómo se llenan los campos de
+  Compra Ágil (valor unitario neto × cantidad + IVA, detalle de 255 caracteres, fecha de vigencia) quedó en
+  `postulaciones/_kit/KIT.md`.
+- **Descartadas por Sergio:** 4027-283-COT26 Antuco («no hay imprenta») y 1233607-3-LE26 SLEP Iquique.
+- **Foros subidos por Sergio:** 1606-35-LE26 AGCID (va con su experiencia de periodista, editor y autor) y
+  1113265-17-LE26 CFT Antofagasta (va con Camino a la U; requisito habilitante del certificado de U+ de Bettersoft).
+- 2122-34-LE26 Seremi Antofagasta: bases bajadas, equipo cotizado ($10,4 MM), oferta en preparación por agente.
+- CNE 610-20-LE26: equipo Negroni (JP) + David; antecedente 2023 (ganó Centro de Energía U. de Chile).
+- Alerta «sin inicio de actividades» eliminada del kit y de los SUBIR.md (Sergio: TL tiene inicio y está hábil).
+
+### Pendiente
+
+- **Lun 19:** 1606-35 y 1113265-17 ya tienen sus preguntas; llamar a Bettersoft (CFT); 19:00 respuestas Tralka
+  (Sergio cree que ya la subió: confirmarlo en «Mis ofertas»; cierre mié 21 16:00); foro 1782-17 GORE Antofagasta (jue 22).
+- **Mar 20:** 2122-34-LE26 Seremi (precio, anexos, revisor; subir antes del mediodía); F29 septiembre; 1317954-9 EPCO
+  23:55; 17:00 respuestas foro CNE.
+- **Mié 21:** reemplazar en CFT Magallanes el respaldo con el RUN visible (antes de 16:00).
+- **Jue 22:** regla de salida CNE (Negroni y un Integrante 2); 1725-219-COT26 ENPCCL.
+- Si adjudican EDEVAL: confirmar por escrito los 45 días antes de aceptar la OC.
+
+### Estado del repo
+
+Sin cambios de código del Radar en esta sesión; solo esta continuidad.
+
 ## Sesión 2026-10-17 (sábado) — pares evaluadores CNA para David y aviso automático en el Radar
 
 Abrió el 16-oct en la noche con dos asuntos: el ingeniero eléctrico para la CNE 610-20-LE26 y los pares
