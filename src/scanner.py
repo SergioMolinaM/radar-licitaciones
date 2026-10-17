@@ -18,6 +18,7 @@ from .sources.mercado_publico import fetch_licitaciones_dia
 from .sources.compra_agil import fetch_compra_agil
 from .sources.undp import fetch_undp_notices
 from .sources.cna import fetch_convocatorias_pares
+from .sources.chilecompra import fetch_avisos_chilecompra
 from .state import load_state, save_state, is_new, mark_seen, prune_state, _parse_iso
 from .notifier import send_email, send_heartbeat, send_aviso_cna, send_aviso_cna_extra, destinatarios_cna_extra
 
@@ -65,9 +66,18 @@ def run() -> int:
     except Exception:
         logger.exception("Noticias CNA: error inesperado")
         avisos_cna, cna_ok = [], False
-    todos = matches_mp + matches_ca + matches_undp
+    # Noticias de chilecompra.cl: procesos de la plataforma nueva y consultas al mercado,
+    # que la API v1 de Mercado Público no devuelve (medido 17-oct-2026).
+    try:
+        matches_cc, resumen_cc = fetch_avisos_chilecompra(ultima=state.get("cc_ultima"))
+    except Exception:
+        logger.exception("ChileCompra noticias: error inesperado")
+        matches_cc, resumen_cc = [], {"ok": False, "leidas": 0, "ultima": state.get("cc_ultima")}
+    state["cc_ultima"] = resumen_cc["ultima"]
+    todos = matches_mp + matches_ca + matches_undp + matches_cc
 
-    logger.info(f"Universo escaneado: MP={universo_mp}, CA devueltas={universo_ca}, PNUD={universo_undp}")
+    logger.info(f"Universo escaneado: MP={universo_mp}, CA devueltas={universo_ca}, PNUD={universo_undp}, "
+                f"ChileCompra noticias={resumen_cc['leidas']}")
     logger.info(f"Total tras filtro keywords: {len(todos)}")
 
     # Universo 0 nunca es real en MP (~4.000 activas) ni en PNUD: es una fuente
@@ -78,6 +88,9 @@ def run() -> int:
               if universo == 0]
     if not resumen_ca["diarios_ok"]:
         caidas.append("Compra Ágil" + (f" ({resumen_ca['cortado']})" if resumen_ca["cortado"] else ""))
+    # Un día sin notas es normal (fin de semana): se da por caída solo si la API falló.
+    if not resumen_cc["ok"]:
+        caidas.append("ChileCompra (noticias: plataforma nueva y consultas al mercado)")
     # Cobertura parcial: va en el aviso del correo, pero no pone la corrida en
     # rojo (con la API lenta pasaría casi todos los días y el rojo dejaría de avisar).
     parciales = []
@@ -138,6 +151,7 @@ def run() -> int:
     if datetime.now(timezone.utc).weekday() == HEARTBEAT_WEEKDAY:
         stats = _weekly_stats(state, universo_mp, universo_ca, universo_undp, len(todos), len(nuevos))
         stats["caidas"] = caidas
+        stats["universo_cc"] = resumen_cc["leidas"]
         stats["parciales"] = parciales
         stats["ca_terminos"] = (
             f"{len(resumen_ca['diarios_ok'])}/{len(resumen_ca['diarios_ok']) + len(resumen_ca['diarios_fallidos'])} diarios, "

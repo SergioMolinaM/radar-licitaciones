@@ -226,6 +226,8 @@ def _render_heartbeat_html(stats: dict) -> str:
                 <td style="padding:8px 0;text-align:right;font-weight:600;">{stats.get('universo_ca', 0):,}</td></tr>
             <tr><td style="padding:8px 0;color:#666;">Entradas escaneadas en PNUD</td>
                 <td style="padding:8px 0;text-align:right;font-weight:600;">{stats['universo_undp']:,}</td></tr>
+            <tr><td style="padding:8px 0;color:#666;">Notas de chilecompra.cl leidas hoy (plataforma nueva y consultas al mercado)</td>
+                <td style="padding:8px 0;text-align:right;font-weight:600;">{stats.get('universo_cc', 0):,}</td></tr>
             <tr><td style="padding:8px 0;color:#666;border-top:1px solid #eee;">Matches con keywords hoy</td>
                 <td style="padding:8px 0;text-align:right;font-weight:600;border-top:1px solid #eee;">{stats['matches_totales_hoy']}</td></tr>
             <tr><td style="padding:8px 0;color:#666;">Nuevas oportunidades notificadas esta semana</td>

@@ -1,5 +1,53 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-17 (sábado) — fuente nueva: noticias de chilecompra.cl (plataforma nueva y consultas al mercado)
+
+Hueco: la API v1 de Mercado Público no devuelve los procesos de la «nueva plataforma modular» (869591-4-LE126:
+«Los parámetros no son válidos») y las Consultas al Mercado (…-RFIPRI26) viven tras reCAPTCHA (prohibido
+automatizarlo; no se intentó). Así se perdieron 869591-2-LE126 (plan de adopción, cerró 2-oct) y 1122317-2-RFIPRI26.
+
+### Hecho
+
+1. **`src/sources/chilecompra.py`** lee `https://www.chilecompra.cl/wp-json/wp/v2/posts` (API pública de WordPress,
+   sin secretos) desde `state["cc_ultima"]` menos 48 h (`after` en hora de Chile: medido por el verificador con la
+   nota 57124; primera corrida: 30 días). Se queda con licitaciones, consultas al mercado, convenios marco,
+   compras coordinadas para proveedores y extensiones de plazo; saca IDs (LE126, LP26, LR26, RFIPRI26, RFIPUB26,
+   RFI26, L126…; descarta el ID truncado «2317-3-RFIPRI26» de la nota del 5-oct) y el cierre del texto (la fecha más
+   tardía tras «hasta / cierre / plazo / extiende…»; con hora si la trae). Lo cerrado no se manda; las horas se leen
+   como UTC−4 para no descartar antes de tiempo. Sin filtro de palabras clave (Radar amplio). Ítems `CC::<id nota>`
+   en `seen`: una extensión de plazo es nota nueva y vuelve a avisar.
+2. **Posts «Organismo – fecha»** (categoría 8 «Normativa»; 45 entre 150 notas): cada uno es solo un PDF con el
+   **manual de compras/adquisiciones** del organismo (abierto el de SLEP Aysén, 56931; los 45 enlaces son
+   `Manual-de-…pdf` salvo dos oficios/cartas). No son oportunidades: se excluyen por categoría.
+3. **Correo:** sección propia «ChileCompra: plataforma nueva y consultas al mercado». Si la API falla, va a
+   «Fuente caída» (salida 3, Actions en rojo) y `cc_ultima` no avanza; un día sin notas no es caída. Fila en el
+   heartbeat. Workflow sin cambios.
+4. **Tests** (primeros del repo, `unittest`, sin red): `tests/test_chilecompra.py` + 7 notas reales en
+   `tests/fixtures/chilecompra-posts-2026-10-17.json` y 5 casos sintéticos. `python -m unittest discover -s tests -t .`
+   → 20 OK.
+5. **Corrida seca real** (chilecompra.cl real, demás fuentes stub, sin correo, state en copia; `data/state.json`
+   intacto): 44 notas en 30 días, **5 avisos**: 897096-1-LE126 (cierra 28/10 15:00), 869591-4-LE126 (04/11 15:00),
+   1122317-4/-5-RFIPRI26 (18/10 18:00), 1122317-17-LR26 impresoras (09/11 15:15), 1122317-3-RFIPRI26 vehículos
+   (20/10 23:55). Segunda corrida: 0 repetidos. Caída simulada: «Fuente caída», salida 3.
+6. Verificador: FALLA (descartaba licitaciones de capacitación/talleres/seminarios con ID; extensión «vencía el 16,
+   se extiende al 30» quedaba en el 16; título sin invitación con ID se perdía) → corregido con casos de prueba;
+   sobre sus 93 notas de 60 días el resultado sigue en 5 abiertas.
+
+### Pendiente
+
+- Lun 19 09:00: primera corrida en Actions; buscar en el log «ChileCompra noticias desde …: N leídas». El primer
+  correo traerá los 5 avisos de arriba si siguen abiertos.
+- Menor: 1122317-5-RFIPRI26 (lubricantes) cierra a las 17:00 y el aviso conjunto dice 18:00 (una nota, un cierre).
+- Un proceso que además salga en la API v1 (p. ej. un LR26) puede aparecer en dos secciones: no se cruza.
+- Notas con cierre en tabla («16 de octubre Cierre de recepción de ofertas a las 15.00») toman la fecha que sigue
+  a «cierre»; coincide hoy porque la apertura es el mismo día.
+
+### Estado del repo
+
+`main`. Commit local (sin push: lo hace la sesión principal) con `src/sources/chilecompra.py`, `src/scanner.py`,
+`src/notifier.py`, `tests/` y esta entrada. `triage/2026-10-17-fuera-del-radar.md` es de la sesión principal: no se
+commitea aquí.
+
 ## 2026-10-17 (sábado) — sesión raíz: Ñuñoa enviada, descartes y foros
 
 Detalle de cada oferta en `../postulaciones/<carpeta>/continuidad.md`.
