@@ -54,6 +54,7 @@ jobs:
           RESEND_API_KEY:        ${{ secrets.RESEND_API_KEY }}
           RADAR_TO_EMAIL:        ${{ secrets.RADAR_TO_EMAIL }}
           RADAR_FROM_EMAIL:      ${{ secrets.RADAR_FROM_EMAIL }}
+          RADAR_CNA_TO:          ${{ secrets.RADAR_CNA_TO }}  # aviso de llamado a pares CNA (David); vacío = solo RADAR_TO_EMAIL
         run: python -m src.scanner
 
       - name: Commit state si cambió

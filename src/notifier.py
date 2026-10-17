@@ -7,6 +7,7 @@ Si no hay RESEND_API_KEY configurada, solo loggea el resumen.
 import os
 import logging
 from datetime import datetime
+from html import escape
 import requests
 
 from .config import FUENTE_PALABRA_SUELTA
@@ -135,6 +136,77 @@ def send_email(items: list[dict], caidas=(), parciales=()) -> bool:
     except requests.RequestException as e:
         logger.error(f"Error enviando correo: {e}")
         return False
+
+
+def _render_aviso_cna_html(avisos: list[dict], nota: str = "") -> str:
+    filas = "".join(f"""
+        <li style="margin:0 0 10px;">
+            <a href="{escape(a['link'])}" style="color:#0a4d8c;font-weight:600;text-decoration:none;">{escape(a['titulo'])}</a>
+            <span style="color:#666;font-size:12px;"> · publicada el {escape(a['fecha'])}</span>
+        </li>""" for a in avisos)
+    aviso_nota = (f'<p style="background:#fff8e1;border-left:4px solid #f9a825;padding:10px 12px;font-size:13px;color:#5d4037;">'
+                  f"{escape(nota)}</p>") if nota else ""
+    return f"""
+    <html><body style="font-family:-apple-system,Segoe UI,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#222;">
+        <h1 style="font-size:18px;margin:0 0 12px;">La CNA publicó un llamado a pares evaluadores</h1>
+        {aviso_nota}
+        <ul style="padding-left:18px;">{filas}</ul>
+        <p style="color:#666;font-size:13px;line-height:1.5;">
+            Revisar en la noticia las bases, los requisitos y el plazo de postulación.
+        </p>
+        <hr style="border:none;border-top:1px solid #eee;margin:20px 0 12px;">
+        <p style="color:#999;font-size:11px;">Aviso automático del Radar de Tercera Letra SpA</p>
+    </body></html>
+    """
+
+
+def _enviar_aviso_cna(para: list[str], avisos: list[dict], nota: str = "") -> bool:
+    clave = os.getenv("RESEND_API_KEY")
+    if not clave:
+        logger.warning("Aviso CNA no enviado - falta RESEND_API_KEY")
+        for a in avisos:
+            logger.info(f"[CNA] {a['titulo']} — {a['link']}")
+        return False
+    payload = {
+        "from": os.getenv("RADAR_FROM_EMAIL", "radar@terceraletra.cl"),
+        "to": para,
+        "subject": "CNA: llamado a pares evaluadores",
+        "html": _render_aviso_cna_html(avisos, nota),
+    }
+    # El repo es público y sus logs también: se loguea la cantidad, no las direcciones.
+    try:
+        resp = requests.post(RESEND_URL, json=payload,
+                             headers={"Authorization": f"Bearer {clave}"}, timeout=TIMEOUT)
+        resp.raise_for_status()
+        logger.info(f"Aviso CNA enviado ({len(para)} destinatario(s))")
+        return True
+    except requests.RequestException as e:
+        codigo = getattr(e.response, "status_code", None)
+        logger.error(f"Error enviando aviso CNA ({len(para)} destinatario(s)): HTTP {codigo or type(e).__name__}")
+        return False
+
+
+def destinatarios_cna_extra() -> list[str]:
+    return [d.strip() for d in os.getenv("RADAR_CNA_TO", "").split(",") if d.strip()]
+
+
+def send_aviso_cna_extra(avisos: list[dict]) -> bool:
+    """Aviso a RADAR_CNA_TO (David), aparte del principal. Con el remitente de prueba
+    onboarding@resend.dev, Resend solo entrega a la cuenta dueña y rechaza (403) a
+    cualquier otro: hace falta un dominio verificado en RADAR_FROM_EMAIL."""
+    return _enviar_aviso_cna(destinatarios_cna_extra(), avisos)
+
+
+def send_aviso_cna(avisos: list[dict], fallo_extra: bool = False) -> bool:
+    """Aviso a RADAR_TO_EMAIL. Si el envío a RADAR_CNA_TO falló, lo dice en el correo."""
+    destinatario = os.getenv("RADAR_TO_EMAIL")
+    if not destinatario:
+        logger.error("Aviso CNA no enviado - falta RADAR_TO_EMAIL")
+        return False
+    nota = ("No se pudo enviar este aviso a los destinatarios de RADAR_CNA_TO (ver el log de la corrida; "
+            "con el remitente onboarding@resend.dev, Resend solo entrega a la cuenta dueña). Reenviarlo a mano: "
+            "el Radar reintenta mientras la noticia tenga menos de 14 días.") if fallo_extra else ""
+    return _enviar_aviso_cna([destinatario], avisos, nota)
 
 
 def _render_heartbeat_html(stats: dict) -> str:

@@ -17,8 +17,9 @@ from datetime import datetime, timedelta, timezone
 from .sources.mercado_publico import fetch_licitaciones_dia
 from .sources.compra_agil import fetch_compra_agil
 from .sources.undp import fetch_undp_notices
+from .sources.cna import fetch_convocatorias_pares
 from .state import load_state, save_state, is_new, mark_seen, prune_state, _parse_iso
-from .notifier import send_email, send_heartbeat
+from .notifier import send_email, send_heartbeat, send_aviso_cna, send_aviso_cna_extra, destinatarios_cna_extra
 
 logging.basicConfig(
     level=logging.INFO,
@@ -34,6 +35,8 @@ def _weekly_stats(state, universo_mp, universo_ca, universo_undp, matches_totale
     seen = state.get("seen", {})
     nuevos_semana = 0
     for _id, ts in seen.items():
+        if _id.startswith(("CNA:", "extra:")):  # avisos CNA: no son oportunidades
+            continue
         dt = _parse_iso(ts)
         if dt and dt >= hace_7d:
             nuevos_semana += 1
@@ -57,6 +60,11 @@ def run() -> int:
     state["ca_ultima"] = resumen_ca["ultima"]
     universo_ca = resumen_ca["devueltas"]
     matches_undp, universo_undp = fetch_undp_notices()
+    try:
+        avisos_cna, cna_ok = fetch_convocatorias_pares()
+    except Exception:
+        logger.exception("Noticias CNA: error inesperado")
+        avisos_cna, cna_ok = [], False
     todos = matches_mp + matches_ca + matches_undp
 
     logger.info(f"Universo escaneado: MP={universo_mp}, CA devueltas={universo_ca}, PNUD={universo_undp}")
@@ -84,6 +92,8 @@ def run() -> int:
     if resumen_ca["truncados"]:
         parciales.append("Compra Ágil con más de 250 resultados para: " + ", ".join(resumen_ca["truncados"])
                          + " (aparecen los primeros 250; pueden faltar los siguientes)")
+    if not cna_ok:
+        parciales.append("Noticias de la CNA sin respuesta: hoy no se revisó si abrió un llamado a pares evaluadores")
     if caidas:
         logger.error(f"Fuentes caídas en esta corrida: {', '.join(caidas)}")
 
@@ -97,6 +107,27 @@ def run() -> int:
 
     for item in nuevos:
         mark_seen(state, item["id"])
+
+    # Llamado a pares de la CNA: correo aparte a RADAR_TO_EMAIL y a RADAR_CNA_TO
+    # (David), cada uno marcado por separado para no repetirle a nadie. Lo que falla
+    # se reintenta mientras siga en la ventana de 14 días. Nada de esto puede
+    # impedir que se guarde el state de las licitaciones ya notificadas.
+    try:
+        fallo_extra = False
+        if destinatarios_cna_extra():
+            extra = [a for a in avisos_cna if is_new(state, "extra:" + a["id"])]
+            if extra:
+                if send_aviso_cna_extra(extra):
+                    for a in extra:
+                        mark_seen(state, "extra:" + a["id"])
+                else:
+                    fallo_extra = True
+        principal = [a for a in avisos_cna if is_new(state, a["id"])]
+        if principal and send_aviso_cna(principal, fallo_extra):
+            for a in principal:
+                mark_seen(state, a["id"])
+    except Exception:
+        logger.exception("Aviso CNA: error inesperado; se sigue sin él")
 
     prune_state(state)
     save_state(state)

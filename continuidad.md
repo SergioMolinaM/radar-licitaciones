@@ -1,5 +1,59 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-17 (sábado) — pares evaluadores CNA para David y aviso automático en el Radar
+
+Abrió el 16-oct en la noche con dos asuntos: el ingeniero eléctrico para la CNE 610-20-LE26 y los pares
+evaluadores de la CNA (pedido de David Blanco en lo personal; Sergio también postularía).
+
+### Hecho
+
+1. **CNE 610-20-LE26:** Sergio consiguió a Juan José Negroni (Santo Tomás) como ingeniero eléctrico y quiere que vaya
+   de **Jefe de Proyecto**, con David en el equipo. Análisis entregado: Negroni puntúa de jefe solo si tiene 7 años en
+   demanda (proyección, planificación, tarificación); si lo suyo es transmisión, calza en Integrante 2. David no puede
+   ser Integrante 2. En cualquier reparto falta una persona. **Otra sesión ya dejó el borrador** a Negroni (cc David,
+   17-oct 11:45, «…te propongo como Jefe de Proyecto»); el de esta sesión no se creó para no duplicar. Le falta pedir
+   el CV de David, el permiso de sus universidades para honorarios y la disponibilidad de 70 días (se le dijo a Sergio
+   que lo agregue a mano). La CNE sigue en la otra sesión.
+2. **CNA, histórico de convocatorias leído en crudo** (`../postulaciones/cna-pares-evaluadores/historico-convocatorias-2026-10-16.md`;
+   fuentes bajadas en `fuentes/`, fuera de git): Ley 20.129 art. 19 exige llamados «a lo menos una vez cada dos años»
+   y 10 años de ejercicio. Llamados documentados: pregrado 2016, institucional universidades+TP 2020 (885 elegidos,
+   registro vigente desde 01-07-2021), solo TP 16-ene a 06-mar-2026. Nada abierto ni anunciado para universidades,
+   pregrado ni postgrado (no leídas: actas posteriores al 22-jul-2026, Transparencia, Diario Oficial). Ni David ni
+   Sergio están en el registro. Honorarios no publicados. Dos subagentes fallaron (investigador sin shell; general
+   colgado dos veces): la lectura la terminó la sesión principal.
+3. **Borrador a la CNA** (convocatoriapares@cnachile.cl, Gmail TL, `r-5742713182224881496`): fecha de la próxima
+   convocatoria en las tres áreas, si pregrado/postgrado reciben antecedentes permanentes y cómo recibir aviso.
+   Verificador FALLA (acotaba a universidades, llamaba «académico» a David) → PASA. Lo envía Sergio. WhatsApp a David
+   enviado por Sergio (texto corregido: no prometer que el Radar le avisa directo todavía).
+4. **Aviso CNA en el Radar** (`src/sources/cna.py` nuevo, `src/notifier.py`, `src/scanner.py`, workflow,
+   `requirements.txt`): cada corrida lee por la API SharePoint las 40 últimas de `/noticias/Paginas` y
+   `/noticias/SiteAssets`; un llamado a pares de los últimos 14 días manda un correo aparte «CNA: llamado a pares
+   evaluadores» a RADAR_TO_EMAIL y, en envío separado y primero, a RADAR_CNA_TO (secreto nuevo, vacío hoy). Marcas
+   `CNA:<FileRef>` y `extra:CNA:<FileRef>` en `seen`, fuera de las cifras del heartbeat. Filtro probado contra 471
+   noticias y 536 archivos: calza todos los llamados históricos (2015, dic-2015, 2016, 2017, 2020, 2026), 0 falsos
+   positivos. cnachile.cl no entrega el certificado intermedio: se agrega el público de DigiCert
+   (`src/sources/certs/geotrust-ev-rsa-ca-g2.pem`, vence 02-07-2030) a certifi. Un fallo de la CNA no tumba el correo
+   de licitaciones (va a «Revisión parcial»). Logs sin direcciones (repo público). Verificador FALLA (5 hallazgos) →
+   PASA; luego cuatro ajustes menores, recompilado y filtro re-corrido.
+
+### Pendiente
+
+- **Para que el aviso le llegue a David:** Sergio verifica terceraletra.cl en Resend (DNS, gratis), cambia el secreto
+  RADAR_FROM_EMAIL a una dirección del dominio y crea RADAR_CNA_TO. Hasta entonces el aviso llega solo a Sergio, con
+  nota para reenviarlo. Medido en docs de Resend: onboarding@resend.dev solo entrega a la cuenta dueña.
+- Lun 19, corrida de las 09:00: confirmar en el log las líneas «CNA /noticias/Paginas: 40 leídas…» y
+  «CNA /noticias/SiteAssets…» (primera corrida real; no se probó en Actions).
+- Sergio: enviar el borrador a la CNA; respuesta de la CNA.
+- Error aceptado del filtro: «Se cierra la convocatoria de pares» daría un aviso de más (para no perder «se cierra el
+  30 de noviembre»).
+- `../postulaciones/cna-pares-evaluadores/` sin commitear: `fuentes/` son documentos de terceros (no van al índice).
+
+### Estado del repo
+
+`main`. Commit de cierre con el aviso CNA (`src/sources/cna.py`, `src/sources/certs/`, `src/notifier.py`,
+`src/scanner.py`, `.github/workflows/scanner.yml`, `requirements.txt`) y esta entrada. Push autorizado por Sergio
+(«si push y cierre por favor», 17-oct). Sin deploy (es un Action).
+
 ## Sesión 2026-10-17 (sábado) — portafolio de experiencia de TL (trabajo en `marca`)
 
 ### Hecho
