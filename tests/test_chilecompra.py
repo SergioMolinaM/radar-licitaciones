@@ -140,6 +140,17 @@ class CasosSinteticos(unittest.TestCase):
                        "ID 869591-9-LE126. Cierre de ofertas: 10 de octubre. El plazo de adjudicación es hasta el 30 de noviembre.")
         self.assertIsNone(cc.post_a_item(p, AHORA))
 
+    def test_adjudicacion_en_la_oracion_anterior_no_bota_el_cierre(self):
+        # Tercera pasada del verificador: el filtro cruzaba oraciones.
+        p = _sintetica("Nuevo Convenio Marco de Aseo: conoce las bases",
+                       "ChileCompra invita a ofertar en el ID 2239-7-LR26, de adjudicación múltiple. "
+                       "Ofertas hasta el 30 de octubre a las 15:00 horas.")
+        self.assertEqual(cc.post_a_item(p, AHORA)["fecha_cierre"], "30/10/2026 15:00")
+        p = _sintetica("Oferta en la licitación de aseo de ChileCompra",
+                       "ID 869591-9-LE126. Fecha de adjudicación estimada: 15 de diciembre. "
+                       "Cierre de ofertas: 30 de octubre a las 15:00 horas.")
+        self.assertEqual(cc.post_a_item(p, AHORA)["fecha_cierre"], "30/10/2026 15:00")
+
     def test_cierre_en_formato_numerico(self):
         p = _sintetica("Oferta en la licitación de aseo de ChileCompra", "ID 869591-9-LE126. Cierre: 30/10/2026 a las 15:00 horas.")
         self.assertEqual(cc.post_a_item(p, AHORA)["fecha_cierre"], "30/10/2026 15:00")

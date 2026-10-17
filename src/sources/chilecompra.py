@@ -114,7 +114,9 @@ def extraer_cierre(texto: str, publicada: datetime):
         else:
             continue
         # «El plazo de adjudicación es hasta el 30 de noviembre» no es el cierre de ofertas.
-        if "adjudic" in t[max(0, a.start() - 60): a.start() + f.end()]:
+        # Solo dentro de la misma oración: «de adjudicación múltiple. Ofertas hasta el 30» sí lo es.
+        previo = t[max(0, a.start() - 60): a.start()].rsplit(". ", 1)[-1]
+        if "adjudic" in previo + t[a.start(): a.start() + f.end()]:
             continue
         anio = int(anio_txt) if anio_txt else publicada.year
         try:
