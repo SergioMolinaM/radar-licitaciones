@@ -1,5 +1,19 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-17 (sábado) — portafolio de experiencia de TL (trabajo en `marca`)
+
+### Hecho
+1. Inventario de experiencia de TL por dos subagentes (repos y OneDrive): facturas solo desde folio 1 (03-08-2026); con pago documentado AFIPA, Agencia Circular y d-aloga; 12 plataformas propias en línea; CUECH y UST son honorarios de Sergio. Resumen en memoria `experiencia-tercera-letra` (raíz y este proyecto) y fila nueva en `postulaciones/_kit/KIT.md`.
+2. Portafolio PDF en `marca/documentos/portafolio.pdf` (detalle en `marca/continuidad.md`, entrada 17-oct).
+3. Guardia `guard-productos-inventados.ps1` arreglado (la última ficha de una sección heredaba los alias de la tabla siguiente; caso nuevo en el arnés, control negativo con la versión vieja).
+
+### Pendiente
+- Lun 19 09:00: primera corrida del Radar con las keywords nuevas y 11 diarios (log «diarios X/11», truncados, ruido de software/plataforma).
+- Cambios sin commitear de otra sesión en este repo (`.github/workflows/scanner.yml`, `requirements.txt`, `src/notifier.py`, `src/scanner.py`, `src/sources/cna.py`, `src/sources/certs/`): no se tocan; los commitea quien los hizo.
+
+### Estado del repo
+`main`. Esta sesión solo agrega esta entrada; los archivos de arriba son de otra sesión.
+
 ## Sesión 2026-10-16 (viernes) — «Otros»: triage del día, fuera del Radar y seis ofertas
 
 Detalle de cada oferta en `../postulaciones/<carpeta>/continuidad.md`.
