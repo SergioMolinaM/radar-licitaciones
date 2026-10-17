@@ -1,5 +1,42 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-17 (sábado, tarde) — Seremi Antofagasta 2122-34-LE26 lista para subir
+
+Detalle en `../postulaciones/seremi-salud-2122-34-ia-cancer/continuidad.md` (entradas del 17-oct tarde y noche).
+
+### Hecho
+
+- **Mediciones en Modal** (US$0,33 en total, cubierto por créditos; $0 cobrado): GPU L4 con Qwen3 8B/14B en lote,
+  0,26-2,8 s por documento, 18-33 h para 100.000; CPU de 4 núcleos y 16 GB, 23-142 s, ≈1.630 h. La tabla del agente
+  (30 s por documento) estaba ~10-45 veces sobre lo real. Equipo C (RTX PRO 4500, $10,4 MM) → **B (RTX PRO 4000 24 GB)**.
+  El servidor del RPC no alcanza para la Etapa 3; sí para el uso anual. PC de Sergio (8 GB RAM, sin GPU) descartado.
+- **Sergio: «estoy dispuesto a pagar el costo y trabajar gratis»** para ganar la primera experiencia de IA con
+  mandante público. Cotización real por subagente → **precio al costo $8.900.000 neto ($10.591.000 con IVA)**, 4 viajes.
+- Oferta completa en `postulaciones/seremi-salud-2122-34-ia-cancer/entregables/` (propuesta v1 10 pp., Anexos 1-5, 7,
+  8, integridad, facturas con el correo del contacto tachado) y `SUBIR.md`. Revisor FALLA → corregido; verificador
+  FALLA ×2 → corregido (sin tercera pasada).
+
+### Pendiente
+
+- **Lun 19:** Seremi 2122-34: medio de verificación del programa de integridad, OK a firma escaneada y a M1 ≥ 98 % /
+  M8 ≥ 50 %, confirmar Anexo 2, teléfono de Guerra si acepta; **subir lun 19 en la tarde** (cierre mar 20 15:00).
+  1606-35 y 1113265-17 ya tienen sus preguntas; llamar a Bettersoft (CFT); 19:00 respuestas Tralka (confirmar en «Mis
+  ofertas» si Sergio la subió; cierre mié 21 16:00); foro 1782-17 GORE Antofagasta (jue 22). Corrida del Radar 09:00:
+  log «diarios X/11», las líneas «CNA /noticias/...» (primera corrida real del aviso CNA) y «ChileCompra noticias
+  desde …: N leídas» (fuente nueva; el primer correo trae 5 avisos si siguen abiertos). Menores de esa fuente en la
+  entrada siguiente.
+- **Mar 20:** F29 septiembre; 1317954-9 EPCO 23:55; 17:00 respuestas foro CNE.
+- **Mié 21:** reemplazar en CFT Magallanes el respaldo con el RUN visible (antes de 16:00).
+- **Jue 22:** regla de salida CNE (Negroni y un Integrante 2); 1725-219-COT26 ENPCCL.
+- Aviso CNA a David: Sergio verifica terceraletra.cl en Resend y crea RADAR_CNA_TO; envía el borrador a la CNA.
+- Si adjudican EDEVAL: confirmar por escrito los 45 días antes de aceptar la OC.
+
+### Estado del repo
+
+`main`. Esta sesión solo agrega esta entrada. La fuente chilecompra (entrada siguiente) quedó commiteada en local por
+otra sesión, sin push: se sube con este push. `triage/2026-10-17-fuera-del-radar.md` sin commitear es de otra
+sesión: no se toca.
+
 ## 2026-10-17 (sábado) — fuente nueva: noticias de chilecompra.cl (plataforma nueva y consultas al mercado)
 
 Hueco: la API v1 de Mercado Público no devuelve los procesos de la «nueva plataforma modular» (869591-4-LE126:
