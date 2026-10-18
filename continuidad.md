@@ -1,5 +1,52 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-18 (domingo) — Seremi Antofagasta 2122-34-LE26 auditada palabra por palabra y lista para subir el lun 19
+
+Detalle completo en `../postulaciones/seremi-salud-2122-34-ia-cancer/continuidad.md` (entrada del 18-oct).
+
+### Hecho
+
+- **Oferta Seremi 2122-34-LE26:**
+  - Tres auditorías afirmación por afirmación más el revisor de privacidad, todas guardadas en la carpeta de la
+    oferta: v1 con 8 FALSA y 10 CONTRADICE; anexos; final de la v2 con 1 FALSA.
+  - **Propuesta v3** (12 pp.), con textos aprobados por Sergio bloque por bloque. Salen las frases falsas sobre
+    horario de oficina, «cota superior» y el servidor del RPC. Se agregan egresos, Ley 21.258 y DS 42, la experiencia
+    de IA verificada y la nube solo para desarrollo.
+  - Anexos fechados el 19-oct. Anexo 2 en la segunda opción, con las tres SpA relacionadas y sus RUT. Anexo 4 con
+    País Circular y AFIPA (OC 007-2026). Respaldo de 5 facturas con correos tachados.
+  - Programa de integridad v1.2 (contacto@), **rediseñado** sobre la plantilla de la propuesta, en 4 pp. y con
+    recuadros gris azulado (Sergio: «sin beige»). Copia en `Downloads`.
+  - Declaración de Sergio firmada. Borradores de Gmail a Ismael y a Andrés (este sin destinatario).
+- **Reglas nuevas de Sergio:**
+  - «cero errores cero inferencias», en `~/.claude/CLAUDE.md` §2 y en las memorias del proyecto, la raíz y el
+    verificador;
+  - no agregar compromisos con costo (memoria `no-agregar-compromisos-que-perjudican`).
+- Corregido en memoria: Radar Circular SpA es de Sergio (RUT aparte para un concurso perdido; **no hay licencia a País
+  Circular**, era falso).
+- CFT Antofagasta: se le explicó a Sergio lo de Bettersoft (llamada del lun 19; preguntas en
+  `cft-antofagasta-1113265-17-permanencia/certificado-u-plus.md`).
+- Incumplimiento: `cd` encadenado una vez, frenado por el guardia y anotado en memoria.
+
+### Pendiente
+
+- **Lun 19 (Seremi):**
+  - Sergio envía los correos de integridad con el PDF v1.2 adjunto, y en el texto cambia «página 3» por «página 4»
+    (la declaración quedó en la p. 4).
+  - Con las respuestas se arma el PDF del medio de verificación.
+  - Revisar la ficha.
+  - **Subir en la tarde con `SUBIR.md`** y bajar el comprobante (cierre mar 20 15:00).
+- Web (`web-tercera-letra`): programa de integridad publicado en `/documentos` y `/integridad`, con commit local y **sin
+  push ni deploy**. El borrador de Netlify se colgó dos veces desde la sesión: Sergio lo lanza con `!`, y el deploy va
+  con DEPLOY-AUTORIZADO.
+- Portafolio con la experiencia de IA documental: **después de subir**, en una sesión abierta en `marca`.
+- Resto de la semana: entrada del 17-oct (EPCO mar 20, CFT Magallanes mié 21, CNE jue 22, ENPCCL jue 22, Bettersoft
+  lun 19).
+- Lun 19 09:00: log de la corrida del Radar (diarios X/11, CNA, ChileCompra noticias).
+
+### Estado del repo
+
+`main`. Solo esta entrada. El trabajo de la oferta vive en el repo `postulaciones`.
+
 ## 2026-10-18 (domingo, cierre de la sesión del 17-oct) — triage «fuera del radar», fuente chilecompra con PASA, Tralka enviada
 
 ### Hecho
