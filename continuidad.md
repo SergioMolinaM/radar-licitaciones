@@ -1,5 +1,39 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-18 (domingo, cierre de la sesión del 17-oct) — triage «fuera del radar», fuente chilecompra con PASA, Tralka enviada
+
+### Hecho
+
+- **Tralka 1469-284-L126 ENVIADA** (Sergio, 17-oct: «lo de tralka ya lo mandamos»). Falta mirar el comprobante en «Mis
+  ofertas» si se quiere respaldo; respuestas del foro lun 19 19:00 por si piden reemplazar anexos antes del mié 21 16:00.
+- **Triage `triage/2026-10-17-fuera-del-radar.md`** (formato §4): las bases que Sergio bajó a Descargas (7 procesos)
+  están todas cerradas o en ejecución. Vigente y calza: **869591-4-LE126**, relicitación de la valorización NICSP 31 de
+  las plataformas de ChileCompra, cierre **04-nov-2026 15:00**, veredicto **CON SOCIO** (firma o profesionales con 5+
+  valorizaciones NICSP 31 / IAS 38; TL sola ≈39-45 puntos si repite la 554-B). Bases del -4 sin bajar: solo se ven en
+  «Licitaciones Beta» con sesión de Sergio.
+- **Fuente chilecompra.cl:** dos correcciones más después de la entrada del 17-oct: `71d1fbb` (tipo de código genérico,
+  LS/R1; «licita»; la fecha de adjudicación no es cierre; cierre numérico dd/mm/aaaa) y `0245b8e` (el filtro de
+  adjudicación mira solo la oración del cierre). 24 tests OK. **Verificador: PASA en la cuarta pasada** (corrida real:
+  43 notas, ok, mismos 5 avisos). Casos borde bajos que quedan: abreviatura con punto entre «adjudicación» y el ancla,
+  punto sin espacio entre oraciones; ya conocidos: un código inventado da un aviso de más, tope de 5 páginas, un solo
+  cierre para dos IDs. Todos fallan hacia avisar de más.
+- Barrido de «Licitaciones Beta» de otros organismos y de «Consultas al Mercado Beta»: **no hecho**. Lo primero exige
+  sesión de Sergio; lo segundo tiene reCAPTCHA Enterprise (prohibido automatizarlo).
+
+### Pendiente
+
+- **Sergio:** iniciar sesión en Mercado Público en Chrome y dar permiso a la extensión para
+  `consulta-mercado.mercadopublico.cl`; con eso se recorren Licitaciones Beta y Consultas Beta a mano (revisión semanal)
+  y se bajan bases y foro de 869591-4-LE126.
+- **Sergio:** decidir a quién se le pide ser socio para 869591-4-LE126 (cierre 04-nov 15:00). Contactarlo es de Sergio.
+- Lun 19 09:00: en el log de Actions, «ChileCompra noticias desde …: N leídas»; el primer correo trae los 5 avisos.
+- Resto de fechas de la semana: entrada del 17-oct tarde (Seremi, EPCO, CFT Magallanes, CNE).
+
+### Estado del repo
+
+`main`. Push en este cierre de `c16a6a3`, `71d1fbb`, `0245b8e` (fuente chilecompra), `b577f09` (otra sesión) y el commit
+del triage con esta entrada.
+
 ## 2026-10-17 (sábado, tarde) — Seremi Antofagasta 2122-34-LE26 lista para subir
 
 Detalle en `../postulaciones/seremi-salud-2122-34-ia-cancer/continuidad.md` (entradas del 17-oct tarde y noche).
