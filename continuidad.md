@@ -1,5 +1,39 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-19 (lunes, mañana) — corrida del Radar y triage del día; pausa hasta la tarde
+
+### Hecho
+
+- Corrida 09:00 OK, pero Compra Ágil agotó la cuota diaria (429). Respondieron 7 de las 11 búsquedas diarias: faltaron diseño
+  web, redes sociales, marketing digital y producción audiovisual. De los rotativos corrieron 2 de 125. CNA: 40 + 40 leídas,
+  0 llamados. ChileCompra noticias: 43 leídas, 4 avisos.
+- Triages `triage/2026-10-19-licitaciones.md` (15 candidatas) y `triage/2026-10-19-compra-agil.md` (5). Bases en
+  `triage/bases-2026-10-19/` (fuera de git).
+- Foros pegados por Sergio:
+  - 1469-286-L126 (U. de Talca), 4 preguntas sacadas de las bases leídas;
+  - 1003780-1-LE26 (Nueva Alameda), 4 preguntas sacadas solo de la ficha: **error mío**. Las cuatro ya estaban respondidas
+    en las bases, leídas después (Res. 1736, 86 pp.).
+- Memorias: `foro-sin-bases-leidas` (nueva) y reincidencia en `cero-errores-cero-inferencias`.
+- Desde hoy los adjuntos de Mercado Público («Ver adjuntos») piden reCAPTCHA Enterprise. Chrome se reconectó al
+  mediodía, pero el clic en el clip no abre nada en la pestaña de la extensión: los adjuntos los baja Sergio.
+
+### Pendiente (tarde)
+
+- **Seremi 2122-34-LE26:** subir con `SUBIR.md` (cierre mar 20 15:00). Falta el formulario de integridad firmado de
+  Andrés (rol y documento ya respondidos) y la respuesta de Ismael.
+- Foro de 4375-137-LE26 (hoy 17:00): solo si Sergio baja los adjuntos y se leen antes.
+- Respuestas de foro de hoy: 1375758-7-LE26 a las 16:30 y 1067476-41-L126 a las 20:00, además de Codegua 18:00 y
+  Tralka 19:00.
+- Mar 20: foros de 635-166-L126 (12:00, faltan los TTRR), 5403-11-LP26 (16:00) y 752-32-LP26 (23:59). Ninguna pregunta
+  sin bases leídas. Compras Ágiles: Rapa Nui 1108734-32-COT26 (12:00) y EPJA 1388-22-COT26 (17:00), decide Sergio.
+- Nueva Alameda: decidir si TL va. Hay que revisar si Sergio acredita 3 estudios cuanti + cuali (BT §10), conseguir los
+  dos profesionales con 5+ años y cotizar el terreno de 1.500 encuestas.
+- Proponer: anotar el captcha en la memoria `mercado-publico-bajar-bases`.
+
+### Estado del repo
+
+`main`. Commit local con los dos triages y esta entrada; sin push.
+
 ## 2026-10-18 (domingo) — Seremi Antofagasta 2122-34-LE26 auditada palabra por palabra y lista para subir el lun 19
 
 Detalle completo en `../postulaciones/seremi-salud-2122-34-ia-cancer/continuidad.md` (entrada del 18-oct).
