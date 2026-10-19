@@ -11,14 +11,28 @@
 - El portal limita el nombre de cada archivo a 70 caracteres. Desde ahora los archivos que se suben llevan nombre
   corto (se anota en el kit).
 - Incumplimiento: un `cd` encadenado. El guardia lo envolvió y quedó en memoria.
+- **635-166-L126 (Arica): descartada por Sergio.** TTRR y anexos leídos (zip en
+  `triage/bases-2026-10-19/635-166-L126/adjuntos-16-29/`, .doc pasados a texto con Word con macros desactivadas). Pide un
+  equipo de cuatro perfiles certificados (Moodle, Scrum/PMP, UX/UI) y la experiencia vale 35 %: sola, TL no alcanza.
+- Rapa Nui 1108734-32-COT26 y EPJA 1388-22-COT26: no van (Sergio, «de acuerdo con lo otro»). EPCO ya estaba descartada.
+- **1375758-7-LE26 (SLEP Santiago Centro): foro leído** (26 respuestas, en `triage/bases-2026-10-19/1375758-7-LE26/`).
+  **Sergio: «Vamos solos»** sobre `dotacion`. Repo nuevo `../licitacion-slep-santiago-centro-dotacion` (commit
+  `add50d0`), con bases, foro y continuidad. La oferta sigue en una sesión abierta allá.
+- Triage `2026-10-19-licitaciones.md` actualizado: candidatas 6 y 7.
 
 ### Pendiente
 
-- Hoy: respuestas de foro de 1375758-7-LE26 (16:30), Codegua (18:00), Tralka (19:00) y 1067476-41-L126 (20:00).
-  El foro de 4375-137-LE26 (17:00) queda sin preguntas: no se bajaron sus adjuntos.
-- Mar 20: revisar la ficha de la Seremi antes de las 15:00; foros de 635-166-L126 (12:00, faltan los TTRR), 5403-11-LP26
-  (16:00) y 752-32-LP26 (23:59); Rapa Nui 1108734-32-COT26 (12:00) y EPJA 1388-22-COT26 (17:00); EPCO 1317954-9 (23:55);
-  F29 de septiembre.
+- Hoy: respuestas de foro de Codegua (18:00), Tralka (19:00) y 1067476-41-L126 (20:00). Cada una se mira en la
+  sesión de su carpeta; esta sesión queda cerrada. El foro de 4375-137-LE26 cerró sin preguntas.
+- Mar 20: revisar la ficha de la Seremi antes de las 15:00; foros de 5403-11-LP26 (16:00) y 752-32-LP26 (23:59), ambas
+  CON SOCIO; F29 de septiembre.
+- 1375758-7-LE26: en su repo (cierre lun 26-10 16:30).
+- Proponer: anotar en la memoria `mercado-publico-bajar-bases` que los adjuntos piden captcha.
+
+### Estado del repo
+
+`main`. Esta entrada, los cambios del triage y `633499f` se commitean y se pushean en este cierre. Las bases bajadas en
+`triage/bases-2026-10-19/` quedan fuera de git.
 
 ## 2026-10-19 (lunes, mañana) — corrida del Radar y triage del día; pausa hasta la tarde
 

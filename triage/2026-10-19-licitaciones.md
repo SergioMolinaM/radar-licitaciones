@@ -9,7 +9,7 @@
 | 3 | 1469-286-L126 | U. de Talca, Odontología | Plataforma e-learning + diseño instruccional curso Cariología | no publicado (L1) | 22-oct 15:30 | 19-oct 12:00 | PRESENTAR + PREGUNTAR AL FORO | 50-70 |
 | 4 | 1461054-45-LP26 | SLEP Elqui | Plataforma de gestión educacional y libro de clases digital, 77 EE, 36 meses | $290.234.736 est. | 22-oct 15:30 | cerrado (01-oct) | CON SOCIO (proveedor de libro de clases validado en EDE) | 20+ |
 | 5 | 5877-40-L126 | Seremi Culturas Los Ríos | Video documental gira BAFONA 27-31 oct | $7.100.000 IVA incl. | 23-oct 09:00 | cerrado (18-oct); respuestas 20-oct 20:00 | CON SOCIO (productora audiovisual de Valdivia) | 8-10 |
-| 6 | 635-166-L126 | Servicio de Salud Arica | Virtualización curso fiscales y actuarios, VALS con perspectiva de género | $2.430.000 IVA incl. | 23-oct 16:00 | 20-oct 12:00 | PRESENTAR + PREGUNTAR AL FORO | 10-15 (+60 ejecución) |
+| 6 | 635-166-L126 | Servicio de Salud Arica | Virtualización curso fiscales y actuarios, VALS con perspectiva de género | $2.430.000 IVA incl. | 23-oct 16:00 | 20-oct 12:00 | CON SOCIO (productora e-learning con 15+ cursos y equipo certificado) | 10-15 (+60 ejecución) |
 | 7 | 1375758-7-LE26 | SLEP Santiago Centro | SaaS de dotación escolar y solicitudes de contratación, 24 meses | $34.080.000 IVA incl. | 26-oct 16:30 | cerrado (08-oct); respuestas 19-oct 16:30 | CON SOCIO (empresa con 5 contratos de sistemas de RR.HH.) | 25-30 |
 | 8 | 5586-164-LE26 | U. de La Frontera | Plataforma de gestión de evento académico | no publicado (LE) | 26-oct 15:00 | 21-oct 09:00 | PREGUNTAR AL FORO | 10 |
 | 9 | 4375-137-LE26 | Hospital Guillermo Grant Benavente | 4 cursos e-learning asincrónicos (adjudicación múltiple) | $23.000.000 disp. en 4 líneas, exento | 26-oct 17:00 | 19-oct 17:00 | CON SOCIO (relator clínico; foro hoy 17:00) | 8 por curso |
@@ -73,14 +73,14 @@ Tres subagentes el 19-oct entre 11:20 y 11:45. Fichas de las 15 completas (texto
 - **Riesgos y lo que falta:** contradicciones sin foro: 4K y 5-10 min (p. 3) contra Full HD y 5-7 min (p. 4); experiencia medida en «años… en áreas de diseño gráfico» (pp. 6-7). La oferta tiene que cubrir ambas lecturas.
 - **Siguiente paso:** Sergio decide si contacta una productora de Valdivia antes del mié 21.
 
-### 6. 635-166-L126 — Virtualización curso VALS, SS Arica — PRESENTAR + PREGUNTAR AL FORO
+### 6. 635-166-L126 — Virtualización curso VALS, SS Arica — CON SOCIO (productora e-learning con 15+ cursos virtualizados y equipo certificado)
 
-- **Qué piden:** virtualizar el curso de formación de fiscales y actuarios con perspectiva de género sobre VALS; montado y probado a más tardar el 20-nov.
-- **Cómo se decide:** económico 45 %; técnico 50 % = equipo 10 (cumple/no cumple, títulos y CV), experiencia 35 (100 con 15+ cursos virtualizados, 50 con 6-14, 10 con 1-5), propuesta 5 (si no cumple, inadmisible); formales 3 %, integridad 2 % (pp. 4-7).
-- **Puntaje estimado de TL:** 60-65 sin experiencia acreditada en cursos virtualizados.
-- **Requisitos y cómo se cubren:** experiencia → pregunta al foro si vale la del equipo; requisitos del equipo en los TTRR, no leídos.
-- **Riesgos y lo que falta:** TTRR sin bajar (módulos, plataforma de destino).
-- **Siguiente paso:** Sergio baja los TTRR; se leen y recién entonces se redactan las preguntas (foro hasta mar 20 12:00). Sin preguntas hasta tener los TTRR leídos.
+- **Qué piden:** curso e-learning asincrónico de 22 h en 4 módulos: 4 SCORM con su fuente editable (.story de Articulate Storyline o equivalente), 2 videos MP4, 2 infografías (.AI o Canva), 4 quizzes y evaluación final, montado en Moodle; garantía de 12 meses y 6 meses de actualizaciones sin costo, ambas so pena de inadmisible (TTRR §2, §12-15). Entregado a más tardar el **20-nov-2026** (TTRR §17), con adjudicación hasta el 12-nov (bases p. 3).
+- **Cómo se decide:** económico 45 %; técnico 50 % = equipo 10 (cumple o no, con títulos, certificados y CV), experiencia 35 (100 con 15+ cursos virtualizados, 50 con 6-14, 10 con 1-5, 0 sin respaldo), propuesta 5 (si no cumple, inadmisible); formales 3 % (pide además fotocopia del RUT, cédula del representante y escritura de poderes), integridad 2 % (TTRR §18).
+- **Puntaje estimado de TL:** sola, ~55 si es la más barata: experiencia 0 (cursos virtualizados facturados no verificados), equipo 0. Un oferente con 15+ cursos y el equipo suma 45 puntos técnicos más: TL no lo alcanza por precio.
+- **Requisitos y cómo se cubren:** equipo mínimo con cuatro perfiles certificados (TTRR §5): gestor con Scrum Master/PMP/PMI-ACP o equivalente; experto Moodle con certificados Moodle Admin/Developer; diseñador instruccional con postgrado en currículo o diseño educativo; diseñador gráfico con certificación UX/UI. Solo con un socio que los tenga; en UTP la experiencia se suma (TTRR §18.2 b).
+- **Riesgos y lo que falta:** 8 días entre adjudicación y entrega si adjudican el último día; multa de 5 % diario (bases p. 10); $2.430.000 con IVA en un pago al final; Storyline tiene licencia de pago (H5P o el editor de Moodle se permiten como equivalente, TTRR §10).
+- **Siguiente paso:** **descartada por Sergio el 19-oct («ok descártalo»)**: no hay productora e-learning para la UTP. TTRR y anexos leídos el 19-oct 16:30 (`bases-2026-10-19/635-166-L126/adjuntos-16-29/`).
 
 ### 7. 1375758-7-LE26 — Plataforma de dotación SLEP Santiago Centro — CON SOCIO (empresa con 5 contratos de sistemas de RR.HH.)
 
@@ -88,8 +88,9 @@ Tres subagentes el 19-oct entre 11:20 y 11:45. Fichas de las 15 completas (texto
 - **Cómo se decide:** precio 35 %, experiencia 25 % (mín(n,5)/5 con facturas u OC con recepción conforme 2021-2026 de sistemas de gestión de personas, dotación, remuneraciones o procesos administrativos), técnica 20 % (mínimo 70/100 o inadmisible), implementación 10 % (>60 días inadmisible), Sello Mujer 5 %, formales 3 %, integridad 2 % (bases §9.3).
 - **Puntaje estimado de TL:** 50-65 sin socio: experiencia 0 (Llanquihue sin recepción conforme a tiempo), técnica 70-100 con lo que `dotacion` ya hace más desarrollos comprometidos, Sello 0, integridad 0 sin prueba de difusión.
 - **Requisitos y cómo se cubren:** «Los datos deberán alojarse en territorio nacional, salvo autorización previa, expresa y fundada del Servicio Local» (Bases Técnicas §5): región del Supabase de `dotacion` no verificada. Garantía 5 % neto; SLA 99 % y 8 h hábiles. Experiencia → UTP con empresa de menor tamaño con 5 contratos; subcontratación permitida.
-- **Riesgos y lo que falta:** respuestas del foro hoy 16:30; anexos sin bajar.
-- **Siguiente paso:** Sergio decide si busca socio; leer respuestas del foro hoy en la tarde.
+- **Riesgos y lo que falta:** foro leído el 19-oct 16:35 (26 respuestas, `bases-2026-10-19/1375758-7-LE26/foro-2026-10-19/`). Experiencia: vale contrato firmado más facturas más certificado o carta de conformidad del mandante, u OC en «Recepción Conforme»; las boletas de honorarios solas no valen; varias facturas de un mismo contrato cuentan como una; máximo 5 (R 1, R 11). Proyectos con IA o de trámites laborales cuentan solo si se acredita una plataforma de gestión de personas o de procesos administrativos (R 10). Datos: nube con región y respaldos en Chile; otra región solo con autorización escrita previa del SLEP, y la oferta no la reemplaza (R 3, R 20). La región del Supabase de `dotacion` está **no verificada**. Técnica: cada funcionalidad da todo o nada, con mínimo 70/100; puede estar «disponible» o comprometida para el día N dentro del plazo del Anexo 6, con un máximo de 60 días (R 13, R 17). Pago: implementación contra acta y 23 cuotas de uso (R 7); solo con factura (R 9). Integración con Browse por CSV o Excel, sin API (R 6, R 15). Dimensión: 43 establecimientos, unos 3.500 funcionarios, 50-100 usuarios, 1.500-2.500 solicitudes al año (R 5, R 14). Anexos sin bajar.
+- **Siguiente paso:** **Sergio, 19-oct: «Vamos solos»**, sobre `dotacion` (Llanquihue). La oferta se arma en el repo
+  `../licitacion-slep-santiago-centro-dotacion` (continuidad con los pendientes); cierre lun 26-oct 16:30.
 
 ### 8. 5586-164-LE26 — Plataforma evento académico UFRO — PREGUNTAR AL FORO
 
