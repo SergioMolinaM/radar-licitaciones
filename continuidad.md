@@ -1,5 +1,25 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-19 (lunes, tarde) — Seremi 2122-34-LE26 ENVIADA (16:16)
+
+### Hecho
+
+- **2122-34-LE26 enviada** a las 16:16, a $8.900.000 neto. El comprobante y el detalle están en
+  `../postulaciones/seremi-salud-2122-34-ia-cancer/continuidad.md` (entrada del 19-oct).
+- Foro de la Seremi bajado otra vez: son las mismas 106 respuestas del 16-oct, y la v3 cumple R 8/9, 11/60, 14,
+  26, 27, 59/76, 62, 64/105 y 71.
+- El portal limita el nombre de cada archivo a 70 caracteres. Desde ahora los archivos que se suben llevan nombre
+  corto (se anota en el kit).
+- Incumplimiento: un `cd` encadenado. El guardia lo envolvió y quedó en memoria.
+
+### Pendiente
+
+- Hoy: respuestas de foro de 1375758-7-LE26 (16:30), Codegua (18:00), Tralka (19:00) y 1067476-41-L126 (20:00).
+  El foro de 4375-137-LE26 (17:00) queda sin preguntas: no se bajaron sus adjuntos.
+- Mar 20: revisar la ficha de la Seremi antes de las 15:00; foros de 635-166-L126 (12:00, faltan los TTRR), 5403-11-LP26
+  (16:00) y 752-32-LP26 (23:59); Rapa Nui 1108734-32-COT26 (12:00) y EPJA 1388-22-COT26 (17:00); EPCO 1317954-9 (23:55);
+  F29 de septiembre.
+
 ## 2026-10-19 (lunes, mañana) — corrida del Radar y triage del día; pausa hasta la tarde
 
 ### Hecho
@@ -19,8 +39,11 @@
 
 ### Pendiente (tarde)
 
-- **Seremi 2122-34-LE26:** subir con `SUBIR.md` (cierre mar 20 15:00). Falta el formulario de integridad firmado de
-  Andrés (rol y documento ya respondidos) y la respuesta de Ismael.
+- **Seremi 2122-34-LE26:** subir con `SUBIR.md` (cierre mar 20 15:00). **Decisión de Sergio (19-oct, 15:10):** el
+  medio de verificación de integridad es solo su declaración firmada y el programa v1.2, sin las de Ismael y Andrés.
+  Ellos recibieron el programa el 18-oct y, según Sergio, están de acuerdo (Ismael por WhatsApp). La página firmada de
+  ninguno de los dos ha llegado. Ficha revisada a las 15:10: sigue el cierre 20-10 15:00 y el texto no trae
+  aclaraciones; la lista de adjuntos no se pudo ver (captcha).
 - Foro de 4375-137-LE26 (hoy 17:00): solo si Sergio baja los adjuntos y se leen antes.
 - Respuestas de foro de hoy: 1375758-7-LE26 a las 16:30 y 1067476-41-L126 a las 20:00, además de Codegua 18:00 y
   Tralka 19:00.
