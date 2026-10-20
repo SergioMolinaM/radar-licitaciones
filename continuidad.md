@@ -1,5 +1,26 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-20 (martes) — decisiones de cartera desde la sesión raíz «Todo»
+
+### Hecho
+
+- **1725-219-COT26 ENPCCL: descartada por Sergio** («lo de diagramar déjalo»): sin diagramador editorial para 150-200
+  pp. en InDesign.
+- **SLEP Los Parques 1375754-80: descartada**, cerró el 20-oct 12:00 sin los certificados (Gmail sin ellos).
+- **Codegua 4732-27: descartada** (TL sin patente municipal; R1 del foro no acepta provisoria). Detalle en su carpeta.
+- **Tralka 1469-284-L126:** no estaba enviada (escritorio de proveedor); se armó y se envió el 20-oct 10:28. Detalle en
+  `../postulaciones/utalca-1469-284-tralka/continuidad.md`.
+- **752-32-LP26 (GORE Los Lagos) y 5403-11-LP26 (CNA):** bases leídas, preguntas subidas al foro el 20-oct, carpetas
+  nuevas en `../postulaciones/gore-los-lagos-752-32-parcc/` y `../postulaciones/cna-5403-11-gobernanza-datos/`.
+
+### Pendiente
+
+- Cada licitación en su carpeta de `postulaciones/` (Los Lagos espera a Pablo Badenier y David; CNA solo con empresa
+  socia). Corrida diaria y foros siguen como en la entrada del 19-oct.
+
+### Estado del repo
+
+Solo esta entrada.
 ## 2026-10-19 (lunes, tarde) — Seremi 2122-34-LE26 ENVIADA (16:16)
 
 ### Hecho
