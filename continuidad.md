@@ -1,5 +1,44 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-22 (jueves, tarde) — segundo ticket de Mercado Público como respaldo; 429 medido
+
+### Hecho
+
+- **Ticket nuevo de Mercado Público** (emitido el 22-oct, Sergio lo pegó en la sesión raíz). Probado contra la API v1
+  (devolvió 1469-284-L126) y contra `api2` de Compra Ágil (OK; control con ticket falso → 401). El ticket del
+  secreto `MERCADO_PUBLICO_TOKEN` (22-jun) también funciona en las dos: la corrida de hoy leyó 4.823 licitaciones.
+- **Decisión:** el nuevo es solo de **respaldo**. Se usa cuando la API rechaza el principal, nunca ante un 429.
+  Alternativa descartada: repartir consultas entre los dos para sumar cuota. Es mejor para el producto porque la cuota
+  es por ticket y por día (guía Compra Ágil §4) y la guía dice que la cuota mayor se pide a ChileCompra (§4.3).
+  Sumar tickets puede leerse como saltarse el límite y arriesga el bloqueo de los dos, y con eso caen también las
+  licitaciones. Costo para nosotros (no fue criterio): igual en las dos opciones.
+- Código: `src/sources/_tickets.py` (nuevo, `tickets()`). En `mercado_publico.py`, la v1 manda los errores como JSON
+  `{"Codigo","Mensaje"}` con HTTP 2xx (ticket inválido: 203; peticiones simultáneas: 10500, medidos hoy). **Antes
+  pasaban callados como 0 licitaciones.** Ahora se loguean, y un 203 pasa al respaldo. El error de `requests` ya no se
+  imprime entero porque su URL lleva el ticket. En `compra_agil.py`, un 401/403 pasa al respaldo y repite el término,
+  y el 429 deja en el log Retry-After, el mensaje y el número de solicitudes de la corrida. `scanner.yml` recibe
+  `MERCADO_PUBLICO_TOKEN_2`.
+- **El 429 no parece una cuota diaria fija.** Según los logs de Actions (estimado: el log no contaba solicitudes), el
+  19 y el 22-oct llegó tras 15 a 17 solicitudes y el 20 y el 21-oct pasaron entre 45 y 51 sin 429. La guía no da la
+  cifra: dice que depende del tipo de ticket (§4.1). El «10.000/día» de `audit_compra_agil.py` no tenía fuente y se
+  corrigió el comentario.
+- Verificador: **PASA** (96 de 100 comprobaciones en seco, sin red ni correo, y `state.json` intacto). Cuatro no pasan
+  y no son defectos: dos esperan el texto antiguo del mensaje y dos prueban un `"203"` como texto, que no está medido.
+
+### Pendiente
+
+1. **Sergio:** cargar el secreto en una terminal normal, no con `!`:
+   `gh secret set MERCADO_PUBLICO_TOKEN_2 -R <repo>`. Sin él, el respaldo no existe y todo sigue igual que antes.
+2. Leer en las próximas corridas la línea `cuota agotada (429) tras N solicitudes; Retry-After=…`. Si Retry-After es
+   corto, el límite es por ráfaga y conviene espaciar las consultas. Si apunta al cambio de día, es cuota diaria y
+   corresponde pedir a ChileCompra un ticket de mayor cuota (§4.3).
+3. La rama `except ValueError` de `fetch_raw_activas` nunca corre: con requests 2.32 el `JSONDecodeError` cae en
+   `RequestException`. El log sale igual. Ya pasaba antes del cambio.
+
+### Estado del repo
+
+`main`. Commit de este cambio y push. `triage/2026-10-22-compra-agil.md` es de otra sesión y no entra en este commit.
+
 ## 2026-10-20 (martes) — decisiones de cartera desde la sesión raíz «Todo»
 
 ### Hecho

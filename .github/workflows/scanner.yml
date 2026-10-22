@@ -51,6 +51,7 @@ jobs:
         if: steps.respaldo.outputs.saltar != '1'
         env:
           MERCADO_PUBLICO_TOKEN: ${{ secrets.MERCADO_PUBLICO_TOKEN }}
+          MERCADO_PUBLICO_TOKEN_2: ${{ secrets.MERCADO_PUBLICO_TOKEN_2 }}  # respaldo solo ante ticket rechazado, nunca ante 429
           RESEND_API_KEY:        ${{ secrets.RESEND_API_KEY }}
           RADAR_TO_EMAIL:        ${{ secrets.RADAR_TO_EMAIL }}
           RADAR_FROM_EMAIL:      ${{ secrets.RADAR_FROM_EMAIL }}

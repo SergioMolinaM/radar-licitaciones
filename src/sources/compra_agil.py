@@ -26,7 +26,6 @@ al agotarlo (§4). Con estado=publicada + ventana de 3 días el universo ronda l
 seguridad. Ante 429 se detiene y retorna lo acumulado (no revienta la corrida).
 """
 
-import os
 import time
 import logging
 from datetime import datetime, timedelta, timezone
@@ -45,6 +44,7 @@ from ..config import (
     KEYWORDS_INCLUDE,
 )
 from ..filters import excluido, keywords_incluidas
+from ._tickets import tickets
 
 logger = logging.getLogger(__name__)
 
@@ -59,10 +59,12 @@ RESERVA_POR_REINTENTO_S = 30  # un 504 tarda ~29 s; se aparta este tiempo por di
 
 
 def _get_ticket() -> str | None:
-    ticket = os.getenv("MERCADO_PUBLICO_TOKEN")
-    if not ticket:
+    """Ticket principal (auditoría). El radar diario usa tickets() con respaldo."""
+    disponibles = tickets()
+    if not disponibles:
         logger.error("MERCADO_PUBLICO_TOKEN no configurado (Compra Ágil)")
-    return ticket
+        return None
+    return disponibles[0][1]
 
 
 def _get_con_reintentos(ticket: str, params: dict, numero_pagina: int) -> requests.Response | None:
@@ -217,13 +219,36 @@ class _CuotaAgotada(Exception):
     pass
 
 
+class _TicketRechazado(Exception):
+    pass
+
+
+# Solicitudes hechas por fetch_compra_agil en esta corrida, para saber con
+# cuántas llega el 429: el 19 y el 22-oct llegó tras 15 a 17 y el 20 y 21-oct
+# 45 a 51 pasaron sin él (estimado de los logs), así que no se sabe aún si es
+# cuota diaria o ráfaga.
+_solicitudes = 0
+
+
+def _detalle_429(resp: requests.Response) -> str:
+    """Retry-After y mensaje del 429 (guía §4.2 y §7), para medir el límite."""
+    try:
+        errores = (resp.json() or {}).get("errors") or []
+        mensaje = errores[0].get("mensaje") if errores else None
+    except (ValueError, AttributeError):
+        mensaje = None
+    return (f"cuota agotada (429) tras {_solicitudes} solicitudes; "
+            f"Retry-After={resp.headers.get('Retry-After')!r}; mensaje={mensaje!r}")
+
+
 def _buscar_termino(ticket: str, termino: str, publicado_desde: str) -> tuple[list[dict], bool] | None:
     """Un intento de búsqueda `q` (guía §5.1 Grupo 5), todas sus páginas.
 
     Retorna (items, truncado) o None si alguna página falla (504, 5xx, red,
-    JSON o forma inesperada). Lanza _CuotaAgotada ante 429 y ante ticket
-    rechazado: seguir no sirve.
+    JSON o forma inesperada). Lanza _CuotaAgotada ante 429 y _TicketRechazado
+    ante 401/403.
     """
+    global _solicitudes
     items: list[dict] = []
     for numero_pagina in range(1, MAX_PAGINAS_TERMINO + 1):
         params = {
@@ -233,15 +258,16 @@ def _buscar_termino(ticket: str, termino: str, publicado_desde: str) -> tuple[li
             "tamano_pagina": TAMANO_PAGINA,
             "numero_pagina": numero_pagina,
         }
+        _solicitudes += 1
         try:
             resp = requests.get(COMPRA_AGIL_API_URL, headers={"ticket": ticket}, params=params, timeout=TIMEOUT)
         except requests.RequestException as e:
             logger.warning(f"Compra Ágil q={termino!r}: error de red — {type(e).__name__}")
             return None
         if resp.status_code == 429:
-            raise _CuotaAgotada("cuota diaria agotada (429)")
+            raise _CuotaAgotada(_detalle_429(resp))
         if resp.status_code in (401, 403):
-            raise _CuotaAgotada(f"ticket rechazado ({resp.status_code})")
+            raise _TicketRechazado(f"ticket rechazado ({resp.status_code})")
         if resp.status_code != 200:
             logger.warning(f"Compra Ágil q={termino!r}: HTTP {resp.status_code} (pág {numero_pagina})")
             return None
@@ -353,8 +379,11 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
         "diarios_ok": [], "diarios_fallidos": [], "rotativos_ok": [], "rotativos_total": len(rotativos),
         "truncados": [], "cursor": cursor, "ultima": ultima, "devueltas": 0, "cortado": "",
     }
-    ticket = _get_ticket()
-    if not ticket:
+    global _solicitudes
+    _solicitudes = 0
+    disponibles = tickets()
+    if not disponibles:
+        logger.error("MERCADO_PUBLICO_TOKEN no configurado (Compra Ágil)")
         resumen["diarios_fallidos"] = list(COMPRA_AGIL_TERMINOS_DIARIOS)
         resumen["cortado"] = "sin ticket"
         return [], resumen
@@ -367,8 +396,23 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
     def queda_tiempo(reserva_s: float = 0) -> bool:
         return time.monotonic() - inicio < presupuesto_s - reserva_s
 
+    def buscar(termino: str) -> tuple[list[dict], bool] | None:
+        # Ante 401/403 se pasa al ticket de respaldo y se repite el término.
+        # Ante 429 no: ver _tickets.py.
+        desde = _desde_rotativo(ultima.get(termino), ahora)
+        while True:
+            nombre, ticket = disponibles[0]
+            try:
+                return _buscar_termino(ticket, termino, desde)
+            except _TicketRechazado as e:
+                disponibles.pop(0)
+                if not disponibles:
+                    alcance = "principal y respaldo" if nombre == "respaldo" else nombre
+                    raise _CuotaAgotada(f"{e}: {alcance}, sin otro ticket")
+                logger.error(f"Compra Ágil: {e} con el ticket {nombre}; se pasa al {disponibles[0][0]}")
+
     def procesar(termino: str) -> bool:
-        r = _buscar_termino(ticket, termino, _desde_rotativo(ultima.get(termino), ahora))
+        r = buscar(termino)
         if r is None:
             return False
         items, truncado = r
@@ -435,7 +479,8 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
     logger.info(
         f"Compra Ágil: diarios {len(resumen['diarios_ok'])}/{len(COMPRA_AGIL_TERMINOS_DIARIOS)} ok, "
         f"rotativos {len(resumen['rotativos_ok'])}/{len(rotativos)} ok (cursor {cursor}→{resumen['cursor']}), "
-        f"{resumen['devueltas']} devueltas, {len(por_codigo)} tras exclusiones"
+        f"{resumen['devueltas']} devueltas, {len(por_codigo)} tras exclusiones, "
+        f"{_solicitudes} solicitudes, ticket {disponibles[0][0] if disponibles else 'ninguno'}"
     )
     if resumen["diarios_fallidos"]:
         logger.warning(f"Compra Ágil: diarios sin respuesta: {', '.join(resumen['diarios_fallidos'])}")

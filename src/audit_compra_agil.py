@@ -20,7 +20,11 @@ Uso:
 
 Costo de cuota: 1 request por página del listado (~16) + 1 por cada Compra Ágil
 cuyo detalle se pide (ahí está la descripción). El tope es MAX_DETALLES. La
-cuota es de 10.000/día por ticket, así que una corrida completa usa ~3%.
+guía (§4.1) dice que la cuota diaria depende del tipo de ticket y no da la
+cifra; el «10.000/día» que decía este comentario no tiene fuente. El 19 y el
+22-oct el radar recibió 429 tras 15 a 17 solicitudes (estimado del log, que
+entonces no las contaba), así que esta auditoría
+puede agotar la cuota del día y dejar sin Compra Ágil la corrida diaria.
 
 NO envía correo ni toca data/state.json. No corre en el cron: es manual.
 

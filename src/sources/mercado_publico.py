@@ -12,11 +12,11 @@ Se consulta sin fecha para obtener TODAS las activas. La deduplicación
 por state.json evita re-notificar las mismas licitaciones día tras día.
 """
 
-import os
 import logging
 import requests
 
 from ..config import MP_API_URL
+from ._tickets import tickets
 from ..filters import matches_keywords
 
 logger = logging.getLogger(__name__)
@@ -30,28 +30,46 @@ def fetch_raw_activas() -> list[dict]:
     Uso principal: auditoría de keywords (src/audit.py) y también fuente para
     fetch_licitaciones_dia. Retorna [] si el token falla o la API responde mal.
     """
-    ticket = os.getenv("MERCADO_PUBLICO_TOKEN")
-    if not ticket:
+    disponibles = tickets()
+    if not disponibles:
         logger.error("MERCADO_PUBLICO_TOKEN no configurado")
         return []
 
-    params = {"estado": "activas", "ticket": ticket}
+    for nombre, ticket in disponibles:
+        params = {"estado": "activas", "ticket": ticket}
 
-    try:
-        resp = requests.get(MP_API_URL, params=params, timeout=TIMEOUT)
-        resp.raise_for_status()
-        data = resp.json()
-    except requests.RequestException as e:
-        logger.error(f"Error consultando Mercado Público: {e}")
-        return []
-    except ValueError as e:
-        logger.error(f"Respuesta no es JSON válido: {e}")
-        return []
+        try:
+            resp = requests.get(MP_API_URL, params=params, timeout=TIMEOUT)
+            resp.raise_for_status()
+            data = resp.json()
+        except requests.RequestException as e:
+            # El mensaje de requests trae la URL y en ella el ticket: no se loguea.
+            logger.error(f"Error consultando Mercado Público: {type(e).__name__}")
+            return []
+        except ValueError as e:
+            logger.error(f"Respuesta no es JSON válido: {e}")
+            return []
 
-    listado = data.get("Listado") or []
-    cantidad = data.get("Cantidad", len(listado))
-    logger.info(f"Mercado Público: {cantidad} licitaciones activas en total")
-    return listado
+        # Los errores de la API v1 llegan como {"Codigo", "Mensaje"} sin Listado
+        # y con HTTP 2xx (ticket inválido: 203; peticiones simultáneas: 200 con
+        # Codigo 10500, medidos el 22-oct). Antes pasaban como 0 licitaciones.
+        if not isinstance(data, dict):
+            logger.error(f"Mercado Público: respuesta inesperada ({type(data).__name__})")
+            return []
+        if "Listado" not in data:
+            codigo, mensaje = data.get("Codigo"), data.get("Mensaje")
+            logger.error(f"Mercado Público: error de la API con ticket {nombre} — {codigo}: {mensaje}")
+            if codigo == 203:
+                continue  # ticket rechazado: se prueba el respaldo, si hay
+            return []
+
+        if nombre != "principal":
+            logger.warning(f"Mercado Público: se usó el ticket {nombre}; revisar el principal")
+        listado = data.get("Listado") or []
+        cantidad = data.get("Cantidad", len(listado))
+        logger.info(f"Mercado Público: {cantidad} licitaciones activas en total")
+        return listado
+    return []
 
 
 def fetch_licitaciones_dia() -> tuple[list[dict], int]:
