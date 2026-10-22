@@ -27,8 +27,9 @@
 
 ### Pendiente
 
-1. **Sergio:** cargar el secreto en una terminal normal, no con `!`:
-   `gh secret set MERCADO_PUBLICO_TOKEN_2 -R <repo>`. Sin él, el respaldo no existe y todo sigue igual que antes.
+1. ~~Cargar el secreto~~ **Hecho:** Sergio cargó `MERCADO_PUBLICO_TOKEN_2` el 22-oct a las 20:22 UTC; aparece en
+   `gh secret list`. No se verificó el valor: un secreto no se puede leer, y el respaldo solo corre cuando se rechaza
+   el principal.
 2. Leer en las próximas corridas la línea `cuota agotada (429) tras N solicitudes; Retry-After=…`. Si Retry-After es
    corto, el límite es por ráfaga y conviene espaciar las consultas. Si apunta al cambio de día, es cuota diaria y
    corresponde pedir a ChileCompra un ticket de mayor cuota (§4.3).
