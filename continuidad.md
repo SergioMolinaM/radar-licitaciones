@@ -1,5 +1,47 @@
 # Continuidad — Radar de Licitaciones
 
+## Sesión 2026-10-26 (lunes, tarde) — PNUD Chile, inglés, empleos para Sergio; UNGM fuera por términos
+
+Sesión raíz. Sergio, tras revisar PNUD Chile en LinkedIn: «tienes que incluir estas cosas en radar licitaciones» y
+«agrega todo».
+
+### Hecho
+
+- **Triages del día** (formato §4): `triage/2026-10-26-compra-agil.md`, `-licitaciones.md` y `-fuera-del-radar.md`
+  (UNGM y empleos PNUD). Bases bajadas en `triage/bases-2026-10-26/` (fuera de git).
+- **Corrida de hoy falló al final:** push de `state.json` rechazado (otra sesión subió `78f35b0` durante los 20 min).
+  El correo salió; el del 27-oct repetirá las 186 del 26. Arreglo en `scanner.yml`: `git pull --rebase --autostash`
+  antes del push.
+- **PNUD Chile tiene feed: CHI.xml** («listings are for CHILE»; CHL da 404, comprobado hoy). El código decía «Chile no
+  tiene feed propio» y solo entraba por el global. Ahora entra completo, sin exigir keyword (`UNDP_FEEDS_SIN_KEYWORDS`),
+  con exclusiones. Hoy 0 avisos (calza con procurement-notices: último aviso CHL del 8-sep).
+- **Keywords en inglés** (`KEYWORDS_INCLUDE_EN` / `KEYWORDS_EXCLUDE_EN`) solo para fuentes internacionales, vía
+  `matches_keywords_intl`. No tocan MP ni las búsquedas de Compra Ágil (125 rotativos y 11 diarios idénticos a HEAD;
+  `matches_keywords` igual en 4.029 títulos de `data/audit-2026-07-08.csv`, verificador).
+- **Fuente nueva `undp_empleos.py`:** empleos del PNUD (Oracle HCM, API pública sin token) en Chile y remotos
+  postulables por externos; sección «Para Sergio: empleos PNUD (personas, no empresa)». Filtro: fuera contratos
+  nacionales de otro país, «Nationals of», «Tier 1», pasantías. Hoy: 37616 (edición Mineduc UCE, cierra 28-10 00:59) y
+  36499 (IPSA12 UNCDF remoto, 30-10). Si falla el detalle de un remoto no se marca visto y se reintenta.
+- **UNGM no entra al Radar:** receta técnica probada (GET + token antiforgery + POST /Public/Notice/Search, HTML), pero
+  los Términos 5.2 y 5.3 prohíben uso comercial e incluir su material en otro sistema sin permiso escrito. Lectura
+  manual para triage sí (hoy: 56 avisos Chile, 9 fichas). Alertas UNGM Pro: costo no verificado.
+- UNDP Careers no tiene consultores individuales (113 avisos: NPSA, FTA, IPSA, pasantías); los IC van por
+  procurement-notices. CEPAL: cepal.org da 403 desde aquí; sus licitaciones probablemente en UNGM (no verificado).
+- Pruebas: `tests/test_undp.py` (10 nuevas); 34 OK. Verificador: **PASA** con 4 observaciones; corregidas la 1, la 2 y
+  la 4. La 3 (sin tzdata en Windows se usa UTC-3 fijo; en Ubuntu hay tzdata) queda documentada en el código.
+
+### Pendiente
+
+- **Push con autorización de Sergio** (commit local hecho). Primera corrida con los cambios: mar 27-10 09:00; mirar en
+  el log `PNUD Chile` y `Empleos PNUD`, y que el push de state.json pase.
+- UNGM: decidir entre revisión manual semanal (como el BEO, lunes) o pedir permiso escrito a UNGM. Decide Sergio.
+- Leer en el log el `Retry-After` del 429 de Compra Ágil (sigue de la entrada del 22-oct).
+
+### Estado del repo
+
+`main`. Commit local con código, pruebas, workflow, triages del 26-oct y esta entrada; sin push hasta que Sergio lo
+autorice. `triage/2026-10-22-compra-agil.md` es de otra sesión: no entra.
+
 
 ## Sesión 2026-10-26 (lunes) — TGR 622-64-L126 descartada, desde la raíz
 

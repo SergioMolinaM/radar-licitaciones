@@ -2,8 +2,10 @@
 
 Endpoint base: https://procurement-notices.undp.org/rss_feeds/{CODIGO}.xml
 - CODIGO = código propietario PNUD (no ISO3 estándar). Ej: BOL, PER, COL.
-- Chile no tiene feed propio: usar Mercado Público para Chile.
+- Chile es CHI (CHL da 404; comprobado el 26-oct-2026). Entra completo, sin exigir
+  keyword (UNDP_FEEDS_SIN_KEYWORDS).
 - Feed global (rss.xml) atrapa licitaciones regionales/multipaís.
+- Keywords en español e inglés (matches_keywords_intl): los avisos vienen en inglés.
 Formato: RSS 1.0 (RDF), actualizado cada hora.
 """
 
@@ -14,8 +16,8 @@ from datetime import datetime
 import feedparser
 import requests
 
-from ..config import UNDP_FEEDS, UNDP_GLOBAL_FEED, UNDP_GLOBAL_PAIS_FILTRO
-from ..filters import matches_keywords
+from ..config import UNDP_FEEDS, UNDP_FEEDS_SIN_KEYWORDS, UNDP_GLOBAL_FEED, UNDP_GLOBAL_PAIS_FILTRO
+from ..filters import matches_keywords_intl
 
 logger = logging.getLogger(__name__)
 
@@ -34,13 +36,13 @@ def _deadline(descripcion: str) -> str:
         return ""
 
 
-def _entry_to_item(entry, fuente: str) -> dict | None:
+def _entry_to_item(entry, fuente: str, exigir_keyword: bool = True) -> dict | None:
     """Transforma una entrada RSS en el esquema interno."""
     titulo = entry.get("title", "") or ""
     descripcion = entry.get("description", "") or entry.get("summary", "") or ""
     texto_match = f"{titulo} {descripcion}"
 
-    match, kws = matches_keywords(texto_match)
+    match, kws = matches_keywords_intl(texto_match, exigir_keyword=exigir_keyword)
     if not match:
         return None
 
@@ -64,7 +66,8 @@ def _entry_to_item(entry, fuente: str) -> dict | None:
     }
 
 
-def _fetch_feed(url: str, fuente: str, pais_filtro: list[str] | None = None) -> tuple[list[dict], int]:
+def _fetch_feed(url: str, fuente: str, pais_filtro: list[str] | None = None,
+                exigir_keyword: bool = True) -> tuple[list[dict], int]:
     """Descarga y parsea un feed RSS. Opcionalmente filtra por país en título.
 
     Retorna (matches, total_entries_del_feed). El segundo valor alimenta el
@@ -89,7 +92,7 @@ def _fetch_feed(url: str, fuente: str, pais_filtro: list[str] | None = None) -> 
             if not any(p in texto for p in pais_filtro):
                 continue
 
-        item = _entry_to_item(entry, fuente)
+        item = _entry_to_item(entry, fuente, exigir_keyword)
         if item:
             resultados.append(item)
 
@@ -107,7 +110,8 @@ def fetch_undp_notices() -> tuple[list[dict], int]:
 
     # Feeds por país
     for pais, url in UNDP_FEEDS.items():
-        matches, universo = _fetch_feed(url, f"PNUD {pais}")
+        matches, universo = _fetch_feed(url, f"PNUD {pais}",
+                                        exigir_keyword=pais not in UNDP_FEEDS_SIN_KEYWORDS)
         universo_total += universo
         for item in matches:
             resultados[item["id"]] = item

@@ -19,6 +19,7 @@ from .sources.compra_agil import fetch_compra_agil
 from .sources.undp import fetch_undp_notices
 from .sources.cna import fetch_convocatorias_pares
 from .sources.chilecompra import fetch_avisos_chilecompra
+from .sources.undp_empleos import fetch_empleos_undp
 from .state import load_state, save_state, is_new, mark_seen, prune_state, _parse_iso
 from .notifier import send_email, send_heartbeat, send_aviso_cna, send_aviso_cna_extra, destinatarios_cna_extra
 
@@ -74,7 +75,13 @@ def run() -> int:
         logger.exception("ChileCompra noticias: error inesperado")
         matches_cc, resumen_cc = [], {"ok": False, "leidas": 0, "ultima": state.get("cc_ultima")}
     state["cc_ultima"] = resumen_cc["ultima"]
-    todos = matches_mp + matches_ca + matches_undp + matches_cc
+    # Empleos del PNUD para Sergio como persona (sección aparte en el correo).
+    try:
+        empleos_undp, empleos_fallas = fetch_empleos_undp()
+    except Exception:
+        logger.exception("Empleos PNUD: error inesperado")
+        empleos_undp, empleos_fallas = [], ["todo (error inesperado)"]
+    todos = matches_mp + matches_ca + matches_undp + matches_cc + empleos_undp
 
     logger.info(f"Universo escaneado: MP={universo_mp}, CA devueltas={universo_ca}, PNUD={universo_undp}, "
                 f"ChileCompra noticias={resumen_cc['leidas']}")
@@ -107,6 +114,9 @@ def run() -> int:
                          + " (aparecen los primeros 250; pueden faltar los siguientes)")
     if not cna_ok:
         parciales.append("Noticias de la CNA sin respuesta: hoy no se revisó si abrió un llamado a pares evaluadores")
+    if empleos_fallas:
+        parciales.append("Empleos del PNUD sin revisar hoy: " + ", ".join(empleos_fallas)
+                         + " (se busca de nuevo en la próxima corrida)")
     if caidas:
         logger.error(f"Fuentes caídas en esta corrida: {', '.join(caidas)}")
 

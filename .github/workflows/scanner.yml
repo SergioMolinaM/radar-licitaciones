@@ -68,6 +68,10 @@ jobs:
           if [[ -n "$(git status --porcelain data/state.json)" ]]; then
             git add data/state.json
             git commit -m "chore(state): actualización automática $(date -u +%FT%TZ)"
+            # La corrida dura ~20 min: si en ese rato se subió otro commit (p. ej. una
+            # continuidad), el push sin rebase se rechaza y state.json no se guarda
+            # (26-oct-2026: el correo del día siguiente repetía lo ya avisado).
+            git pull --rebase --autostash
             git push
           else
             echo "state.json sin cambios"

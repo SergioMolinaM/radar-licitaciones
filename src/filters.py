@@ -2,7 +2,10 @@
 
 import re
 import unicodedata
-from .config import KEYWORDS_INCLUDE, KEYWORDS_INCLUDE_PALABRA, KEYWORDS_EXCLUDE
+from .config import (
+    KEYWORDS_INCLUDE, KEYWORDS_INCLUDE_PALABRA, KEYWORDS_EXCLUDE,
+    KEYWORDS_INCLUDE_EN, KEYWORDS_EXCLUDE_EN,
+)
 
 
 def _normalize(text: str) -> str:
@@ -81,4 +84,23 @@ def matches_keywords(text: str) -> tuple[bool, list[str]]:
 
     # Filtro de inclusión (devuelve las originales con acentos, para display)
     encontradas = [kw_original for kw_original, patron in _INCLUDE_RE if patron.search(t)]
+    return (len(encontradas) > 0, encontradas)
+
+
+_INCLUDE_EN_RE = [(kw, _patron(_normalize(kw))) for kw in KEYWORDS_INCLUDE_EN]
+_EXCLUDE_EN_RE = [_patron(_normalize(kw)) for kw in KEYWORDS_EXCLUDE_EN]
+
+
+def matches_keywords_intl(text: str, exigir_keyword: bool = True) -> tuple[bool, list[str]]:
+    """Como matches_keywords, para fuentes internacionales: keywords en español y en
+    inglés, exclusiones de los dos idiomas. Con exigir_keyword=False pasa todo lo no
+    excluido (feeds de país chicos que se quieren ver completos)."""
+    if not text:
+        return False, []
+    t = _normalize(text)
+    if any(p.search(t) for p in _EXCLUDE_RE + _EXCLUDE_EN_RE):
+        return False, []
+    encontradas = [kw for kw, p in _INCLUDE_RE + _INCLUDE_EN_RE if p.search(t)]
+    if not exigir_keyword:
+        return True, encontradas or ["(todo el feed del país)"]
     return (len(encontradas) > 0, encontradas)

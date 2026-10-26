@@ -292,8 +292,37 @@ MP_ESTADOS_INTERES = ["publicada", "activa"]
 # Monto mínimo estimado (en CLP) para filtrar ruido. None = sin filtro.
 MONTO_MINIMO_CLP = None
 
-# Feeds RSS de PNUD a consultar.
+# Keywords en inglés, solo para fuentes internacionales (PNUD y ONU), que publican
+# casi todo en inglés: con las de arriba un «Communication strategy» no calzaba.
+# Lista aparte porque KEYWORDS_INCLUDE alimenta las búsquedas rotativas de Compra
+# Ágil y sumarle términos gasta su cuota (429). Mismo matcheo: inicio de palabra.
+KEYWORDS_INCLUDE_EN = [
+    "communication", "outreach", "public awareness", "awareness campaign", "media",
+    "campaign", "advocacy", "storytelling", "editorial", "editing", "copy edit",
+    "publication", "audiovisual", "video production",
+    "survey", "public opinion", "perception study", "focus group", "qualitative",
+    "quantitative", "research", "baseline", "evaluation", "assessment", "diagnostic",
+    "data", "dashboard", "information system", "digital platform", "web platform",
+    "website", "web portal", "software development", "artificial intelligence",
+    "machine learning",
+    "citizen participation", "public participation", "consultation", "stakeholder",
+    "engagement", "dialogue", "governance", "capacity building", "training",
+    "workshop", "facilitation",
+    "circular economy", "waste management", "recycling", "extended producer",
+    "climate change", "education",
+]
+
+# Exclusiones en inglés para las mismas fuentes (bienes y obras).
+KEYWORDS_EXCLUDE_EN = [
+    "supply of", "supply and", "delivery of goods", "equipment", "vehicle",
+    "construction", "civil works", "rehabilitation works", "medical", "laboratory",
+    "furniture", "fuel", "spare parts", "refrigeration", "air conditioning",
+]
+
+# Feeds RSS de PNUD a consultar. Chile es CHI, no CHL: CHL da 404 y por eso hasta el
+# 26-oct-2026 Chile solo entraba por el feed global (CHI.xml: «listings are for CHILE»).
 UNDP_FEEDS = {
+    "Chile": "https://procurement-notices.undp.org/rss_feeds/CHI.xml",
     "Bolivia": "https://procurement-notices.undp.org/rss_feeds/BOL.xml",
     "Perú": "https://procurement-notices.undp.org/rss_feeds/PER.xml",
     "Colombia": "https://procurement-notices.undp.org/rss_feeds/COL.xml",
@@ -301,6 +330,10 @@ UNDP_FEEDS = {
     "Ecuador": "https://procurement-notices.undp.org/rss_feeds/ECU.xml",
     "México": "https://procurement-notices.undp.org/rss_feeds/MEX.xml",
 }
+
+# Países cuyo feed PNUD entra completo, sin exigir keyword: pocos avisos al mes
+# (5 de jul a oct 2026) y Sergio prefiere ver todo y decidir. Siguen las exclusiones.
+UNDP_FEEDS_SIN_KEYWORDS = {"Chile"}
 
 UNDP_GLOBAL_FEED = "https://procurement-notices.undp.org/rss_feeds/rss.xml"
 
