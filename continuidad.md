@@ -32,15 +32,16 @@ Sesión raíz. Sergio, tras revisar PNUD Chile en LinkedIn: «tienes que incluir
 
 ### Pendiente
 
-- **Push con autorización de Sergio** (commit local hecho). Primera corrida con los cambios: mar 27-10 09:00; mirar en
-  el log `PNUD Chile` y `Empleos PNUD`, y que el push de state.json pase.
+- Revisar la corrida del mar 27-10 09:00, la primera con los cambios: en el log, `PNUD Chile` y `Empleos PNUD`, y que el
+  push de state.json pase. El correo repite las 186 del 26 (esperado). Responsable: Claude, en la sesión del 27.
+- Sergio decide el empleo 37616 (cierra 28-10 00:59) y el correo de interés a UNICEF CLE 244-2026 (cierra 9-nov).
 - UNGM: decidir entre revisión manual semanal (como el BEO, lunes) o pedir permiso escrito a UNGM. Decide Sergio.
 - Leer en el log el `Retry-After` del 429 de Compra Ágil (sigue de la entrada del 22-oct).
 
 ### Estado del repo
 
-`main`. Commit local con código, pruebas, workflow, triages del 26-oct y esta entrada; sin push hasta que Sergio lo
-autorice. `triage/2026-10-22-compra-agil.md` es de otra sesión: no entra.
+`main`. `c2b0078` (código, pruebas, workflow y triages del 26-oct) subido con el ok de Sergio («push», 26-oct).
+`triage/2026-10-22-compra-agil.md` es de otra sesión: no entra.
 
 
 ## Sesión 2026-10-26 (lunes) — TGR 622-64-L126 descartada, desde la raíz
