@@ -1,5 +1,28 @@
 # Continuidad — Radar de Licitaciones
 
+
+## Sesión 2026-10-26 (lunes) — TGR 622-64-L126 descartada, desde la raíz
+
+### Hecho
+
+- Ficha leída hoy: el cierre se movió al **03-11-2026 15:00** (antes 27-10). Foro: 89 preguntas, respondidas el
+  23-10 salvo 66 y 69; respuestas hasta el 29-10; viene modificación (70 participantes, dos versiones de 35).
+- Nuestra pregunta 20: a socio único le cuenta su experiencia como persona natural de los últimos 5 años. Pero cada
+  experiencia exige ser capacitación (79), contrato u OC ≥ $1.000.000 (87), RUT de mandante distinto (37) y
+  respaldo del mandante (35). Sergio tiene un curso UST (honorario sin monto escrito) y lo de la DEP, sin respaldo.
+- Pesos (bases, p. de evaluación): relator 25, metodología 20, experiencia 20, precio 20, integridad 5, formales 5,
+  Sello Mujer 5. TL: 55-63 sin precio contra ~75-80 de una OTEC con 5 cursos.
+- **Sergio, 26-oct: descartada.**
+
+### Pendiente
+
+- Ninguno por la TGR. Siguen los de la entrada del 22-oct.
+
+### Estado del repo
+
+`main`. Esta sesión commitea solo `continuidad.md`. `triage/2026-10-22-compra-agil.md` sin seguimiento es de otra
+sesión: no se tocó. Sin deploy (es un Action).
+
 ## 2026-10-22 (jueves, tarde) — segundo ticket de Mercado Público como respaldo; 429 medido
 
 ### Hecho
