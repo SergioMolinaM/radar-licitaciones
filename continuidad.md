@@ -30,6 +30,9 @@ Sesión raíz. Sergio, tras revisar PNUD Chile en LinkedIn: «tienes que incluir
 - Pruebas: `tests/test_undp.py` (10 nuevas); 34 OK. Verificador: **PASA** con 4 observaciones; corregidas la 1, la 2 y
   la 4. La 3 (sin tzdata en Windows se usa UTC-3 fijo; en Ubuntu hay tzdata) queda documentada en el código.
 
+- **869591-4-LE126 (DCCP, valorización de intangibles, 2.º llamado) descartada por Sergio el 26-oct.** Triage en
+  `triage/2026-10-26-869591-4-LE126.md`: sin proyectos de valorización, TL sola llega a ≈ 45 puntos; solo con firma socia.
+
 ### Pendiente
 
 - Revisar la corrida del mar 27-10 09:00, la primera con los cambios: en el log, `PNUD Chile` y `Empleos PNUD`, y que el
