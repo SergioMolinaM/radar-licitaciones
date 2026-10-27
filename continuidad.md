@@ -1,5 +1,24 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-27 (martes, sesión raíz) — revisión de la corrida del 27-oct
+
+### Hecho
+- Corrida `40500375502` (workflow_dispatch 12:00 UTC, 1m23s, success), log leído con `gh run view --log`:
+  - Mercado Público: 4.794 activas, 80 coincidencias. PNUD Chile 0 entradas (Bolivia 2, Perú 2, Colombia 10, Argentina
+    10, Ecuador 2, México 1, Global 494); PNUD 1 coincidencia. Empleos PNUD: 2 avisos. Total tras filtros 103; correo
+    con 41 ítems.
+  - **state.json subido**: `a2845a6`, push `2793cdf..a2845a6`. El paso con pull antes del push funciona.
+  - 🔴 **Compra Ágil:** 504 en «diseño web» y después **429 tras 3 solicitudes, `Retry-After=None`** (el encabezado no
+    viene). Diarios 1/11, rotativos 0/125 (cursor 33→33), 18 devueltas. Hoy la cobertura de CA quedó casi en cero.
+  - CNA (`/noticias/Paginas` y `/SiteAssets`): sin respuesta.
+- Commit del triage del 22-oct, que estaba sin seguimiento.
+
+### Pendiente
+- 🔴 Compra Ágil: con 3 solicitudes por corrida no se cubren los 11 términos diarios. Decidir entre espaciar las
+  solicitudes, partir los términos en varias corridas al día o usar el segundo ticket (entrada del 22-oct). Sin
+  `Retry-After` no hay cuánto esperar: medirlo.
+- Sergio: empleo 37616 (cerraba el 28-10 a las 00:59), UNICEF CLE 244-2026 (9-nov), UNGM.
+
 ## Sesión 2026-10-26 (lunes, tarde) — PNUD Chile, inglés, empleos para Sergio; UNGM fuera por términos
 
 Sesión raíz. Sergio, tras revisar PNUD Chile en LinkedIn: «tienes que incluir estas cosas en radar licitaciones» y
