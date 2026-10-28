@@ -6,7 +6,8 @@ estado+publicado_desde+ordenar_por+tamano_pagina=50. Esta sonda prueba
 variantes de esos parámetros, dos rondas, y registra código, tiempo y
 paginación de cada una. El ticket va solo en el header y nunca se imprime.
 
-Uso: python -m src.probe_compra_agil
+Uso: python -m src.probe_compra_agil            (alternativas a los diarios que dan 504)
+     python -m src.probe_compra_agil --variantes (sondas del 14 y 16-oct)
 """
 
 import os
@@ -111,17 +112,41 @@ def semantica(ticket: str) -> None:
             print(f"{frase!r} = {palabra!r} ∪ web: {f == (p | w)}; = ∩: {f == (p & w)}")
 
 
+# 28-oct: cuatro diarios dan 504 en todas las corridas del 20 al 27-oct. ¿Responde
+# alguna de sus palabras sola? Las frases van de control negativo y «encuesta»
+# de control positivo (respondió en 6-10 s el 16-oct).
+ALTERNATIVAS = [
+    "encuesta",
+    "diseño web", "web", "diseño",
+    "redes sociales", "redes", "sociales",
+    "marketing digital", "marketing", "digital",
+    "producción audiovisual", "audiovisual", "producción",
+]
+
+
+def alternativas(ticket: str) -> None:
+    desde = _desde(3)
+    for ronda in (1, 2):
+        print(f"--- alternativas, ronda {ronda} ({datetime.now(timezone.utc):%H:%M:%S} UTC), desde {desde}")
+        for t in ALTERNATIVAS:
+            _probar(ticket, f"q={t}", {"q": t, "estado": "publicada", "publicado_desde": desde, "tamano_pagina": 50})
+            time.sleep(5)
+
+
 def main() -> int:
     ticket = os.getenv("MERCADO_PUBLICO_TOKEN")
     if not ticket:
         print("MERCADO_PUBLICO_TOKEN no configurado")
         return 1
-    semantica(ticket)
-    for ronda in (1, 2):
-        print(f"--- ronda {ronda} ({datetime.now(timezone.utc):%H:%M:%S} UTC)")
-        for nombre, params in VARIANTES:
-            _probar(ticket, nombre, params)
-            time.sleep(3)
+    if "--variantes" in sys.argv:
+        semantica(ticket)
+        for ronda in (1, 2):
+            print(f"--- ronda {ronda} ({datetime.now(timezone.utc):%H:%M:%S} UTC)")
+            for nombre, params in VARIANTES:
+                _probar(ticket, nombre, params)
+                time.sleep(3)
+        return 0
+    alternativas(ticket)
     return 0
 
 

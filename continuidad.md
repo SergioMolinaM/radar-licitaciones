@@ -1,5 +1,35 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-28 (miércoles, sesión raíz) — Compra Ágil: el daño es el 504 por término, no el 429
+
+### Hecho
+- Logs de las corridas del 20 al 28-oct leídos término por término (`gh run view --log`):
+  - **504 fijo por término:** «diseño web», «redes sociales», «marketing digital» y «producción audiovisual» dan 504
+    (~29 s, tope del API Gateway) en **todas** las corridas del 20 al 28-oct. El radar no ve Compras Ágiles de web,
+    redes, marketing ni audiovisual desde hace al menos una semana. El 26-oct, 27 de 54 solicitudes fueron 504; los
+    rotativos responden cerca de la mitad. Hoy también «economía circular».
+  - **429 sin patrón de cuota diaria:** tras 15-17 (19 y 22-oct), 3 (27-oct, un día después de 54 sin 429) y 45 (hoy,
+    12:15 UTC). Mensaje: «Se ha superado el límite de tasa de solicitudes». `Retry-After` nunca viene.
+  - «diálogo social» trajo más de 5 páginas (>250): calza con `q` = cualquiera de las palabras.
+  - Corrida de hoy `40684308702`: diarios 6/11, rotativos 9/23 intentados (cursor 33→56), 584 devueltas, 429 tras 45.
+  - CNA cae ahora por `CERTIFICATE_VERIFY_FAILED` (antes, sin respuesta). No se tocó.
+- `src/sources/compra_agil.py`: el 429 se rotula «límite de la API (429)», no «cuota diaria agotada», y el comentario
+  del contador suma el dato del 27-oct.
+- `src/probe_compra_agil.py`: modo por defecto nuevo, `alternativas`: cada diario que da 504 y sus palabras sueltas
+  (encuesta de control positivo, frases de control negativo), dos rondas, 5 s entre consultas. Las sondas del 14 y
+  16-oct quedan con `--variantes`. Push con el ok de Sergio («ok», 28-oct).
+- Pruebas: 34 tests OK (no cubren compra_agil).
+
+### Pendiente
+- Lanzar la sonda (`gh workflow run probe-compra-agil.yml`) ~15:00 Chile, lejos del 429 de las 12:15 UTC y de la
+  corrida de mañana; con el resultado, proponer reemplazo de los diarios ciegos (decide Sergio).
+- Sergio: ver si salió el reclamo a ChileCompra del 14-oct (borrador en Gmail TL; no verificado desde aquí).
+- CNA: certificado SSL.
+- Siguen: empleo 37616 cerró el 28-10 00:59 sin decisión registrada; UNICEF CLE 244-2026 (9-nov); UNGM.
+
+### Estado del repo
+`main`. Commit de `src/sources/compra_agil.py`, `src/probe_compra_agil.py` y esta continuidad; push autorizado.
+
 ## 2026-10-27 (martes, sesión raíz) — revisión de la corrida del 27-oct
 
 ### Hecho

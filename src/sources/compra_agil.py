@@ -112,7 +112,7 @@ def _fetch_pagina(ticket: str, publicado_desde: str, numero_pagina: int) -> dict
         return None
 
     if resp.status_code == 429:
-        logger.warning("Compra Ágil: cuota diaria agotada (429). Se detiene el barrido.")
+        logger.warning("Compra Ágil: límite de la API (429). Se detiene el barrido.")
         return None
     if resp.status_code in (401, 403):
         logger.error(
@@ -200,7 +200,7 @@ def fetch_detalle(codigo: str) -> dict | None:
             timeout=TIMEOUT,
         )
         if resp.status_code == 429:
-            logger.warning(f"Compra Ágil: cuota agotada (429) al pedir detalle de {codigo}")
+            logger.warning(f"Compra Ágil: límite de la API (429) al pedir detalle de {codigo}")
             return None
         resp.raise_for_status()
         data = resp.json()
@@ -225,8 +225,9 @@ class _TicketRechazado(Exception):
 
 # Solicitudes hechas por fetch_compra_agil en esta corrida, para saber con
 # cuántas llega el 429: el 19 y el 22-oct llegó tras 15 a 17 y el 20 y 21-oct
-# 45 a 51 pasaron sin él (estimado de los logs), así que no se sabe aún si es
-# cuota diaria o ráfaga.
+# 45 a 51 pasaron sin él (estimado de los logs). El 27-oct llegó tras 3, un día
+# después de 54 sin él, con el mensaje «Se ha superado el límite de tasa de
+# solicitudes»: no calza con una cuota diaria fija.
 _solicitudes = 0
 
 
@@ -237,7 +238,7 @@ def _detalle_429(resp: requests.Response) -> str:
         mensaje = errores[0].get("mensaje") if errores else None
     except (ValueError, AttributeError):
         mensaje = None
-    return (f"cuota agotada (429) tras {_solicitudes} solicitudes; "
+    return (f"límite de la API (429) tras {_solicitudes} solicitudes; "
             f"Retry-After={resp.headers.get('Retry-After')!r}; mensaje={mensaje!r}")
 
 
