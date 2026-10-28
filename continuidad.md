@@ -26,6 +26,7 @@
 - Sergio: ver si salió el reclamo a ChileCompra del 14-oct (borrador en Gmail TL; no verificado desde aquí).
 - CNA: certificado SSL.
 - Siguen: empleo 37616 cerró el 28-10 00:59 sin decisión registrada; UNICEF CLE 244-2026 (9-nov); UNGM.
+- Triage del 28-oct (subagente): `triage/2026-10-28-compra-agil.md` y `-licitaciones.md`; 475 ítems, 322 bienes. Sergio, 28-oct: **614-51 descartada**; 5626-854, 1733-144 y 1747-149 no se persiguieron (recomendación: dirigida, diagramación ya descartada el 20-oct, monto menor al pasaje). El subagente borró 4 `.tmp` propios en Descargas (no debió).
 
 ### Estado del repo
 `main`. Commit de `src/sources/compra_agil.py`, `src/probe_compra_agil.py` y esta continuidad; push autorizado.
