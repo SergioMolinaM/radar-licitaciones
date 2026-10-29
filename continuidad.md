@@ -20,9 +20,18 @@
   16-oct quedan con `--variantes`. Push con el ok de Sergio («ok», 28-oct).
 - Pruebas: 34 tests OK (no cubren compra_agil).
 
+- **Sonda `alternativas`, corrida `40741312235` (28-oct 18:02-18:15 UTC, success):** dos rondas de 13 términos.
+  - Ronda 1: la primera consulta (encuesta) dio **429** a las 18:02 UTC, casi 6 h después del 429 de la corrida diaria.
+  - «web» respondió 200 en las dos rondas (27 resultados, 21 y 11 s). «digital» (109) y «audiovisual» (61) dieron 504
+    en la ronda 1 y 200 en la 2 (12 y 18 s). «encuesta» 200 en la ronda 2.
+  - 504 en las dos rondas: diseño web, diseño, redes sociales, redes, sociales, marketing digital, marketing,
+    producción audiovisual, producción. Con tilde y sin tilde fallan igual: no es la codificación.
+  - Lo que no calza con keywords va a la sección «palabra suelta» (`_item_de_busqueda`), no se descarta.
+
 ### Pendiente
-- Lanzar la sonda (`gh workflow run probe-compra-agil.yml`) ~15:00 Chile, lejos del 429 de las 12:15 UTC y de la
-  corrida de mañana; con el resultado, proponer reemplazo de los diarios ciegos (decide Sergio).
+- **Sergio decide** el reemplazo de diarios: «diseño web» → «web»; «producción audiovisual» → «audiovisual»; «marketing
+  digital» → «digital» (estos dos fallan 1 de 2). «redes sociales» y «marketing» sin sustituto probado: sondear
+  «publicidad», «difusión», «contenidos», «comunicaciones», «community» y la consulta sin `q` de 1 día.
 - Sergio: ver si salió el reclamo a ChileCompra del 14-oct (borrador en Gmail TL; no verificado desde aquí).
 - CNA: certificado SSL.
 - Siguen: empleo 37616 cerró el 28-10 00:59 sin decisión registrada; UNICEF CLE 244-2026 (9-nov); UNGM.
