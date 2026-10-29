@@ -112,15 +112,16 @@ def semantica(ticket: str) -> None:
             print(f"{frase!r} = {palabra!r} ∪ web: {f == (p | w)}; = ∩: {f == (p & w)}")
 
 
-# 28-oct: cuatro diarios dan 504 en todas las corridas del 20 al 27-oct. ¿Responde
-# alguna de sus palabras sola? Las frases van de control negativo y «encuesta»
-# de control positivo (respondió en 6-10 s el 16-oct).
+# 28-oct (run 40741312235): de las palabras sueltas de los cuatro diarios que dan
+# 504 respondieron «web» (2 de 2 rondas), «digital» y «audiovisual» (1 de 2);
+# «diseño», «redes», «sociales», «marketing» y «producción», 504 en las dos.
+# 29-oct: ¿qué término trae redes sociales, marketing y difusión? «web» va de
+# control positivo, «redes sociales» de control negativo, y al final el listado
+# sin q de 1 día, por si cabe en 29 s.
 ALTERNATIVAS = [
-    "encuesta",
-    "diseño web", "web", "diseño",
-    "redes sociales", "redes", "sociales",
-    "marketing digital", "marketing", "digital",
-    "producción audiovisual", "audiovisual", "producción",
+    "web", "redes sociales",
+    "publicidad", "difusión", "comunicaciones", "comunicación", "contenidos",
+    "community", "campaña", "fotografía", "video", "gráfico",
 ]
 
 
@@ -131,6 +132,8 @@ def alternativas(ticket: str) -> None:
         for t in ALTERNATIVAS:
             _probar(ticket, f"q={t}", {"q": t, "estado": "publicada", "publicado_desde": desde, "tamano_pagina": 50})
             time.sleep(5)
+        _probar(ticket, "sin q, 1 d", {"estado": "publicada", "publicado_desde": _desde(1), "tamano_pagina": 50})
+        time.sleep(5)
 
 
 def main() -> int:

@@ -368,12 +368,17 @@ COMPRA_AGIL_DIAS_VENTANA = 3
 # audiovisual» se quedan porque además traen «diseño» y «producción» (el folleto
 # de Antuco 4027-283-COT26, PRESENTAR el 16-oct, solo llegaba por «diseño»). Las
 # cuatro frases siguen en la rotación.
+# 29-oct (Sergio): «diseño web», «marketing digital» y «producción audiovisual»
+# dieron 504 en todas las corridas del 20 al 28-oct, y «diseño» y «producción»
+# solas también. Sonda run 40741312235 (28-oct): «web» 200 en 2 de 2 rondas;
+# «digital» y «audiovisual» 200 en 1 de 2. Las frases vuelven a la rotación.
+# «redes sociales» queda hasta que la sonda encuentre sustituto.
 COMPRA_AGIL_TERMINOS_DIARIOS = [
     "inteligencia artificial",
-    "diseño web",
+    "web",
     "redes sociales",
-    "marketing digital",
-    "producción audiovisual",
+    "digital",
+    "audiovisual",
     "encuesta",
     "redacción",
     "diagramación",
