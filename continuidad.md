@@ -1,5 +1,28 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-29 (jueves, sesión raíz) — diarios ciegos reemplazados; reclamo reescrito
+
+### Hecho
+- **Sergio, 29-oct: «ok a todo... lo importante es que no se nos escapen oportunidades».**
+- `src/config.py`: diarios «diseño web» → «web», «marketing digital» → «digital», «producción audiovisual» →
+  «audiovisual» (sonda del 28-oct). Las tres frases vuelven a la rotación (`terminos_rotativos`, comprobado).
+  «redes sociales» sigue de diario hasta tener sustituto. Rige desde la corrida del 30-oct: la del 29-oct (12:00 UTC)
+  ya corría con los términos viejos. Commit `b947c58`, con push.
+- `src/probe_compra_agil.py`: segunda sonda `alternativas` (publicidad, difusión, comunicaciones, comunicación,
+  contenidos, community, campaña, fotografía, video, gráfico; «web» control positivo, «redes sociales» negativo;
+  más el listado sin `q` de 1 día). 34 tests OK. **No se lanzó:** Sergio cerró la sesión antes de las 15:03.
+- Sergio: el borrador del reclamo a ChileCompra no está en Gmail. Reescrito con los datos al 28-oct en
+  `soporte/reclamo-chilecompra-2026-10-29.txt`; lo pega Sergio en el formulario de ChileCompra (ClaveÚnica).
+
+### Pendiente
+- Lanzar la segunda sonda (`gh workflow run probe-compra-agil.yml`, lejos de las 12:00 UTC) y proponer sustituto
+  de «redes sociales» y «marketing». Leer el log en primer plano: el watch en segundo plano lo mata la memoria.
+- Log del 30-oct: que «web», «digital» y «audiovisual» respondan y qué traen.
+- Sergio: pegar el reclamo. CNA: certificado SSL. UNICEF CLE 244-2026 (9-nov); UNGM.
+
+### Estado del repo
+`main`; push autorizado por Sergio el 29-oct.
+
 ## 2026-10-28 (miércoles, sesión raíz) — Compra Ágil: el daño es el 504 por término, no el 429
 
 ### Hecho
