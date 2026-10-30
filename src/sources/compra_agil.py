@@ -12,13 +12,15 @@ Diferencias con la API de Licitaciones (importantes):
   - El listado NO trae `descripcion` (solo el endpoint de detalle la tiene).
     El match de keywords se hace sobre `nombre`, igual que en licitaciones.  [§6.1 vs §6.3]
 
-Estrategia del radar (desde el 14-oct-2026): búsqueda por palabra clave en el
-servidor (`q`) sobre las publicadas de los últimos COMPRA_AGIL_DIAS_VENTANA
-días: los términos diarios en cada corrida y el resto en rotación
-(fetch_compra_agil). El barrido completo del listado (fetch_raw_publicadas)
-queda solo para la auditoría: con la API respondiendo en 23-29 s por página y
-cortando a los 29 s, y ~5.400 publicadas en 3 días, no termina. La
-deduplicación por state.json evita re-notificar día tras día.
+Estrategia del radar (desde el 30-oct-2026, fetch_compra_agil): (0) el listado
+completo sin q desde la última barrida completa, filtrado por título con todas
+las keywords (_barrer_listado: 62 páginas de 1 día respondieron en la sonda del
+30-oct); (1) búsqueda por palabra clave en el servidor (`q`), que también mira
+la descripción, con los términos diarios y el resto en rotación. Del 14 al
+29-oct solo existía (1), porque el listado caía en 504 y las frases que daban
+504 dejaban temas ciegos. fetch_raw_publicadas es la versión antigua del
+barrido, que sigue usando la auditoría. La deduplicación por state.json evita
+re-notificar día tras día.
 
 Nota de cuota: el límite es por ticket y por día calendario, y se devuelve 429
 al agotarlo (§4). Con estado=publicada + ventana de 3 días el universo ronda las
@@ -54,8 +56,18 @@ MAX_PAGINAS = 80            # tope de seguridad del barrido completo (solo audit
 MAX_PAGINAS_TERMINO = 5     # una búsqueda q trae 1-19 resultados (medido 14-oct); 5 páginas = 250
 REINTENTOS_ESPERA_S = (20, 60)  # barrido completo: esperas entre intentos ante 5xx/red
 PRESUPUESTO_BARRIDO_S = 15 * 60  # tope del barrido completo (auditoría)
-PRESUPUESTO_BUSQUEDA_S = 20 * 60  # tope de la búsqueda diaria; el job tiene timeout-minutes: 40
+PRESUPUESTO_BUSQUEDA_S = 20 * 60  # tope de la búsqueda q; el job tiene timeout-minutes: 50
 RESERVA_POR_REINTENTO_S = 30  # un 504 tarda ~29 s; se aparta este tiempo por diario fallido
+# Listado completo sin q (30-oct-2026, sonda run 41081425045): 62 páginas de 1 día
+# respondieron todas, 0,9-7,3 s cada una, sin 429, con 5 s entre solicitudes. Esa
+# tarde pasaron 88 solicitudes espaciadas sin 429; en la mañana, 5 seguidas lo
+# dispararon («límite de tasa»): se espacia toda solicitud. No verificado que la
+# pausa sea la causa.
+PAUSA_ENTRE_SOLICITUDES_S = 4
+PRESUPUESTO_LISTADO_S = 18 * 60
+LISTADO_TRASLAPE = timedelta(hours=2)   # la paginación se corre si entran publicaciones mientras se recorre
+LISTADO_DIAS_MAX = 4                    # más atrás no cabe en el presupuesto (~3.000 publicadas por día)
+CLAVE_LISTADO = "__listado__"           # en state["ca_ultima"]: inicio de la última barrida completa
 
 
 def _get_ticket() -> str | None:
@@ -229,6 +241,20 @@ class _TicketRechazado(Exception):
 # después de 54 sin él, con el mensaje «Se ha superado el límite de tasa de
 # solicitudes»: no calza con una cuota diaria fija.
 _solicitudes = 0
+_ultima_solicitud = 0.0
+
+
+def _get_espaciado(ticket: str, params: dict) -> requests.Response:
+    """GET a la API con PAUSA_ENTRE_SOLICITUDES_S desde la solicitud anterior."""
+    global _solicitudes, _ultima_solicitud
+    espera = PAUSA_ENTRE_SOLICITUDES_S - (time.monotonic() - _ultima_solicitud)
+    if espera > 0:
+        time.sleep(espera)
+    _solicitudes += 1
+    try:
+        return requests.get(COMPRA_AGIL_API_URL, headers={"ticket": ticket}, params=params, timeout=TIMEOUT)
+    finally:
+        _ultima_solicitud = time.monotonic()
 
 
 def _detalle_429(resp: requests.Response) -> str:
@@ -249,7 +275,6 @@ def _buscar_termino(ticket: str, termino: str, publicado_desde: str) -> tuple[li
     JSON o forma inesperada). Lanza _CuotaAgotada ante 429 y _TicketRechazado
     ante 401/403.
     """
-    global _solicitudes
     items: list[dict] = []
     for numero_pagina in range(1, MAX_PAGINAS_TERMINO + 1):
         params = {
@@ -259,9 +284,8 @@ def _buscar_termino(ticket: str, termino: str, publicado_desde: str) -> tuple[li
             "tamano_pagina": TAMANO_PAGINA,
             "numero_pagina": numero_pagina,
         }
-        _solicitudes += 1
         try:
-            resp = requests.get(COMPRA_AGIL_API_URL, headers={"ticket": ticket}, params=params, timeout=TIMEOUT)
+            resp = _get_espaciado(ticket, params)
         except requests.RequestException as e:
             logger.warning(f"Compra Ágil q={termino!r}: error de red — {type(e).__name__}")
             return None
@@ -290,6 +314,74 @@ def _buscar_termino(ticket: str, termino: str, publicado_desde: str) -> tuple[li
             return items, False
     logger.warning(f"Compra Ágil q={termino!r}: más de {MAX_PAGINAS_TERMINO} páginas, se corta")
     return items, True
+
+
+def _barrer_listado(ticket: str, publicado_desde: str, presupuesto_s: float) -> tuple[list[dict], int, int]:
+    """Todas las páginas del listado sin q desde `publicado_desde`.
+
+    Retorna (items, páginas leídas, páginas totales). Una página que falla dos
+    veces se salta y deja el barrido incompleto (leídas < totales); se siguen las
+    demás. Lanza _CuotaAgotada ante 429 y _TicketRechazado ante 401/403.
+    """
+    items: list[dict] = []
+    leidas, total, pagina, inicio = 0, None, 1, time.monotonic()
+    while total is None or pagina <= total:
+        if time.monotonic() - inicio > presupuesto_s:
+            logger.error(f"Compra Ágil listado: se agotó el presupuesto de {presupuesto_s:.0f} s en la pág {pagina}")
+            break
+        params = {"estado": COMPRA_AGIL_ESTADOS, "publicado_desde": publicado_desde,
+                  "tamano_pagina": TAMANO_PAGINA, "numero_pagina": pagina}
+        payload = None
+        for _ in range(2):
+            try:
+                resp = _get_espaciado(ticket, params)
+            except requests.RequestException as e:
+                logger.warning(f"Compra Ágil listado: error de red (pág {pagina}) — {type(e).__name__}")
+                continue
+            if resp.status_code == 429:
+                raise _CuotaAgotada(_detalle_429(resp))
+            if resp.status_code in (401, 403):
+                raise _TicketRechazado(f"ticket rechazado ({resp.status_code})")
+            if resp.status_code != 200:
+                logger.warning(f"Compra Ágil listado: HTTP {resp.status_code} (pág {pagina})")
+                continue
+            try:
+                data = resp.json()
+            except ValueError:
+                data = None
+            p = data.get("payload") if isinstance(data, dict) and data.get("success") == "OK" else None
+            if isinstance(p, dict) and isinstance(p.get("items") or [], list):
+                payload = p
+                break
+            logger.warning(f"Compra Ágil listado: respuesta inesperada (pág {pagina})")
+        if payload is None:
+            if total is None:
+                return items, 0, 1  # sin la primera página no se sabe cuántas hay
+        else:
+            leidas += 1
+            items.extend(i for i in payload.get("items") or [] if isinstance(i, dict))
+            if total is None:
+                t = (payload.get("paginacion") or {}).get("total_paginas")
+                total = t if isinstance(t, int) else 1
+                if total > MAX_PAGINAS * 3:
+                    logger.error(f"Compra Ágil listado: {total} páginas, se leen {MAX_PAGINAS * 3}")
+                    total = MAX_PAGINAS * 3
+        pagina += 1
+    return items, leidas, total or 1
+
+
+def _item_de_listado(item: dict) -> dict | None:
+    """Item del listado completo: entra solo si el nombre trae una keyword (el
+    listado no trae descripción). Exclusiones como en la búsqueda q."""
+    nombre = item.get("nombre", "") or ""
+    if not item.get("codigo") or excluido(nombre, omitir=COMPRA_AGIL_EXCLUSIONES_OMITIDAS):
+        return None
+    en_titulo = keywords_incluidas(nombre)
+    if not en_titulo:
+        return None
+    d = _item_to_dict_sin_filtro(item)
+    d["keywords_match"] = en_titulo
+    return d
 
 
 def _item_de_busqueda(item: dict, termino: str) -> dict | None:
@@ -379,9 +471,11 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
     resumen = {
         "diarios_ok": [], "diarios_fallidos": [], "rotativos_ok": [], "rotativos_total": len(rotativos),
         "truncados": [], "cursor": cursor, "ultima": ultima, "devueltas": 0, "cortado": "",
+        "listado_ok": False, "listado_paginas": 0, "listado_total": 0, "listado_desde": "",
     }
-    global _solicitudes
+    global _solicitudes, _ultima_solicitud
     _solicitudes = 0
+    _ultima_solicitud = 0.0
     disponibles = tickets()
     if not disponibles:
         logger.error("MERCADO_PUBLICO_TOKEN no configurado (Compra Ágil)")
@@ -390,27 +484,59 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
         return [], resumen
 
     ahora = datetime.now(timezone.utc)
-    inicio = time.monotonic()
     por_codigo: dict[str, dict] = {}
     devueltos: set[str] = set()
 
-    def queda_tiempo(reserva_s: float = 0) -> bool:
-        return time.monotonic() - inicio < presupuesto_s - reserva_s
-
-    def buscar(termino: str) -> tuple[list[dict], bool] | None:
-        # Ante 401/403 se pasa al ticket de respaldo y se repite el término.
-        # Ante 429 no: ver _tickets.py.
-        desde = _desde_rotativo(ultima.get(termino), ahora)
+    def con_respaldo(fn, *args):
+        # Ante 401/403 se pasa al ticket de respaldo y se repite. Ante 429 no: ver _tickets.py.
         while True:
             nombre, ticket = disponibles[0]
             try:
-                return _buscar_termino(ticket, termino, desde)
+                return fn(ticket, *args)
             except _TicketRechazado as e:
                 disponibles.pop(0)
                 if not disponibles:
                     alcance = "principal y respaldo" if nombre == "respaldo" else nombre
                     raise _CuotaAgotada(f"{e}: {alcance}, sin otro ticket")
                 logger.error(f"Compra Ágil: {e} con el ticket {nombre}; se pasa al {disponibles[0][0]}")
+
+    # (0) Listado completo desde la última barrida completa, filtrado por título.
+    try:
+        ultima_listado = datetime.strptime(ultima.get(CLAVE_LISTADO) or "", "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        desde_listado = max(ultima_listado - LISTADO_TRASLAPE, ahora - timedelta(days=LISTADO_DIAS_MAX))
+    except ValueError:
+        desde_listado = ahora - timedelta(days=COMPRA_AGIL_DIAS_VENTANA)
+    resumen["listado_desde"] = _iso(desde_listado)
+    try:
+        crudos, leidas, total = con_respaldo(_barrer_listado, _iso(desde_listado), PRESUPUESTO_LISTADO_S)
+    except _CuotaAgotada as e:
+        logger.error(f"Compra Ágil listado: {e}. Se detiene.")
+        resumen["cortado"] = str(e)
+        resumen["diarios_fallidos"] = list(COMPRA_AGIL_TERMINOS_DIARIOS)
+        crudos, leidas, total = [], 0, 0
+    resumen["listado_paginas"], resumen["listado_total"] = leidas, total
+    resumen["listado_ok"] = total > 0 and leidas == total
+    if resumen["listado_ok"]:
+        ultima[CLAVE_LISTADO] = _iso(ahora)
+    for it in crudos:
+        if it.get("codigo"):
+            devueltos.add(it["codigo"])
+        d = _item_de_listado(it)
+        if d and d["codigo"] not in por_codigo:
+            por_codigo[d["codigo"]] = d
+    logger.info(f"Compra Ágil listado desde {resumen['listado_desde']}: {leidas}/{total} páginas, "
+                f"{len(crudos)} publicadas, {len(por_codigo)} con keyword en el título")
+    if resumen["cortado"]:
+        resumen["devueltas"] = len(devueltos)
+        return list(por_codigo.values()), resumen
+
+    inicio = time.monotonic()
+
+    def queda_tiempo(reserva_s: float = 0) -> bool:
+        return time.monotonic() - inicio < presupuesto_s - reserva_s
+
+    def buscar(termino: str) -> tuple[list[dict], bool] | None:
+        return con_respaldo(_buscar_termino, termino, _desde_rotativo(ultima.get(termino), ahora))
 
     def procesar(termino: str) -> bool:
         r = buscar(termino)

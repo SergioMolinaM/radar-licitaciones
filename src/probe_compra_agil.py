@@ -185,6 +185,23 @@ def main() -> int:
     if "--paginacion" in sys.argv:
         paginacion(ticket, dias=1)
         return 0
+    if "--radar" in sys.argv:
+        # La búsqueda real del radar (listado + q) con el state del repo en memoria:
+        # no envía correo ni escribe data/state.json.
+        import json
+        import logging
+        from pathlib import Path
+
+        from .sources.compra_agil import fetch_compra_agil
+
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+        state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
+        matches, resumen = fetch_compra_agil(cursor=state.get("ca_cursor", 0), ultima=state.get("ca_ultima"))
+        print(f"--- {len(matches)} matches; resumen sin ultima: "
+              f"{ {k: v for k, v in resumen.items() if k != 'ultima'} }")
+        for m in sorted(matches, key=lambda m: m.get("fuente", ""))[:400]:
+            print(f"{m['codigo']:22} | {m.get('fuente', ''):35} | {', '.join(m['keywords_match'])[:40]:40} | {m['titulo'][:80]}")
+        return 0
     if "--variantes" in sys.argv:
         semantica(ticket)
         for ronda in (1, 2):

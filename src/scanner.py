@@ -93,7 +93,9 @@ def run() -> int:
     caidas = [nombre for nombre, universo in
               (("Mercado Público", universo_mp), ("PNUD", universo_undp))
               if universo == 0]
-    if not resumen_ca["diarios_ok"]:
+    # Desde el 30-oct primero se baja el listado completo: Compra Ágil cae solo si
+    # no se leyó ninguna página del listado y tampoco respondió ningún diario.
+    if not resumen_ca["diarios_ok"] and not resumen_ca["listado_paginas"]:
         caidas.append("Compra Ágil" + (f" ({resumen_ca['cortado']})" if resumen_ca["cortado"] else ""))
     # Un día sin notas es normal (fin de semana): se da por caída solo si la API falló.
     if not resumen_cc["ok"]:
@@ -101,11 +103,18 @@ def run() -> int:
     # Cobertura parcial: va en el aviso del correo, pero no pone la corrida en
     # rojo (con la API lenta pasaría casi todos los días y el rojo dejaría de avisar).
     parciales = []
-    if resumen_ca["diarios_ok"]:
+    if not resumen_ca["listado_ok"] and resumen_ca["listado_total"]:
+        parciales.append(f"Compra Ágil: listado completo leído en {resumen_ca['listado_paginas']} de "
+                         f"{resumen_ca['listado_total']} páginas desde {resumen_ca['listado_desde']} (se vuelve"
+                         " a leer desde ahí en la próxima corrida)")
+    if resumen_ca["diarios_ok"] or resumen_ca["listado_paginas"]:
         if resumen_ca["diarios_fallidos"]:
+            alcance = ("los títulos están cubiertos por el listado completo; falta lo que calce solo en la"
+                       " descripción" if resumen_ca["listado_ok"] else
+                       "lo que calce solo con esos términos no aparece hoy")
             parciales.append("Compra Ágil sin respuesta para: " + ", ".join(resumen_ca["diarios_fallidos"])
-                             + " (lo que calce solo con esos términos no aparece hoy; se busca de nuevo"
-                               " en la próxima corrida desde la última búsqueda exitosa)")
+                             + f" ({alcance}; se busca de nuevo en la próxima corrida desde la última"
+                               " búsqueda exitosa)")
         if resumen_ca["cortado"]:
             parciales.append(f"Compra Ágil cortada ({resumen_ca['cortado']}): los términos rotativos"
                              " que faltaban se buscan en la próxima corrida")

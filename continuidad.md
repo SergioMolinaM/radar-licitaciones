@@ -18,9 +18,29 @@
 - Adjuntos de Compra Ágil desde Chrome: el clic en el adjunto hace un XHR a
   `adjunto.mercadopublico.cl/.../descargar/<GUID>` con Bearer y user_key que pone la página; se lee parchando
   `XMLHttpRequest.send` y abriendo el docx con JSZip. La ficha a veces carga vacía y un script largo congela la pestaña.
+- **CNA arreglada** (`3a14b63`): la CNA renovó el certificado el 20-oct con otro emisor (Thawte TLS RSA CA G1); el
+  intermedio GeoTrust guardado ya no servía. `cna.py` baja el intermedio que anuncia el certificado (AIA) y solo lo
+  acepta si no es autofirmado, es CA y lo firma directamente una raíz de certifi; `certs/` queda de respaldo (ahora
+  con Thawte). Verificador: FALLA (un MITM pasaba con un autofirmado por AIA; HTML en el AIA tumbaba el bundle) →
+  corregido → PASA, con ataque simulado en sus 4 variantes.
+- **Sonda alternativas** (run `41078223545`, 15:10 UTC, 26 solicitudes sin 429): «redes sociales», «publicidad» y
+  «difusión» 504 en 2/2; «comunicaciones», «campaña», «contenidos», «video», «gráfico» 200 en 2/2. **Sergio, 30-oct:
+  diarios «comunicaciones» y «campaña» en lugar de «redes sociales»**, más keywords «biometría», «biométrico»,
+  «biométrica», «blockchain», «cadena de bloques» (Andrés Alberdi es especialista). `df103ad`.
+- **Sonda paginación** (run `41081425045`, 15:31 UTC): listado sin q de 1 día, **62 páginas, todas 200, 0,9-7,3 s,
+  0 fallas, sin 429**, 5 s entre solicitudes, 3.052 códigos únicos en 496 s. Esa tarde 88 solicitudes espaciadas sin
+  429; en la mañana 5 seguidas lo dispararon (la pausa como causa: no verificado).
+- **Compra Ágil vuelve a barrer el listado completo** (decisión: elegido listado completo + q; descartado solo q;
+  mejor para el producto porque ningún título se pierde por un 504 de término y toda keyword nueva rige el primer
+  día; costo, no criterio: ~6 min y ~60 solicitudes más por corrida). Paso (0) en `fetch_compra_agil`: listado desde
+  `ca_ultima["__listado__"]` − 2 h (tope 4 días), filtro por título; después la búsqueda q de antes (cubre la
+  descripción). Toda solicitud espaciada 4 s. `scanner.py`: caída solo si no hubo listado ni diarios; parcial si el
+  listado quedó incompleto. Timeout del job 40 → 50 min. 7 tests nuevos (41 OK). Sonda con modo `--radar` (búsqueda
+  real sin correo ni state).
 
 ### Pendiente
-- Lanzar la segunda sonda (`gh workflow run probe-compra-agil.yml`) pasadas las 15:00 Chile y proponer sustitutos.
+- Resultado de la sonda `--radar` y del verificador sobre el listado completo; corregir antes del lunes 2-nov 09:00.
+- Lunes 2-nov: primera corrida con listado completo; mirar en el log «Compra Ágil listado desde …: N/M páginas».
 - Respuesta de ChileCompra a `INC-1408539-R5Z0W4` (hasta el 4-nov).
 - Sergio: qué hacer con `triage/correo-radar-2026-10-29.txt` (sin commit).
 
