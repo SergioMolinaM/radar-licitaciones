@@ -102,8 +102,9 @@ class ListadoTest(unittest.TestCase):
     def test_red_caida_en_la_primera_pagina(self):
         api = _API({(None, 1): requests.ConnectionError("x")})
         _, r = self._correr(api)
-        self.assertEqual((r["listado_paginas"], r["listado_total"]), (0, 1))
+        self.assertEqual((r["listado_paginas"], r["listado_total"]), (0, None))
         self.assertFalse(r["listado_ok"])
+        self.assertIn("primera página", r["listado_corte"])
 
     def test_ticket_rechazado_pasa_al_respaldo(self):
         llamadas = {"n": 0}
@@ -124,6 +125,49 @@ class ListadoTest(unittest.TestCase):
         desde = ca.datetime.strptime(r["listado_desde"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=ca.timezone.utc)
         tope = ca.datetime.now(ca.timezone.utc) - ca.timedelta(days=ca.LISTADO_DIAS_MAX)
         self.assertLess(abs((desde - tope).total_seconds()), 60)
+
+    def test_429_a_mitad_conserva_lo_leido(self):
+        api = _API({
+            (None, 1): _pagina([_item("1-1-COT26", "Sitio web")], 3),
+            (None, 2): _Resp(429, {"errors": [{"mensaje": "límite"}]}),
+        })
+        matches, r = self._correr(api, ultima={ca.CLAVE_LISTADO: "2026-10-29T12:00:00Z"})
+        self.assertEqual([m["codigo"] for m in matches], ["1-1-COT26"])
+        self.assertEqual((r["listado_paginas"], r["listado_total"]), (1, 3))
+        self.assertIn("429", r["cortado"])
+        self.assertFalse(r["listado_ok"])
+
+    def test_total_ilegible_o_recortado_no_cuenta_como_completo(self):
+        for pag in ({"total_paginas": "98"}, {}, {"total_paginas": 0}):
+            api = _API({(None, 1): _Resp(200, {"success": "OK", "payload": {"items": [], "paginacion": pag}})})
+            _, r = self._correr(api, ultima={ca.CLAVE_LISTADO: "2026-10-29T12:00:00Z"})
+            self.assertFalse(r["listado_ok"], pag)
+            self.assertEqual(r["ultima"][ca.CLAVE_LISTADO], "2026-10-29T12:00:00Z")
+        with mock.patch.object(ca, "MAX_PAGINAS_LISTADO", 2):
+            api = _API({(None, 1): _pagina([], 5)})
+            _, r = self._correr(api, ultima={ca.CLAVE_LISTADO: "2026-10-29T12:00:00Z"})
+            self.assertFalse(r["listado_ok"])
+
+    def test_ticket_rechazado_a_mitad_sigue_en_la_misma_pagina(self):
+        n = {"p2": 0}
+
+        def p2():
+            n["p2"] += 1
+            return _Resp(403, {}) if n["p2"] == 1 else _pagina([_item("1-2-COT26", "Sitio web")], 2)
+
+        api = _API({(None, 1): _pagina([], 2), (None, 2): p2})
+        with mock.patch.object(ca, "tickets", lambda: [("principal", "A"), ("respaldo", "B")]):
+            matches, r = self._correr(api)
+        self.assertTrue(r["listado_ok"])
+        self.assertEqual(api.llamadas.count((None, 1)), 1)
+
+    def test_marca_corrupta_no_lanza(self):
+        _, r = self._correr(_API({}), ultima={ca.CLAVE_LISTADO: 12345})
+        self.assertTrue(r["listado_ok"])
+
+    def test_hueco_por_tope_se_informa(self):
+        _, r = self._correr(_API({}), ultima={ca.CLAVE_LISTADO: "2026-01-01T00:00:00Z"})
+        self.assertTrue(r["listado_hueco"].startswith("2026-01-01"))
 
     def test_q_sigue_despues_del_listado(self):
         api = _API({(None, 1): _pagina([], 1)})

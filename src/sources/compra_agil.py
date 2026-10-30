@@ -56,7 +56,7 @@ MAX_PAGINAS = 80            # tope de seguridad del barrido completo (solo audit
 MAX_PAGINAS_TERMINO = 5     # una búsqueda q trae 1-19 resultados (medido 14-oct); 5 páginas = 250
 REINTENTOS_ESPERA_S = (20, 60)  # barrido completo: esperas entre intentos ante 5xx/red
 PRESUPUESTO_BARRIDO_S = 15 * 60  # tope del barrido completo (auditoría)
-PRESUPUESTO_BUSQUEDA_S = 20 * 60  # tope de la búsqueda q; el job tiene timeout-minutes: 50
+PRESUPUESTO_BUSQUEDA_S = 15 * 60  # tope de la búsqueda q, después del listado (18 min); el job tiene timeout-minutes: 50
 RESERVA_POR_REINTENTO_S = 30  # un 504 tarda ~29 s; se aparta este tiempo por diario fallido
 # Listado completo sin q (30-oct-2026, sonda run 41081425045): 62 páginas de 1 día
 # respondieron todas, 0,9-7,3 s cada una, sin 429, con 5 s entre solicitudes. Esa
@@ -67,7 +67,9 @@ PAUSA_ENTRE_SOLICITUDES_S = 4
 PRESUPUESTO_LISTADO_S = 18 * 60
 LISTADO_TRASLAPE = timedelta(hours=2)   # la paginación se corre si entran publicaciones mientras se recorre
 LISTADO_DIAS_MAX = 4                    # más atrás no cabe en el presupuesto (~3.000 publicadas por día)
-CLAVE_LISTADO = "__listado__"           # en state["ca_ultima"]: inicio de la última barrida completa
+CLAVE_LISTADO = "__listado__"           # en state["ca_ultima"]: hasta dónde se leyó el listado sin hueco
+MAX_PAGINAS_LISTADO = 300               # tope de seguridad: un recorte deja el barrido incompleto
+LISTADO_ORDEN = "FechaPublicacion"      # PENDIENTE: sentido medido por la sonda --orden
 
 
 def _get_ticket() -> str | None:
@@ -316,32 +318,43 @@ def _buscar_termino(ticket: str, termino: str, publicado_desde: str) -> tuple[li
     return items, True
 
 
-def _barrer_listado(ticket: str, publicado_desde: str, presupuesto_s: float) -> tuple[list[dict], int, int]:
+def _barrer_listado(disponibles: list, publicado_desde: str, limite: float) -> dict:
     """Todas las páginas del listado sin q desde `publicado_desde`.
 
-    Retorna (items, páginas leídas, páginas totales). Una página que falla dos
-    veces se salta y deja el barrido incompleto (leídas < totales); se siguen las
-    demás. Lanza _CuotaAgotada ante 429 y _TicketRechazado ante 401/403.
+    `disponibles` es la lista de tickets: ante 401/403 se pasa al siguiente y se
+    repite la misma página. Nunca lanza. Retorna un dict con items, leidas, total
+    (None si no se supo), prefijo (páginas 1..k leídas sin hueco) y corte (motivo
+    si se detuvo antes del final: 429, tickets, presupuesto, total ilegible). Una
+    página que falla dos veces se salta y se siguen las demás.
     """
-    items: list[dict] = []
-    leidas, total, pagina, inicio = 0, None, 1, time.monotonic()
-    while total is None or pagina <= total:
-        if time.monotonic() - inicio > presupuesto_s:
-            logger.error(f"Compra Ágil listado: se agotó el presupuesto de {presupuesto_s:.0f} s en la pág {pagina}")
+    r = {"items": [], "leidas": 0, "total": None, "prefijo": 0, "corte": ""}
+    pagina, sin_hueco = 1, True
+    while r["total"] is None or pagina <= r["total"]:
+        if time.monotonic() > limite:
+            r["corte"] = f"se agotó el presupuesto de {PRESUPUESTO_LISTADO_S // 60} min en la pág {pagina}"
             break
         params = {"estado": COMPRA_AGIL_ESTADOS, "publicado_desde": publicado_desde,
-                  "tamano_pagina": TAMANO_PAGINA, "numero_pagina": pagina}
-        payload = None
-        for _ in range(2):
+                  "ordenar_por": LISTADO_ORDEN, "tamano_pagina": TAMANO_PAGINA, "numero_pagina": pagina}
+        payload, intentos = None, 0
+        while intentos < 2 and not r["corte"]:
+            intentos += 1
             try:
-                resp = _get_espaciado(ticket, params)
+                resp = _get_espaciado(disponibles[0][1], params)
             except requests.RequestException as e:
                 logger.warning(f"Compra Ágil listado: error de red (pág {pagina}) — {type(e).__name__}")
                 continue
             if resp.status_code == 429:
-                raise _CuotaAgotada(_detalle_429(resp))
+                r["corte"] = _detalle_429(resp)
+                break
             if resp.status_code in (401, 403):
-                raise _TicketRechazado(f"ticket rechazado ({resp.status_code})")
+                nombre = disponibles.pop(0)[0]
+                if not disponibles:
+                    r["corte"] = f"ticket rechazado ({resp.status_code}), sin otro ticket"
+                    break
+                logger.error(f"Compra Ágil: ticket rechazado ({resp.status_code}) con el ticket {nombre}; "
+                             f"se pasa al {disponibles[0][0]}")
+                intentos -= 1  # el cambio de ticket no gasta intento
+                continue
             if resp.status_code != 200:
                 logger.warning(f"Compra Ágil listado: HTTP {resp.status_code} (pág {pagina})")
                 continue
@@ -350,24 +363,48 @@ def _barrer_listado(ticket: str, publicado_desde: str, presupuesto_s: float) -> 
             except ValueError:
                 data = None
             p = data.get("payload") if isinstance(data, dict) and data.get("success") == "OK" else None
-            if isinstance(p, dict) and isinstance(p.get("items") or [], list):
+            if isinstance(p, dict) and isinstance(p.get("items") or [], list) \
+                    and isinstance(p.get("paginacion") or {}, dict):
                 payload = p
                 break
             logger.warning(f"Compra Ágil listado: respuesta inesperada (pág {pagina})")
+        if r["corte"]:
+            break
         if payload is None:
-            if total is None:
-                return items, 0, 1  # sin la primera página no se sabe cuántas hay
+            sin_hueco = False
+            if r["total"] is None:
+                r["corte"] = "no respondió la primera página"
+                break
         else:
-            leidas += 1
-            items.extend(i for i in payload.get("items") or [] if isinstance(i, dict))
-            if total is None:
+            r["leidas"] += 1
+            r["items"].extend(i for i in payload.get("items") or [] if isinstance(i, dict))
+            if sin_hueco:
+                r["prefijo"] = pagina
+            if r["total"] is None:
                 t = (payload.get("paginacion") or {}).get("total_paginas")
-                total = t if isinstance(t, int) else 1
-                if total > MAX_PAGINAS * 3:
-                    logger.error(f"Compra Ágil listado: {total} páginas, se leen {MAX_PAGINAS * 3}")
-                    total = MAX_PAGINAS * 3
+                if not isinstance(t, int) or t < 1:
+                    r["corte"] = f"total de páginas ilegible ({t!r})"
+                    break
+                r["total"] = min(t, MAX_PAGINAS_LISTADO)
+                if t > MAX_PAGINAS_LISTADO:
+                    logger.error(f"Compra Ágil listado: {t} páginas, se leen {MAX_PAGINAS_LISTADO}")
+                    r["recorte"] = f"{t} páginas, se leyeron las primeras {MAX_PAGINAS_LISTADO}"
         pagina += 1
-    return items, leidas, total or 1
+    if r.get("recorte") and not r["corte"]:
+        r["corte"] = r["recorte"]
+    return r
+
+
+def _parse_iso(s) -> datetime | None:
+    try:
+        return datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        return None
+
+
+def _marca_parcial(b: dict, marca: datetime | None) -> datetime | None:
+    """Hasta dónde se leyó sin hueco en un barrido incompleto: PENDIENTE de la sonda --orden."""
+    return None
 
 
 def _item_de_listado(item: dict) -> dict | None:
@@ -471,7 +508,8 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
     resumen = {
         "diarios_ok": [], "diarios_fallidos": [], "rotativos_ok": [], "rotativos_total": len(rotativos),
         "truncados": [], "cursor": cursor, "ultima": ultima, "devueltas": 0, "cortado": "",
-        "listado_ok": False, "listado_paginas": 0, "listado_total": 0, "listado_desde": "",
+        "listado_ok": False, "listado_paginas": 0, "listado_total": None, "listado_desde": "",
+        "listado_corte": "", "listado_hueco": "",
     }
     global _solicitudes, _ultima_solicitud
     _solicitudes = 0
@@ -500,33 +538,43 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
                     raise _CuotaAgotada(f"{e}: {alcance}, sin otro ticket")
                 logger.error(f"Compra Ágil: {e} con el ticket {nombre}; se pasa al {disponibles[0][0]}")
 
-    # (0) Listado completo desde la última barrida completa, filtrado por título.
-    try:
-        ultima_listado = datetime.strptime(ultima.get(CLAVE_LISTADO) or "", "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-        desde_listado = max(ultima_listado - LISTADO_TRASLAPE, ahora - timedelta(days=LISTADO_DIAS_MAX))
-    except ValueError:
+    # (0) Listado completo desde donde se leyó sin hueco la última vez, filtrado por título.
+    tope = ahora - timedelta(days=LISTADO_DIAS_MAX)
+    marca = _parse_iso(ultima.get(CLAVE_LISTADO))
+    if marca is None:
         desde_listado = ahora - timedelta(days=COMPRA_AGIL_DIAS_VENTANA)
+    else:
+        desde_listado = max(marca - LISTADO_TRASLAPE, tope)
+        if marca - LISTADO_TRASLAPE < tope:
+            # Lo publicado entre la marca y el tope no se leerá: se dice en el correo.
+            resumen["listado_hueco"] = f"{_iso(marca)} a {_iso(tope)}"
+            logger.error(f"Compra Ágil listado: hueco sin leer de {resumen['listado_hueco']} (tope {LISTADO_DIAS_MAX} d)")
     resumen["listado_desde"] = _iso(desde_listado)
-    try:
-        crudos, leidas, total = con_respaldo(_barrer_listado, _iso(desde_listado), PRESUPUESTO_LISTADO_S)
-    except _CuotaAgotada as e:
-        logger.error(f"Compra Ágil listado: {e}. Se detiene.")
-        resumen["cortado"] = str(e)
-        resumen["diarios_fallidos"] = list(COMPRA_AGIL_TERMINOS_DIARIOS)
-        crudos, leidas, total = [], 0, 0
-    resumen["listado_paginas"], resumen["listado_total"] = leidas, total
-    resumen["listado_ok"] = total > 0 and leidas == total
-    if resumen["listado_ok"]:
-        ultima[CLAVE_LISTADO] = _iso(ahora)
-    for it in crudos:
+    b = _barrer_listado(disponibles, _iso(desde_listado), time.monotonic() + PRESUPUESTO_LISTADO_S)
+    resumen["listado_paginas"], resumen["listado_total"] = b["leidas"], b["total"]
+    resumen["listado_corte"] = b["corte"]
+    resumen["listado_ok"] = bool(b["total"]) and b["prefijo"] == b["total"] and not b["corte"]
+    nueva_marca = ahora if resumen["listado_ok"] else _marca_parcial(b, marca)
+    if nueva_marca is not None:
+        ultima[CLAVE_LISTADO] = _iso(nueva_marca)
+    for it in b["items"]:
         if it.get("codigo"):
             devueltos.add(it["codigo"])
         d = _item_de_listado(it)
         if d and d["codigo"] not in por_codigo:
             por_codigo[d["codigo"]] = d
-    logger.info(f"Compra Ágil listado desde {resumen['listado_desde']}: {leidas}/{total} páginas, "
-                f"{len(crudos)} publicadas, {len(por_codigo)} con keyword en el título")
-    if resumen["cortado"]:
+    logger.info(f"Compra Ágil listado desde {resumen['listado_desde']}: {b['leidas']}/{b['total']} páginas "
+                f"(sin hueco hasta la {b['prefijo']}), {len(b['items'])} publicadas, {len(por_codigo)} con keyword "
+                f"en el título, marca {ultima.get(CLAVE_LISTADO)}" + (f"; cortado: {b['corte']}" if b["corte"] else ""))
+    if "429" in b["corte"] or "sin otro ticket" in b["corte"]:
+        # La búsqueda q chocaría con lo mismo: se corta aquí y se guarda lo leído.
+        resumen["cortado"] = b["corte"]
+        resumen["diarios_fallidos"] = list(COMPRA_AGIL_TERMINOS_DIARIOS)
+        resumen["devueltas"] = len(devueltos)
+        return list(por_codigo.values()), resumen
+    if not disponibles:
+        resumen["cortado"] = "sin ticket"
+        resumen["diarios_fallidos"] = list(COMPRA_AGIL_TERMINOS_DIARIOS)
         resumen["devueltas"] = len(devueltos)
         return list(por_codigo.values()), resumen
 

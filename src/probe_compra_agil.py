@@ -185,6 +185,28 @@ def main() -> int:
     if "--paginacion" in sys.argv:
         paginacion(ticket, dias=1)
         return 0
+    if "--orden" in sys.argv:
+        # ¿En qué orden pagina el listado, con y sin ordenar_por? Fechas de publicación
+        # de la primera y la última fila de la primera y la última página.
+        desde = _desde(1)
+        for nombre, extra in (("sin ordenar_por", {}), ("ordenar_por=FechaPublicacion", {"ordenar_por": "FechaPublicacion"})):
+            base = {"estado": "publicada", "publicado_desde": desde, "tamano_pagina": 50, **extra}
+            total = None
+            for pagina in (1, None):
+                time.sleep(5)
+                p = {**base, "numero_pagina": pagina or total}
+                r = requests.get(COMPRA_AGIL_API_URL, headers={"ticket": ticket}, params=p, timeout=TIMEOUT)
+                if r.status_code != 200:
+                    print(f"{nombre} pág {p['numero_pagina']}: HTTP {r.status_code}")
+                    break
+                pl = r.json().get("payload") or {}
+                total = total or (pl.get("paginacion") or {}).get("total_paginas")
+                it = pl.get("items") or []
+                f = [(i.get("fechas") or {}) for i in it]
+                print(f"{nombre} pág {p['numero_pagina']}/{total}: claves fechas={sorted(f[0]) if f else []}")
+                print(f"   primera={f[0] if f else None}")
+                print(f"   última ={f[-1] if f else None}")
+        return 0
     if "--radar" in sys.argv:
         # La búsqueda real del radar (listado + q) con el state del repo en memoria:
         # no envía correo ni escribe data/state.json.

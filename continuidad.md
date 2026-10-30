@@ -38,8 +38,18 @@
   listado quedó incompleto. Timeout del job 40 → 50 min. 7 tests nuevos (41 OK). Sonda con modo `--radar` (búsqueda
   real sin correo ni state).
 
+- Verificador sobre `f427488`: **FALLA** (marca trabada si no se lee todo, 429 a mitad bota lo leído, recorte o
+  total ilegible contados como completos, mensajes falsos, 401 a mitad reinicia el presupuesto, sin try en scanner).
+  Corregido todo menos la marca parcial, que depende del orden del listado (sonda `--orden`); mientras tanto un
+  barrido incompleto no mueve la marca. Tests: 46 OK.
+- **Sonda `--radar`** (run `41086809008`, 16:06-16:43 UTC, búsqueda real sin correo ni state): listado 144/144
+  páginas (3 días, 7.158 publicadas) en ~16 min, 159 con keyword en el título; después q: diarios 12/12, rotativos
+  28/133, **214 solicitudes espaciadas 4 s sin 429**; 18 rotativos con 504 (software, diseño gráfico, gestión de
+  datos…); 639 ítems en total.
+
 ### Pendiente
-- Resultado de la sonda `--radar` y del verificador sobre el listado completo; corregir antes del lunes 2-nov 09:00.
+- Sonda `--orden`, marca parcial y segunda pasada del verificador antes del lunes 2-nov 09:00. El listado de 3 días
+  tardó ~16 de los 18 min de presupuesto: el lunes queda justo.
 - Lunes 2-nov: primera corrida con listado completo; mirar en el log «Compra Ágil listado desde …: N/M páginas».
 - Respuesta de ChileCompra a `INC-1408539-R5Z0W4` (hasta el 4-nov).
 - Sergio: qué hacer con `triage/correo-radar-2026-10-29.txt` (sin commit).
