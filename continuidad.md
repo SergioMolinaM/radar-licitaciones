@@ -47,9 +47,16 @@
   28/133, **214 solicitudes espaciadas 4 s sin 429**; 18 rotativos con 504 (software, diseño gráfico, gestión de
   datos…); 639 ítems en total.
 
+- **Sonda `--orden`** (run `41092789158`): el listado viene de lo más nuevo a lo más viejo, con o sin `ordenar_por`;
+  `fechas.fecha_publicacion` en hora de Chile sin zona («2026-10-30 13:44» a las 16:45 UTC). La guía §5.1 Grupo 2
+  trae `publicado_hasta`. **Decisión:** el listado se recorre en tramos cerrados de 6 h del más antiguo al más nuevo
+  y la marca avanza al fin de cada tramo leído entero (descartado: marca quieta si no se termina, que se trababa;
+  mejor para el producto porque cada corrida avanza sin hueco y un tramo cerrado no se desplaza con lo que entra;
+  costo, no criterio: algunas solicitudes más). 48 tests OK.
+
 ### Pendiente
-- Sonda `--orden`, marca parcial y segunda pasada del verificador antes del lunes 2-nov 09:00. El listado de 3 días
-  tardó ~16 de los 18 min de presupuesto: el lunes queda justo.
+- Sonda `--hasta` (que `publicado_hasta` filtre y en qué zona) y segunda pasada del verificador antes del lunes
+  2-nov 09:00. El listado de 3 días tardó ~16 de los 18 min de presupuesto.
 - Lunes 2-nov: primera corrida con listado completo; mirar en el log «Compra Ágil listado desde …: N/M páginas».
 - Respuesta de ChileCompra a `INC-1408539-R5Z0W4` (hasta el 4-nov).
 - Sergio: qué hacer con `triage/correo-radar-2026-10-29.txt` (sin commit).

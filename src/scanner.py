@@ -65,7 +65,7 @@ def run() -> int:
             "diarios_ok": [], "diarios_fallidos": [], "truncados": [], "cursor": state.get("ca_cursor", 0),
             "ultima": state.get("ca_ultima"), "devueltas": 0, "cortado": f"error inesperado: {type(e).__name__}",
             "listado_ok": False, "listado_paginas": 0, "listado_total": None, "listado_desde": "",
-            "listado_corte": "", "listado_hueco": ""}
+            "listado_corte": "", "listado_hueco": "", "listado_pendiente": ""}
     state["ca_cursor"] = resumen_ca["cursor"]
     state["ca_ultima"] = resumen_ca["ultima"]
     universo_ca = resumen_ca["devueltas"]
@@ -115,9 +115,9 @@ def run() -> int:
             parciales.append(f"Compra Ágil: no se pudo leer el listado completo{motivo}; hoy los títulos"
                              " solo se revisaron con las búsquedas por término")
         else:
-            parciales.append(f"Compra Ágil: listado completo leído en {resumen_ca['listado_paginas']} de "
-                             f"{resumen_ca['listado_total']} páginas{motivo}; lo no leído se lee en la próxima"
-                             " corrida")
+            parciales.append(f"Compra Ágil: el listado completo no se terminó{motivo}; lo publicado de "
+                             f"{resumen_ca['listado_pendiente']} se lee en la próxima corrida (hoy solo por las"
+                             " búsquedas por término)")
     if resumen_ca["listado_hueco"]:
         parciales.append(f"Compra Ágil: lo publicado de {resumen_ca['listado_hueco']} no se revisó en el listado"
                          " completo (más atrás del tope de días)")

@@ -50,6 +50,7 @@ class ListadoTest(unittest.TestCase):
         self.p = [
             mock.patch.object(ca, "PAUSA_ENTRE_SOLICITUDES_S", 0),
             mock.patch.object(ca, "tickets", lambda: [("principal", "T")]),
+            mock.patch.object(ca, "LISTADO_TRAMO", ca.timedelta(days=30)),  # un solo tramo, salvo donde se diga
         ]
         for p in self.p:
             p.start()
@@ -86,6 +87,7 @@ class ListadoTest(unittest.TestCase):
         self.assertFalse(r["listado_ok"])
         self.assertEqual((r["listado_paginas"], r["listado_total"]), (2, 3))
         self.assertEqual(r["ultima"][ca.CLAVE_LISTADO], "2026-10-29T12:00:00Z")
+        self.assertTrue(r["listado_pendiente"])
         self.assertEqual({m["codigo"] for m in matches}, {"1-1-COT26", "1-3-COT26"})
         self.assertEqual(api.llamadas.count((None, 2)), 2)  # un reintento
 
@@ -138,7 +140,7 @@ class ListadoTest(unittest.TestCase):
         self.assertFalse(r["listado_ok"])
 
     def test_total_ilegible_o_recortado_no_cuenta_como_completo(self):
-        for pag in ({"total_paginas": "98"}, {}, {"total_paginas": 0}):
+        for pag in ({"total_paginas": "98"}, {}, {"total_paginas": -1}):  # 0 sin ítems es un tramo vacío
             api = _API({(None, 1): _Resp(200, {"success": "OK", "payload": {"items": [], "paginacion": pag}})})
             _, r = self._correr(api, ultima={ca.CLAVE_LISTADO: "2026-10-29T12:00:00Z"})
             self.assertFalse(r["listado_ok"], pag)
@@ -168,6 +170,35 @@ class ListadoTest(unittest.TestCase):
     def test_hueco_por_tope_se_informa(self):
         _, r = self._correr(_API({}), ultima={ca.CLAVE_LISTADO: "2026-01-01T00:00:00Z"})
         self.assertTrue(r["listado_hueco"].startswith("2026-01-01"))
+
+    def test_tramos_mueven_la_marca_hasta_el_ultimo_completo(self):
+        llamadas = []
+
+        def get(url, headers=None, params=None, timeout=None):
+            if params.get("q"):
+                return _pagina([], 1)
+            llamadas.append((params["publicado_desde"], params.get("publicado_hasta")))
+            if len(llamadas) in (2, 3):  # el segundo tramo no responde en sus dos intentos
+                return _Resp(504, {})
+            return _pagina([_item(f"9-{len(llamadas)}-COT26", "Sitio web")], 1)
+
+        ahora = ca.datetime.now(ca.timezone.utc)
+        marca = ca._iso(ahora - ca.timedelta(days=3))
+        with mock.patch.object(ca, "LISTADO_TRAMO", ca.timedelta(days=1)), mock.patch.object(ca.requests, "get", get):
+            matches, r = ca.fetch_compra_agil(cursor=0, ultima={ca.CLAVE_LISTADO: marca}, presupuesto_s=60)
+        self.assertFalse(r["listado_ok"])
+        # Todos los tramos con desde y hasta; el primero empieza en marca − traslape.
+        self.assertTrue(all(h for _, h in llamadas))
+        primero_desde, primero_hasta = llamadas[0]
+        self.assertEqual(primero_desde, ca._iso(ca._parse_iso(marca) - ca.LISTADO_TRASLAPE))
+        self.assertEqual(r["ultima"][ca.CLAVE_LISTADO], primero_hasta)
+        self.assertTrue(r["listado_pendiente"].startswith(primero_hasta))
+        self.assertEqual(len(llamadas), 3)  # tramo 1 ok, tramo 2 dos intentos, y no sigue
+
+    def test_tramo_vacio_cuenta_como_leido(self):
+        api = _API({(None, 1): _Resp(200, {"success": "OK", "payload": {"items": [], "paginacion": {"total_paginas": 0}}})})
+        _, r = self._correr(api)
+        self.assertTrue(r["listado_ok"])
 
     def test_q_sigue_despues_del_listado(self):
         api = _API({(None, 1): _pagina([], 1)})

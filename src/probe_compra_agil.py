@@ -185,6 +185,28 @@ def main() -> int:
     if "--paginacion" in sys.argv:
         paginacion(ticket, dias=1)
         return 0
+    if "--hasta" in sys.argv:
+        # ¿publicado_hasta filtra, y en qué zona? Tramo de 1 h que terminó hace 3 h (UTC):
+        # la fecha_publicacion viene en hora de Chile sin zona (sonda --orden).
+        fin = datetime.now(timezone.utc) - timedelta(hours=3)
+        ini = fin - timedelta(hours=1)
+        f = lambda d: d.strftime("%Y-%m-%dT%H:%M:%SZ")
+        print(f"tramo UTC {f(ini)} → {f(fin)}")
+        p = {"estado": "publicada", "publicado_desde": f(ini), "publicado_hasta": f(fin), "tamano_pagina": 50}
+        total, fechas, pagina = None, [], 1
+        while total is None or pagina <= total:
+            time.sleep(5)
+            r = requests.get(COMPRA_AGIL_API_URL, headers={"ticket": ticket}, params={**p, "numero_pagina": pagina}, timeout=TIMEOUT)
+            if r.status_code != 200:
+                print(f"pág {pagina}: HTTP {r.status_code} {r.text[:200]!r}")
+                break
+            pl = r.json().get("payload") or {}
+            total = total or (pl.get("paginacion") or {}).get("total_paginas") or 0
+            fechas += [(i.get("fechas") or {}).get("fecha_publicacion") for i in pl.get("items") or []]
+            pagina += 1
+        fechas = sorted(x for x in fechas if x)
+        print(f"páginas={total} ítems={len(fechas)} mín={fechas[0] if fechas else None} máx={fechas[-1] if fechas else None}")
+        return 0
     if "--orden" in sys.argv:
         # ¿En qué orden pagina el listado, con y sin ordenar_por? Fechas de publicación
         # de la primera y la última fila de la primera y la última página.
