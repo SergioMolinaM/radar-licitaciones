@@ -1,5 +1,29 @@
 # Continuidad — Radar de Licitaciones
 
+## 2026-10-30 (viernes, sesión raíz) — reclamo enviado; Compra Ágil cortada a las 5 solicitudes
+
+### Hecho
+- Corrida `41052118810` (12:00 UTC, success, 1m57s): MP 5.123 activas, 91 coincidencias; ChileCompra noticias 3
+  avisos; Empleos PNUD 2; correo con 29 ítems. 🔴 **Compra Ágil: 429 tras 5 solicitudes** (Retry-After=None),
+  diarios 2/11, rotativos 0/127 (cursor 87→87), 46 devueltas; «redes sociales» 504; «digital» y «audiovisual» no
+  alcanzaron a consultarse. CNA sigue con `CERTIFICATE_VERIFY_FAILED`. La del 29-oct: 59 solicitudes, 23 con 504,
+  ningún 429 (contado con control positivo).
+- **Reclamo a ChileCompra enviado por Sergio el 30-oct: requerimiento `INC-1408539-R5Z0W4`** (Centro de Ayuda,
+  Proveedores → Incidentes; Producto «Datos abiertos», Tema «API Mercado Público», según la FAQ KA-01985). Texto en
+  `soporte/reclamo-chilecompra-2026-10-29.txt`, actualizado hoy con los datos del 29 y 30-oct. Plazo de respuesta:
+  3 días hábiles (condiciones de la API, §6).
+- Triage del día lo hizo la sesión `postulaciones-10` (`triage/2026-10-30-*.md`); esta sesión lo commiteó junto con
+  los del 29-oct. Decisiones de Sergio: 4777-895-COT26 PRESENTAR (oferta en `postulaciones/la-union-4777-895-896/`),
+  4777-896-COT26 NO, 2728-55-COT26 va (demo en `cementerio-demo/`), 5178-5382-COT26 va, 4239-538-COT26 NO.
+- Adjuntos de Compra Ágil desde Chrome: el clic en el adjunto hace un XHR a
+  `adjunto.mercadopublico.cl/.../descargar/<GUID>` con Bearer y user_key que pone la página; se lee parchando
+  `XMLHttpRequest.send` y abriendo el docx con JSZip. La ficha a veces carga vacía y un script largo congela la pestaña.
+
+### Pendiente
+- Lanzar la segunda sonda (`gh workflow run probe-compra-agil.yml`) pasadas las 15:00 Chile y proponer sustitutos.
+- Respuesta de ChileCompra a `INC-1408539-R5Z0W4` (hasta el 4-nov).
+- Sergio: qué hacer con `triage/correo-radar-2026-10-29.txt` (sin commit).
+
 ## 2026-10-29 (jueves, sesión raíz) — diarios ciegos reemplazados; reclamo reescrito
 
 ### Hecho

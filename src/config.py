@@ -163,6 +163,19 @@ KEYWORDS_INCLUDE = [
     "plan municipal de cultura",
     "participativo",
     "participativa",
+    # 30-oct-2026 (Sergio): «comunicaciones» y «campaña» son los diarios que
+    # reemplazan a «redes sociales» (sonda run 41078223545). Contra
+    # audit-2026-07-08.csv suman 12 títulos: publicidad y difusión municipal,
+    # «Producción y Difusión Campaña», y ruido de redes MPLS y «campaña invierno».
+    "comunicaciones",
+    "campaña",
+    # 30-oct-2026 (Sergio): Andrés Alberdi es especialista. En julio, «biométric»
+    # trajo 5 (firma electrónica biométrica y relojes de asistencia); blockchain, 0.
+    "biometría",
+    "biométrico",
+    "biométrica",
+    "blockchain",
+    "cadena de bloques",
 ]
 
 # Keywords de inclusión que deben calzar como PALABRA COMPLETA (no prefijo).
@@ -372,11 +385,15 @@ COMPRA_AGIL_DIAS_VENTANA = 3
 # dieron 504 en todas las corridas del 20 al 28-oct, y «diseño» y «producción»
 # solas también. Sonda run 40741312235 (28-oct): «web» 200 en 2 de 2 rondas;
 # «digital» y «audiovisual» 200 en 1 de 2. Las frases vuelven a la rotación.
-# «redes sociales» queda hasta que la sonda encuentre sustituto.
+# 30-oct (Sergio): sonda run 41078223545, «redes sociales», «publicidad» y
+# «difusión» 504 en 2 de 2 rondas; «comunicaciones» (49) y «campaña» (12, trae
+# «Servicios De Publicidad Y Difusión») 200 en las dos. «redes sociales» vuelve a la
+# rotación.
 COMPRA_AGIL_TERMINOS_DIARIOS = [
     "inteligencia artificial",
     "web",
-    "redes sociales",
+    "comunicaciones",
+    "campaña",
     "digital",
     "audiovisual",
     "encuesta",

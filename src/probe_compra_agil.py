@@ -8,6 +8,7 @@ paginación de cada una. El ticket va solo en el header y nunca se imprime.
 
 Uso: python -m src.probe_compra_agil            (alternativas a los diarios que dan 504)
      python -m src.probe_compra_agil --variantes (sondas del 14 y 16-oct)
+     python -m src.probe_compra_agil --paginacion (listado sin q, todas las páginas de 1 día)
 """
 
 import os
@@ -136,11 +137,54 @@ def alternativas(ticket: str) -> None:
         time.sleep(5)
 
 
+# 30-oct (run 41078223545): el listado sin q de 1 día respondió en 3-4 s en las dos
+# rondas (3.040 resultados, 61 páginas); el 14-oct el de 3 días caía en 504. Si todas
+# las páginas responden, se puede bajar todo y filtrar local en vez de 140 términos q.
+# Esta sonda recorre todas las páginas: código, tiempo, ítems y códigos únicos.
+def paginacion(ticket: str, dias: int = 1, pausa: float = 5) -> None:
+    desde = _desde(dias)
+    print(f"--- paginación sin q, {dias} d ({datetime.now(timezone.utc):%H:%M:%S} UTC), desde {desde}")
+    codigos, total, pagina, fallas, t_inicio = set(), None, 1, 0, time.monotonic()
+    while total is None or pagina <= total:
+        params = {"estado": "publicada", "publicado_desde": desde, "tamano_pagina": 50, "numero_pagina": pagina}
+        t0 = time.monotonic()
+        try:
+            resp = requests.get(COMPRA_AGIL_API_URL, headers={"ticket": ticket}, params=params, timeout=TIMEOUT)
+        except requests.RequestException as e:
+            print(f"pág {pagina:3} | error de red tras {time.monotonic() - t0:5.1f} s — {type(e).__name__}")
+            fallas += 1
+            pagina += 1
+            continue
+        dt = time.monotonic() - t0
+        if resp.status_code == 200:
+            payload = resp.json().get("payload") or {}
+            pag = payload.get("paginacion") or {}
+            total = total or pag.get("total_paginas") or 0
+            items = payload.get("items") or []
+            codigos |= {i.get("codigo") for i in items}
+            print(f"pág {pagina:3}/{total} | HTTP 200 | {dt:5.1f} s | items={len(items)} total_resultados={pag.get('total_resultados')}")
+        else:
+            fallas += 1
+            print(f"pág {pagina:3} | HTTP {resp.status_code} | {dt:5.1f} s | {resp.text[:120]!r} | Retry-After={resp.headers.get('Retry-After')}")
+            if resp.status_code == 429:
+                print("429: se detiene")
+                break
+            if total is None:
+                total = 1  # sin la primera página no se sabe cuántas hay
+        pagina += 1
+        time.sleep(pausa)
+    print(f"--- fin: {pagina - 1} páginas pedidas, {fallas} fallas, {len(codigos)} códigos únicos, "
+          f"{time.monotonic() - t_inicio:.0f} s")
+
+
 def main() -> int:
     ticket = os.getenv("MERCADO_PUBLICO_TOKEN")
     if not ticket:
         print("MERCADO_PUBLICO_TOKEN no configurado")
         return 1
+    if "--paginacion" in sys.argv:
+        paginacion(ticket, dias=1)
+        return 0
     if "--variantes" in sys.argv:
         semantica(ticket)
         for ronda in (1, 2):

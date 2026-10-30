@@ -4,6 +4,11 @@ name: Sonda Compra Ágil
 # código y tiempo de cada una. No envía correo ni commitea nada.
 on:
   workflow_dispatch:
+    inputs:
+      modo:
+        description: "vacío = alternativas; --paginacion; --variantes"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -11,7 +16,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -22,4 +27,5 @@ jobs:
       - name: Sonda
         env:
           MERCADO_PUBLICO_TOKEN: ${{ secrets.MERCADO_PUBLICO_TOKEN }}
-        run: python -m src.probe_compra_agil
+          MODO: ${{ inputs.modo }}
+        run: python -m src.probe_compra_agil $MODO
