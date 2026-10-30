@@ -54,9 +54,17 @@
   mejor para el producto porque cada corrida avanza sin hueco y un tramo cerrado no se desplaza con lo que entra;
   costo, no criterio: algunas solicitudes más). 48 tests OK.
 
+- **Sonda `--hasta`** (run `41101204459`, 17:44 UTC): se pidió 13:44:48Z → 14:44:48Z y volvieron 203 ítems de
+  13:45 a 14:40 en `fecha_publicacion`: **la API lee publicado_desde/hasta como hora de Chile aunque lleven Z**. Con
+  UTC el filtro quedaba 3 h corrido (hueco de 1 h entre corridas con el traslape de 2 h). `_api_fecha` convierte a
+  America/Santiago para tramos y q; state y log siguen en UTC.
+- Verificador, segunda pasada (simulación de semana con la API en hora de Chile, cambios de horario de abr y sep
+  2027): 0 pérdidas; marca nunca pasa sobre lo no leído; lunes de ~7.400 completa a 6,7 s/página y si se corta el
+  martes se pone al día. FALLA por 4 menores, corregidos: KeyError del heartbeat si Compra Ágil revienta, aviso de
+  hueco falso, texto «solo por término» con q caída, borde exclusivo (cada tramo pide hasta + 1 min). 50 tests OK.
+
 ### Pendiente
-- Sonda `--hasta` (que `publicado_hasta` filtre y en qué zona) y segunda pasada del verificador antes del lunes
-  2-nov 09:00. El listado de 3 días tardó ~16 de los 18 min de presupuesto.
+- Tercera pasada corta del verificador sobre esos 4 arreglos.
 - Lunes 2-nov: primera corrida con listado completo; mirar en el log «Compra Ágil listado desde …: N/M páginas».
 - Respuesta de ChileCompra a `INC-1408539-R5Z0W4` (hasta el 4-nov).
 - Sergio: qué hacer con `triage/correo-radar-2026-10-29.txt` (sin commit).

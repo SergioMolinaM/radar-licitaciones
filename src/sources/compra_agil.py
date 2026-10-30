@@ -31,6 +31,7 @@ seguridad. Ante 429 se detiene y retorna lo acumulado (no revienta la corrida).
 import time
 import logging
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import requests
 
@@ -49,6 +50,10 @@ from ..filters import excluido, keywords_incluidas
 from ._tickets import tickets
 
 logger = logging.getLogger(__name__)
+try:
+    CHILE_TZ = ZoneInfo("America/Santiago")
+except ZoneInfoNotFoundError:  # Windows sin tzdata; el runner de GitHub (Ubuntu) la trae
+    CHILE_TZ = timezone(timedelta(hours=-3))
 
 TIMEOUT = 60
 TAMANO_PAGINA = 50          # máximo permitido por la API (default 15, mínimo 10)  [guía §5.1 Grupo 6]
@@ -477,19 +482,29 @@ def terminos_rotativos() -> list[str]:
 
 
 def _iso(dt: datetime) -> str:
+    """UTC, para state.json y el log."""
     return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _api_fecha(dt: datetime) -> str:
+    """Fecha para publicado_desde/hasta: la API la lee como hora de Chile aunque lleve
+    «Z». Sonda --hasta (run 41101204459, 30-oct): se pidió 13:44:48Z → 14:44:48Z y
+    volvieron fecha_publicacion 13:45 a 14:40, que es hora de Chile (la sonda corrió
+    a las 17:44 UTC). Con UTC el filtro quedaba 3 h corrido."""
+    return dt.astimezone(CHILE_TZ).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _desde_rotativo(ultima: str | None, ahora: datetime) -> str:
     """Desde la última búsqueda exitosa del término (con 1 h de traslape), con
-    piso en la ventana diaria y techo en COMPRA_AGIL_DIAS_MAX_ROTATIVO días."""
+    piso en la ventana diaria y techo en COMPRA_AGIL_DIAS_MAX_ROTATIVO días.
+    Devuelve la fecha para la API (_api_fecha)."""
     minimo = ahora - timedelta(days=COMPRA_AGIL_DIAS_MAX_ROTATIVO)
     por_defecto = ahora - timedelta(days=COMPRA_AGIL_DIAS_VENTANA)
     try:
         dt = datetime.strptime(ultima, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc) - timedelta(hours=1)
     except (TypeError, ValueError):
-        return _iso(por_defecto)
-    return _iso(max(minimo, min(dt, por_defecto)))
+        return _api_fecha(por_defecto)
+    return _api_fecha(max(minimo, min(dt, por_defecto)))
 
 
 def fetch_compra_agil(cursor=0, ultima: dict | None = None,
@@ -551,7 +566,7 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
         desde_listado = ahora - timedelta(days=COMPRA_AGIL_DIAS_VENTANA)
     else:
         desde_listado = max(marca - LISTADO_TRASLAPE, tope)
-        if marca - LISTADO_TRASLAPE < tope:
+        if marca < tope:
             # Lo publicado entre la marca y el tope no se leerá: se dice en el correo.
             resumen["listado_hueco"] = f"{_iso(marca)} a {_iso(tope)}"
             logger.error(f"Compra Ágil listado: hueco sin leer de {resumen['listado_hueco']} (tope {LISTADO_DIAS_MAX} d)")
@@ -561,10 +576,14 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
     resumen["listado_total"] = 0
     while tramo_desde < ahora:
         tramo_hasta = min(tramo_desde + LISTADO_TRAMO, ahora)
-        b = _barrer_listado(disponibles, _iso(tramo_desde), limite, _iso(tramo_hasta))
+        # hasta + 1 min: la fecha_publicacion viene al minuto y no está medido si el
+        # borde es inclusivo; el solape solo duplica, y se deduplica por código.
+        b = _barrer_listado(disponibles, _api_fecha(tramo_desde), limite,
+                            _api_fecha(tramo_hasta + timedelta(minutes=1)))
         resumen["listado_paginas"] += b["leidas"]
         if b["total"] is None:
             total_conocido = False
+            resumen["listado_total"] += b["leidas"]  # al menos lo leído, para no quedar bajo las páginas
         else:
             resumen["listado_total"] += b["total"]
         n_publicadas += len(b["items"])

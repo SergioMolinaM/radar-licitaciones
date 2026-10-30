@@ -190,10 +190,22 @@ class ListadoTest(unittest.TestCase):
         # Todos los tramos con desde y hasta; el primero empieza en marca − traslape.
         self.assertTrue(all(h for _, h in llamadas))
         primero_desde, primero_hasta = llamadas[0]
-        self.assertEqual(primero_desde, ca._iso(ca._parse_iso(marca) - ca.LISTADO_TRASLAPE))
-        self.assertEqual(r["ultima"][ca.CLAVE_LISTADO], primero_hasta)
-        self.assertTrue(r["listado_pendiente"].startswith(primero_hasta))
+        self.assertEqual(primero_desde, ca._api_fecha(ca._parse_iso(marca) - ca.LISTADO_TRASLAPE))
+        nueva = r["ultima"][ca.CLAVE_LISTADO]
+        # state en UTC; la API recibe hora de Chile y el hasta con 1 min de solape
+        self.assertEqual(ca._api_fecha(ca._parse_iso(nueva) + ca.timedelta(minutes=1)), primero_hasta)
+        self.assertTrue(r["listado_pendiente"].startswith(nueva))
         self.assertEqual(len(llamadas), 3)  # tramo 1 ok, tramo 2 dos intentos, y no sigue
+
+    def test_fecha_para_la_api_en_hora_de_chile(self):
+        dt = ca.datetime(2026, 10, 30, 17, 44, 48, tzinfo=ca.timezone.utc)
+        self.assertEqual(ca._api_fecha(dt), "2026-10-30T14:44:48Z")  # Chile UTC-3 en horario de verano
+
+    def test_hueco_solo_si_la_marca_quedo_fuera_del_tope(self):
+        ahora = ca.datetime.now(ca.timezone.utc)
+        dentro = ca._iso(ahora - ca.timedelta(days=ca.LISTADO_DIAS_MAX) + ca.timedelta(hours=1))
+        _, r = self._correr(_API({}), ultima={ca.CLAVE_LISTADO: dentro})
+        self.assertEqual(r["listado_hueco"], "")
 
     def test_tramo_vacio_cuenta_como_leido(self):
         api = _API({(None, 1): _Resp(200, {"success": "OK", "payload": {"items": [], "paginacion": {"total_paginas": 0}}})})
