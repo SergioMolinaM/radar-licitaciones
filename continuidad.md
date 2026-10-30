@@ -63,8 +63,21 @@
   martes se pone al día. FALLA por 4 menores, corregidos: KeyError del heartbeat si Compra Ágil revienta, aviso de
   hueco falso, texto «solo por término» con q caída, borde exclusivo (cada tramo pide hasta + 1 min). 50 tests OK.
 
+- Verificador, tercera pasada sobre `0d9ef29`: **PASA** (los 4 arreglos y sin regresiones; borde exclusivo con
+  segundos :00: 103 perdidos → 0). Sin verificar: si la API guarda hora de pared o UTC en el cambio de horario.
+
 ### Pendiente
-- Tercera pasada corta del verificador sobre esos 4 arreglos.
+- **Lun 2-nov 09:00, primera corrida con listado completo:** en el log, «Compra Ágil listado … → …: N/M páginas» por
+  tramo (ventana desde el 30-oct ~16:00 UTC: la marca no existe en state, así que parte de 3 días atrás), que no
+  haya 429, el tiempo total del job (< 50 min) y cuántos ítems trae el correo. Un lunes de ~6.400 a 8,1 s/página se
+  corta por presupuesto (simulado); el martes se pone al día.
+- Ruido del filtro por título: «slep» y «campaña» traen compras de bienes (verificador, muestra de julio). Mirar en
+  el correo del lunes antes de tocar keywords.
+- Respuesta de ChileCompra a `INC-1408539-R5Z0W4` (hasta el 4-nov).
+- Sergio: qué hacer con `triage/correo-radar-2026-10-29.txt` (sin commit).
+
+### Estado del repo
+`main`, todo con push salvo `triage/correo-radar-2026-10-29.txt`. Sin deploy (es un Action).
 - Lunes 2-nov: primera corrida con listado completo; mirar en el log «Compra Ágil listado desde …: N/M páginas».
 - Respuesta de ChileCompra a `INC-1408539-R5Z0W4` (hasta el 4-nov).
 - Sergio: qué hacer con `triage/correo-radar-2026-10-29.txt` (sin commit).
