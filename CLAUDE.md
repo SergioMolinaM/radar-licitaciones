@@ -11,9 +11,14 @@ se abre todo servicio vigente y se leen los adjuntos sin preguntar; un «no» so
 su página y sin forma de cubrirlo; decide Sergio. Los papeles y piezas repetidas de toda oferta están en
 `../postulaciones/_kit/KIT.md`.
 
-Los triages del día van en `triage/AAAA-MM-DD-<fuente>.md` con el formato fijo de la skill §4 (lo vigila
-`guard-formato-triage.py`; formato y criterio no se cambian por sesión); las bases bajadas en `triage/bases-AAAA-MM-DD/<código>/`
-(fuera de git: son documentos de terceros).
+**Este repo es público (31-oct-2026).** Las notas de negocio viven en `privado/`, un repo privado anidado
+(`radar-licitaciones-privado`) que este repo ignora: `privado/continuidad.md` (ofertas, decisiones, personas),
+`privado/triage/`, `privado/docs/`, `privado/soporte/`. En `continuidad.md` de este repo va **solo** lo técnico
+(código, workflows, cuotas, errores), sin ofertas, precios, clientes ni nombres de personas.
+
+Los triages del día van en `privado/triage/AAAA-MM-DD-<fuente>.md` con el formato fijo de la skill §4 (lo vigila
+`guard-formato-triage.py`; formato y criterio no se cambian por sesión); las bases bajadas en
+`privado/triage/bases-AAAA-MM-DD/<código>/` (fuera de git también en el repo privado: son documentos de terceros).
 
 ## Verificación
 
