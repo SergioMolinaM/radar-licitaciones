@@ -56,6 +56,9 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   frase», «palabras sin respuesta», duración de la búsqueda q, que no haya 429, e ítems del correo.
 - El buscador web (`api.buscador.mercadopublico.cl`) responde lo que la API oficial no. Usarlo exige su credencial
   embebida: no se hace sin autorización de ChileCompra; decide Sergio (requerimiento `INC-1408539-R5Z0W4`).
+- Clasificador medido con Haiku, Sonnet y Opus 5.5 sobre el set de prueba, y parte 2 del diseño de selección
+  escrita: detalle en el repo privado (`privado/docs/SELECCION-RADAR-2026-11-02.md` §4-8). SDK `anthropic` 2.4.0
+  instalado en el PC para la medición.
 - Siguen del 02-11: tope o resumen del correo y rediseño de la
   selección (clasificador).
 
