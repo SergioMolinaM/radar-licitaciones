@@ -56,7 +56,7 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   ítems, completo=True).
 
 - Fuera de este repo, desde esta sesión: repos privados `gestor-documental` y `procesos-ia` creados en GitHub;
-  respuesta del MINVU a la AP001T0009186 cotejada en `radar-construccion-industrializados`; `ESTADO.md` al día.
+  respuestas del MINVU (AP001T0009186) y de CORFO (AH004T0008055) cotejadas en sus proyectos; `ESTADO.md` al día.
 
 ### Pendiente
 - **Mar 3-nov, después de la corrida de las 09:00 (decisión del 02-11):** `gh workflow run probe-compra-agil.yml -f modo=--universo`; `gh run download <id> -n universo -D
