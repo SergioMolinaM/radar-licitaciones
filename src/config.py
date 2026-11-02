@@ -169,7 +169,7 @@ KEYWORDS_INCLUDE = [
     # «Producción y Difusión Campaña», y ruido de redes MPLS y «campaña invierno».
     "comunicaciones",
     "campaña",
-    # 30-oct-2026 (Sergio): Andrés Alberdi es especialista. En julio, «biométric»
+    # 30-oct-2026: pedido de negocio (detalle en privado). En julio, «biométric»
     # trajo 5 (firma electrónica biométrica y relojes de asistencia); blockchain, 0.
     "biometría",
     "biométrico",
@@ -402,7 +402,7 @@ COMPRA_AGIL_TERMINOS_DIARIOS = [
     "infografía",
     "relator",
     "economía circular",
-    # 02-nov (Sergio): biometría y blockchain todos los días (Andrés Alberdi). Sonda
+    # 02-nov: biometría y blockchain todos los días (pedido de negocio). Sonda
     # --palabras (run 41520717922, 3 días): biométrico 2, biométrica 1, biometría 0,
     # blockchain 0, todas 200. «cadena de bloques» sigue en la rotación: q la parte en
     # «cadena» (20) y «bloques» (31), casi todo ajeno; el título lo revisa el listado.

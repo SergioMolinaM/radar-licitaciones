@@ -42,7 +42,7 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 - Buscador web (`buscador.mercadopublico.cl/compra-agil`, otro backend): «diseño web» 30-oct a 2-nov = 61
   resultados. Datos Abiertos de Compra Ágil solo publica cotizaciones mensuales del mes anterior: no sirve.
 
-- Sergio, 02-11: «biometría», «biométrico», «biométrica» y «blockchain» pasan a términos diarios de q (16
+- Decisión del 02-11: «biometría», «biométrico», «biométrica» y «blockchain» pasan a términos diarios de q (16
   diarios). «cadena de bloques» sigue rotativa: q la parte en «cadena» (20) y «bloques» (31), casi todo ajeno.
   Costo, no criterio: 4 solicitudes más por corrida (~30 s); Actions gratis por ser repo público.
 
@@ -56,14 +56,13 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   ítems, completo=True).
 
 ### Pendiente
-- **Mar 3-nov, después de la corrida de las 09:00 (Sergio, 02-11: «hagamos la prueba mañana y tomamos la
-  decisión»):** `gh workflow run probe-compra-agil.yml -f modo=--universo`; `gh run download <id> -n universo -D
+- **Mar 3-nov, después de la corrida de las 09:00 (decisión del 02-11):** `gh workflow run probe-compra-agil.yml -f modo=--universo`; `gh run download <id> -n universo -D
   <scratchpad>`; `python privado/clasif/universo.py <scratchpad>/universo.json` (~US$1,2: Opus y Haiku sobre ~900
-  ítems); Sergio revisa `privado/clasif/universo-resultado.md`.
+  ítems); se revisa `privado/clasif/universo-resultado.md`.
 - Mar 3-nov 09:00: primera corrida con rotativos por palabra. En el log: «rotativos que no respondieron como
   frase», «palabras sin respuesta», duración de la búsqueda q, que no haya 429, e ítems del correo.
 - El buscador web (`api.buscador.mercadopublico.cl`) responde lo que la API oficial no. Usarlo exige su credencial
-  embebida: no se hace sin autorización de ChileCompra; decide Sergio (requerimiento `INC-1408539-R5Z0W4`).
+  embebida: no se hace sin autorización de ChileCompra; decisión pendiente (requerimiento `INC-1408539-R5Z0W4`).
 - Clasificador medido con Haiku, Sonnet y Opus 5.5 sobre el set de prueba, y parte 2 del diseño de selección
   escrita: detalle en el repo privado (`privado/docs/SELECCION-RADAR-2026-11-02.md` §4-8). SDK `anthropic` 2.4.0
   instalado en el PC para la medición.
@@ -108,4 +107,5 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 - Respuesta de ChileCompra al incidente de la API (detalle en `privado/continuidad.md`).
 
 ### Estado del repo
-`main`. `privado/` ignorado por `.gitignore`.
+`main`. `privado/` ignorado por `.gitignore`. Sin nombres de personas en este repo: dos comentarios de
+`src/config.py` los tenían (30-oct y 02-11) y se quitaron el 02-11; siguen en el historial de git.
