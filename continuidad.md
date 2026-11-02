@@ -55,6 +55,9 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   de 6 h y lo sube como artefacto `universo` (retención 3 días). Probada sin red con la API simulada (4 tramos, 8
   ítems, completo=True).
 
+- Fuera de este repo, desde esta sesión: repos privados `gestor-documental` y `procesos-ia` creados en GitHub;
+  respuesta del MINVU a la AP001T0009186 cotejada en `radar-construccion-industrializados`; `ESTADO.md` al día.
+
 ### Pendiente
 - **Mar 3-nov, después de la corrida de las 09:00 (decisión del 02-11):** `gh workflow run probe-compra-agil.yml -f modo=--universo`; `gh run download <id> -n universo -D
   <scratchpad>`; `python privado/clasif/universo.py <scratchpad>/universo.json` (~US$1,2: Opus y Haiku sobre ~900
