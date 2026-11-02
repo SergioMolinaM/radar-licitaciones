@@ -7,6 +7,25 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-02 — primera corrida con listado completo de Compra Ágil
+
+### Hecho (medido en el log del run 41441187390, workflow_dispatch 12:00:19 → 12:24:55 UTC)
+- Listado: 12 tramos de 6 h desde 2026-10-30T12:00:38Z, 62 páginas, 2.628 publicadas, 64 con keyword en el
+  título, marca `__listado__` en 2026-11-02T12:00:38Z. ~10 min, dentro del presupuesto de 18.
+- Búsqueda `q=`: 14 términos con HTTP 504 (digital, audiovisual, diseño gráfico, construcción industrializada…),
+  ~14 min sin resultado. Correo enviado con 278 ítems nuevos.
+- Medición del correo (subagente, título por título): 24 calzan, 30 dudosos, 224 ruido; `q=` trae 191 ítems con 2
+  que calzan (el servidor busca cada palabra por separado). 134 de 278 cerraban en < 24 h al llegar el correo.
+- radar-emprende no depende de este radar (grep con control positivo).
+
+### Pendiente (técnico; ajustes aprobados el 02-11)
+- Apagar `q=` o dejarla solo como respaldo (confirmar antes que el filtro del listado no pierde lo de descripción).
+- Tope o resumen del correo. `--workflow scanner.yml` en el conteo del respaldo.
+- Rediseño de la selección y ritmo de Compra Ágil (varias pasadas al día): diseño en
+  `privado/docs/SELECCION-RADAR-2026-11-02.md` (parte 1 escrita). Prueba de clasificador en `privado/clasif/`
+  (set de 1.143 ítems etiquetados, `build.py` y `clasificar.py`); clave de API verificada con Haiku 5.5; falta
+  correr los tres modelos (medición de costo autorizada el 02-11).
+
 ## 2026-10-31 — separación del repo: código público, notas de negocio privadas
 
 ### Hecho
