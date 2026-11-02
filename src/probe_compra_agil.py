@@ -229,6 +229,39 @@ def main() -> int:
                 print(f"   primera={f[0] if f else None}")
                 print(f"   última ={f[-1] if f else None}")
         return 0
+    if "--ventana" in sys.argv:
+        # ¿El 504 de q depende del tamaño de la ventana? Términos rotativos que dieron
+        # 504 en todas las corridas del 19-oct al 2-nov (nunca respondieron), con
+        # ventanas cerradas de 3 d, 1 d, 6 h y 1 h; «encuesta» de control (responde a
+        # diario). Fechas en hora de Chile, como las lee la API (sonda --hasta).
+        from .sources.compra_agil import _api_fecha
+        terminos = ["encuesta", "diseño web", "redes sociales", "marketing digital", "producción audiovisual",
+                    "educación superior", "diseño gráfico", "construcción industrializada", "desarrollo web"]
+        fin = datetime.now(timezone.utc)
+        for termino in terminos:
+            for nombre, horas in (("3 d", 72), ("1 d", 24), ("6 h", 6), ("1 h", 1)):
+                time.sleep(5)
+                p = {"q": termino, "estado": "publicada", "publicado_desde": _api_fecha(fin - timedelta(hours=horas)),
+                     "publicado_hasta": _api_fecha(fin), "tamano_pagina": 50, "numero_pagina": 1}
+                t0 = time.monotonic()
+                try:
+                    r = requests.get(COMPRA_AGIL_API_URL, headers={"ticket": ticket}, params=p, timeout=TIMEOUT)
+                except requests.RequestException as e:
+                    print(f"{termino:30} | {nombre:4} | error de red {time.monotonic() - t0:5.1f} s {type(e).__name__}")
+                    continue
+                dt = time.monotonic() - t0
+                extra = ""
+                if r.status_code == 200:
+                    try:
+                        pl = r.json().get("payload") or {}
+                        extra = f"items={len(pl.get('items') or [])} total_paginas={(pl.get('paginacion') or {}).get('total_paginas')}"
+                    except ValueError:
+                        extra = "JSON inválido"
+                print(f"{termino:30} | {nombre:4} | HTTP {r.status_code} | {dt:5.1f} s | {extra}", flush=True)
+                if r.status_code == 429:
+                    print("429: se detiene la sonda")
+                    return 0
+        return 0
     if "--radar" in sys.argv:
         # La búsqueda real del radar (listado + q) con el state del repo en memoria:
         # no envía correo ni escribe data/state.json.

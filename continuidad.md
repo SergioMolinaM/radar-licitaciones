@@ -7,6 +7,23 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-02 (tarde) — 504 de q: pausa de rotativos y sonda de ventana
+
+### Hecho
+- `q=` no se apaga: de los 191 ítems que solo trajo hoy, 2 calzan (895072-133-COT26, 5952-109-COT26) y no
+  tienen keyword en el título, así que el listado no los ve. Cruce con `privado/clasif/set.jsonl`.
+- Corrección a la entrada de la mañana: hoy fueron 12 solicitudes con 504 (~33 s cada una, ~6,7 min), no 14; los
+  ~14 min son la búsqueda q entera, que gastó su presupuesto de 15. Diarios 12/12 (digital y audiovisual en el
+  reintento), rotativos 14 de 24 intentados.
+- Logs de 19 corridas (19-oct a 2-nov): 66 de 133 rotativos dieron 504 cada vez que se buscaron y nunca
+  respondieron (sin fecha en `ca_ultima`); 11 más nunca se alcanzaron.
+- Pausa de rotativos que fallan (`state["ca_pausa"]`, 1/2/4/8 días; sin commit hasta que pase el verificador).
+- Sonda `--ventana` (commit aparte): términos muertos con ventanas de 3 d, 1 d, 6 h y 1 h.
+
+### Pendiente
+- Resultado de la sonda `--ventana`. Si con ventanas cortas responden, partir q en tramos como el listado.
+- Verificador sobre la pausa; commit.
+
 ## 2026-11-02 — primera corrida con listado completo de Compra Ágil
 
 ### Hecho (medido en el log del run 41441187390, workflow_dispatch 12:00:19 → 12:24:55 UTC)
