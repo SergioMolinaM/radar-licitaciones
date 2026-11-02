@@ -229,6 +229,47 @@ def main() -> int:
                 print(f"   primera={f[0] if f else None}")
                 print(f"   última ={f[-1] if f else None}")
         return 0
+    if "--universo" in sys.argv:
+        # Prueba del universo (diseño de selección, 02-nov §6.6 paso 2): todo el listado de
+        # Compra Ágil publicado en las últimas 24 h, sin filtro, a universo.json (artefacto
+        # del workflow). Mismos tramos de 6 h y espaciado que el radar.
+        import json
+        import time as _t
+
+        from .sources import compra_agil as ca
+        fin = datetime.now(timezone.utc)
+        desde = fin - timedelta(hours=24)
+        limite = _t.monotonic() + 40 * 60
+        disponibles = ca.tickets()
+        items, completo = {}, True
+        tramo = desde
+        while tramo < fin:
+            hasta = min(tramo + ca.LISTADO_TRAMO, fin)
+            b = ca._barrer_listado(disponibles, ca._api_fecha(tramo), limite,
+                                   ca._api_fecha(hasta + timedelta(minutes=1)))
+            ok = bool(b["total"]) and b["prefijo"] == b["total"] and not b["corte"]
+            print(f"tramo {ca._iso(tramo)} → {ca._iso(hasta)}: {b['leidas']}/{b['total']} páginas, "
+                  f"{len(b['items'])} ítems" + (f"; corte: {b['corte']}" if b["corte"] else ""), flush=True)
+            completo = completo and ok
+            for it in b["items"]:
+                c = it.get("codigo")
+                if c:
+                    items[c] = {
+                        "codigo": c, "titulo": it.get("nombre") or "",
+                        "organismo": (it.get("institucion") or {}).get("organismo_comprador", ""),
+                        "monto": (it.get("montos") or {}).get("monto_disponible_clp"),
+                        "publicacion": (it.get("fechas") or {}).get("fecha_publicacion"),
+                        "cierre": (it.get("fechas") or {}).get("fecha_cierre"),
+                    }
+            if "429" in b["corte"] or "sin otro ticket" in b["corte"]:
+                break
+            tramo = hasta
+        Path = __import__("pathlib").Path
+        Path("universo.json").write_text(json.dumps(
+            {"desde": ca._iso(desde), "hasta": ca._iso(fin), "completo": completo, "items": list(items.values())},
+            ensure_ascii=False), encoding="utf-8")
+        print(f"universo.json: {len(items)} ítems únicos, completo={completo}")
+        return 0
     if "--palabras" in sys.argv:
         # q busca cada palabra por separado (sonda 16-oct), así que una frase = unión de sus
         # palabras. Se prueba cada palabra distinta de los rotativos que nunca respondieron

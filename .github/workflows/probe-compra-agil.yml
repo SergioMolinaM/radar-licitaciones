@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: "vacío = alternativas; --paginacion; --variantes; --radar; --ventana; --palabras"
+        description: "vacío = alternativas; --paginacion; --variantes; --radar; --ventana; --palabras; --universo"
         required: false
         default: ""
 
@@ -29,3 +29,10 @@ jobs:
           MERCADO_PUBLICO_TOKEN: ${{ secrets.MERCADO_PUBLICO_TOKEN }}
           MODO: ${{ inputs.modo }}
         run: python -m src.probe_compra_agil $MODO
+      - name: Universo (solo --universo)
+        if: always() && hashFiles('universo.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: universo
+          path: universo.json
+          retention-days: 3

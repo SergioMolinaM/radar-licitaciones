@@ -51,7 +51,15 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 - CNA funciona: run 41441187390 leyó 40 noticias en /noticias/Paginas y 40 en /noticias/SiteAssets. El pendiente
   `CERTIFICATE_VERIFY_FAILED` del 31-oct estaba resuelto desde `3a14b63` (30-oct).
 
+- Sonda `--universo` (para la prueba del 03-11): baja todo el listado de Compra Ágil de las últimas 24 h en tramos
+  de 6 h y lo sube como artefacto `universo` (retención 3 días). Probada sin red con la API simulada (4 tramos, 8
+  ítems, completo=True).
+
 ### Pendiente
+- **Mar 3-nov, después de la corrida de las 09:00 (Sergio, 02-11: «hagamos la prueba mañana y tomamos la
+  decisión»):** `gh workflow run probe-compra-agil.yml -f modo=--universo`; `gh run download <id> -n universo -D
+  <scratchpad>`; `python privado/clasif/universo.py <scratchpad>/universo.json` (~US$1,2: Opus y Haiku sobre ~900
+  ítems); Sergio revisa `privado/clasif/universo-resultado.md`.
 - Mar 3-nov 09:00: primera corrida con rotativos por palabra. En el log: «rotativos que no respondieron como
   frase», «palabras sin respuesta», duración de la búsqueda q, que no haya 429, e ítems del correo.
 - El buscador web (`api.buscador.mercadopublico.cl`) responde lo que la API oficial no. Usarlo exige su credencial
