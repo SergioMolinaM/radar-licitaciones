@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: "vacío = alternativas; --paginacion; --variantes; --radar; --ventana"
+        description: "vacío = alternativas; --paginacion; --variantes; --radar; --ventana; --palabras"
         required: false
         default: ""
 

@@ -229,6 +229,47 @@ def main() -> int:
                 print(f"   primera={f[0] if f else None}")
                 print(f"   última ={f[-1] if f else None}")
         return 0
+    if "--palabras" in sys.argv:
+        # q busca cada palabra por separado (sonda 16-oct), así que una frase = unión de sus
+        # palabras. Se prueba cada palabra distinta de los rotativos que nunca respondieron
+        # (sin fecha en ca_ultima), 3 días como el radar, sin publicado_hasta (la sonda
+        # --ventana dio 0 ítems con hasta, incluso para «encuesta»).
+        import json
+        from pathlib import Path
+
+        from .config import COMPRA_AGIL_TERMINOS_DIARIOS
+        from .sources.compra_agil import _api_fecha, terminos_rotativos
+        ultima = json.loads(Path("data/state.json").read_text(encoding="utf-8")).get("ca_ultima") or {}
+        vacias = {"de", "la", "el", "del", "los", "las", "y", "en", "e", "a", "para", "por", "con", "materia", "al"}
+        muertos = [t for t in terminos_rotativos() if not ultima.get(t)]
+        palabras = sorted({w for t in muertos for w in t.split() if w not in vacias} - set(COMPRA_AGIL_TERMINOS_DIARIOS))
+        print(f"{len(muertos)} términos sin respuesta → {len(palabras)} palabras", flush=True)
+        desde = _api_fecha(datetime.now(timezone.utc) - timedelta(days=3))
+        limite = time.monotonic() + 44 * 60
+        for w in palabras:
+            if time.monotonic() > limite:
+                print("presupuesto agotado", flush=True)
+                break
+            time.sleep(4)
+            p = {"q": w, "estado": "publicada", "publicado_desde": desde, "tamano_pagina": 50, "numero_pagina": 1}
+            t0 = time.monotonic()
+            try:
+                r = requests.get(COMPRA_AGIL_API_URL, headers={"ticket": ticket}, params=p, timeout=TIMEOUT)
+            except requests.RequestException as e:
+                print(f"PALABRA {w:20} | red | {time.monotonic() - t0:5.1f} s {type(e).__name__}", flush=True)
+                continue
+            extra = ""
+            if r.status_code == 200:
+                try:
+                    pl = r.json().get("payload") or {}
+                    extra = f"items={len(pl.get('items') or [])} total_paginas={(pl.get('paginacion') or {}).get('total_paginas')}"
+                except ValueError:
+                    extra = "JSON inválido"
+            print(f"PALABRA {w:20} | HTTP {r.status_code} | {time.monotonic() - t0:5.1f} s | {extra}", flush=True)
+            if r.status_code == 429:
+                print("429: se detiene la sonda")
+                break
+        return 0
     if "--ventana" in sys.argv:
         # ¿El 504 de q depende del tamaño de la ventana? Términos rotativos que dieron
         # 504 en todas las corridas del 19-oct al 2-nov (nunca respondieron), con

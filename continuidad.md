@@ -20,8 +20,14 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 - Pausa de rotativos que fallan (`state["ca_pausa"]`, 1/2/4/8 días; sin commit hasta que pase el verificador).
 - Sonda `--ventana` (commit aparte): términos muertos con ventanas de 3 d, 1 d, 6 h y 1 h.
 
+- Sonda `--ventana` (run 41517074064, 20:12 UTC): los 8 términos muertos dan 504 a los 29,5 s con ventanas de
+  3 d, 1 d, 6 h y 1 h. La ventana no es la causa. Control «encuesta» con `publicado_hasta`: 200 con 0 ítems en las 4
+  (q + hasta probablemente anula la búsqueda; no usar hasta con q).
+- Buscador web (`buscador.mercadopublico.cl/compra-agil`, otro backend): «diseño web» 30-oct a 2-nov = 61
+  resultados. Datos Abiertos de Compra Ágil solo publica cotizaciones mensuales del mes anterior: no sirve.
+
 ### Pendiente
-- Resultado de la sonda `--ventana`. Si con ventanas cortas responden, partir q en tramos como el listado.
+- Sonda `--palabras`: cada palabra de los términos muertos por separado (q = unión de palabras).
 - Verificador sobre la pausa; commit.
 
 ## 2026-11-02 — primera corrida con listado completo de Compra Ágil
