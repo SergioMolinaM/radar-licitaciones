@@ -81,6 +81,28 @@ MAX_PAGINAS_LISTADO = 300               # tope de seguridad: un recorte deja el 
 # entero mueve la marca a su fin, y lo que entra mientras se recorre no desplaza las
 # páginas de un tramo ya cerrado.
 LISTADO_TRAMO = timedelta(hours=6)
+# Rotativos por palabra (02-nov-2026). En los logs del 19-oct al 2-nov, 66 de los 133
+# rotativos dieron 504 cada vez que se buscaron (nunca respondieron). La sonda --ventana
+# (run 41517074064) descartó el tamaño de la ventana: 504 también con 1 h. La sonda
+# --palabras (run 41520717922) buscó por separado las 93 palabras de esas frases: 73
+# respondieron y 20 dieron 504, todas comunes (servicios, gestión, diseño, datos,
+# producción, educación, desarrollo…). Una frase rotativa se busca entera, como antes
+# (q devuelve la unión de sus palabras, sonda 16-oct); solo si no responde se busca
+# palabra por palabra y se queda con los ítems presentes en TODAS las palabras que
+# respondieron completas (intersección). La unión de palabras como «municipal» o
+# «programa» (10-14 páginas en 3 días) llenaría el correo de ruido; la intersección es
+# ganancia neta para frases que antes no traían nada. Si una palabra no responde o viene
+# truncada, la frase se evalúa con las demás (resultado más amplio). Cada palabra se
+# pide una vez por corrida y ventana.
+# Una frase o palabra que falla se salta en sus próximas 1, 2, 4 y hasta PAUSA_SALTOS_MAX
+# apariciones (no días: un término reaparece cada varias corridas y una pausa en días ya
+# habría vencido; verificador, 02-nov). Al responder se borra. Los términos diarios no
+# se pausan ni se parten: el 2-nov «digital» y «audiovisual» dieron 504 y respondieron
+# en el reintento.
+PAUSA_SALTOS_MAX = 8
+PAUSA_FALLAS_MAX = 30   # tope al leer state: 2 ** fallas no crece sin límite
+COMPRA_AGIL_PALABRAS_VACIAS = {"de", "la", "el", "del", "los", "las", "y", "en", "e", "a", "para", "por",
+                               "con", "materia", "al"}
 
 
 def _get_ticket() -> str | None:
@@ -507,8 +529,32 @@ def _desde_rotativo(ultima: str | None, ahora: datetime) -> str:
     return _api_fecha(max(minimo, min(dt, por_defecto)))
 
 
+def _palabras(termino: str) -> list[str]:
+    """Palabras de un término sin las vacías, en orden y sin repetir."""
+    vistas = []
+    for w in termino.split():
+        if w not in COMPRA_AGIL_PALABRAS_VACIAS and w not in vistas:
+            vistas.append(w)
+    return vistas
+
+
+def _pausa_limpia(pausa, palabras: set[str]) -> dict:
+    """state["ca_pausa"] validado: palabra vigente → {fallas 1..PAUSA_FALLAS_MAX, saltar 0..PAUSA_SALTOS_MAX}."""
+    if not isinstance(pausa, dict):
+        return {}
+    limpia = {}
+    for w, p in pausa.items():
+        if w not in palabras or not isinstance(p, dict):
+            continue
+        fallas, saltar = p.get("fallas"), p.get("saltar")
+        if type(fallas) is int and type(saltar) is int and fallas >= 1 and saltar >= 0:
+            limpia[w] = {"fallas": min(fallas, PAUSA_FALLAS_MAX), "saltar": min(saltar, PAUSA_SALTOS_MAX)}
+    return limpia
+
+
 def fetch_compra_agil(cursor=0, ultima: dict | None = None,
-                      presupuesto_s: float = PRESUPUESTO_BUSQUEDA_S) -> tuple[list[dict], dict]:
+                      presupuesto_s: float = PRESUPUESTO_BUSQUEDA_S,
+                      pausa: dict | None = None) -> tuple[list[dict], dict]:
     """Busca en el servidor cada término (`q`) entre las Compras Ágiles publicadas.
 
     Orden: (1) una pasada por COMPRA_AGIL_TERMINOS_DIARIOS; (2) si respondió al
@@ -520,14 +566,21 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
     recuperarse. Cada término, diario
     o rotativo, busca desde su última búsqueda exitosa y no truncada (`ultima`,
     término → ISO UTC), con piso de COMPRA_AGIL_DIAS_VENTANA días. Retorna (matches, resumen); el resumen trae
-    `cursor` y `ultima` actualizados para guardarlos en state.json.
+    `cursor`, `ultima` y `pausa` actualizados para guardarlos en state.json. Los
+    rotativos se buscan palabra por palabra (intersección); una palabra en `pausa`
+    (palabra → {fallas, saltar}) se salta sin solicitud. Ver PAUSA_SALTOS_MAX.
     """
     if not isinstance(cursor, int):
         cursor = 0
     ultima = dict(ultima) if isinstance(ultima, dict) else {}
     rotativos = terminos_rotativos()
+    # Claves de pausa: las palabras de los rotativos y las frases rotativas de más de una palabra.
+    pausa = _pausa_limpia(pausa, {w for t in rotativos for w in _palabras(t)}
+                          | {t for t in rotativos if len(_palabras(t)) > 1})
     resumen = {
         "diarios_ok": [], "diarios_fallidos": [], "rotativos_ok": [], "rotativos_total": len(rotativos),
+        "rotativos_fallidos": [], "rotativos_en_pausa": [], "frases_parciales": [], "frases_por_palabra": [],
+        "palabras_fallidas": [], "palabras_en_pausa": [], "pausa": pausa,
         "truncados": [], "cursor": cursor, "ultima": ultima, "devueltas": 0, "cortado": "",
         "listado_ok": False, "listado_paginas": 0, "listado_total": None, "listado_desde": "",
         "listado_corte": "", "listado_hueco": "", "listado_pendiente": "",
@@ -629,13 +682,19 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
     def queda_tiempo(reserva_s: float = 0) -> bool:
         return time.monotonic() - inicio < presupuesto_s - reserva_s
 
-    def buscar(termino: str) -> tuple[list[dict], bool] | None:
-        return con_respaldo(_buscar_termino, termino, _desde_rotativo(ultima.get(termino), ahora))
+    # Estado de cada palabra o frase en esta corrida («ok», «pausa», «falla») y
+    # resultados por (término, desde), para no pedir dos veces lo mismo.
+    estado_palabra: dict[str, str] = {}
+    resultados: dict[tuple[str, str], tuple[list[dict], bool]] = {}
+    diarios = set(COMPRA_AGIL_TERMINOS_DIARIOS)
 
     def procesar(termino: str) -> bool:
-        r = buscar(termino)
+        desde = _desde_rotativo(ultima.get(termino), ahora)
+        r = con_respaldo(_buscar_termino, termino, desde)
         if r is None:
             return False
+        resultados[(termino, desde)] = r
+        estado_palabra[termino] = "ok"
         items, truncado = r
         if truncado:
             # No se avanza `ultima`: la próxima búsqueda vuelve a cubrir el tramo.
@@ -649,6 +708,81 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
             if d and d["codigo"] not in por_codigo:
                 por_codigo[d["codigo"]] = d
         return True
+
+    def pedir(w: str, desde: str, es_frase: bool = False):
+        """(items, truncado), «pausa» o «falla» para una palabra o una frase rotativa.
+        Lanza _CuotaAgotada como _buscar_termino. Los términos diarios no se pausan."""
+        if estado_palabra.get(w) in ("pausa", "falla"):
+            return estado_palabra[w]
+        if (w, desde) in resultados:
+            return resultados[(w, desde)]
+        p = pausa.get(w)
+        if w not in estado_palabra and p and p["saltar"] > 0:
+            p["saltar"] -= 1  # una aparición por corrida
+            estado_palabra[w] = "pausa"
+            if not es_frase:
+                resumen["palabras_en_pausa"].append(w)
+            return "pausa"
+        r = con_respaldo(_buscar_termino, w, desde)
+        if r is None:
+            if w not in diarios:
+                fallas = min((p["fallas"] if p else 0) + 1, PAUSA_FALLAS_MAX)
+                pausa[w] = {"fallas": fallas, "saltar": min(2 ** (fallas - 1), PAUSA_SALTOS_MAX)}
+            estado_palabra[w] = "falla"
+            if not es_frase and w not in diarios:  # la falla de un diario la informa diarios_fallidos
+                resumen["palabras_fallidas"].append(w)
+            return "falla"
+        pausa.pop(w, None)
+        estado_palabra[w] = "ok"
+        resultados[(w, desde)] = r
+        for it in r[0]:
+            if it.get("codigo"):
+                devueltos.add(it["codigo"])
+        return r
+
+    def agregar(items: list[dict], frase: str) -> None:
+        for it in items:
+            d = _item_de_busqueda(it, frase)
+            if d and d["codigo"] not in por_codigo:
+                por_codigo[d["codigo"]] = d
+
+    def rotativo(frase: str) -> str:
+        """«ok», «pausa» (todo en pausa) o «falla». Primero la frase entera, como
+        siempre; solo si no responde (o está en pausa), palabra por palabra."""
+        desde = _desde_rotativo(ultima.get(frase), ahora)
+        ws = _palabras(frase)
+        if len(ws) > 1:
+            r = pedir(frase, desde, es_frase=True)
+            if isinstance(r, tuple):
+                items, truncado = r
+                if truncado:
+                    resumen["truncados"].append(frase)
+                else:
+                    ultima[frase] = _iso(ahora)
+                agregar(items, frase)
+                return "ok"
+            resumen["frases_por_palabra"].append(frase)
+        res = [pedir(w, desde) for w in ws]
+        completos = [r[0] for r in res if isinstance(r, tuple) and not r[1]]
+        truncados = [r[0] for r in res if isinstance(r, tuple) and r[1]]
+        if not completos and not truncados:
+            return "pausa" if all(r == "pausa" for r in res) else "falla"
+        # Intersección de las palabras completas; si ninguna vino completa, de las
+        # truncadas, y la frase queda truncada (no avanza `ultima`).
+        conjuntos = completos or truncados
+        por_cod = {it["codigo"]: it for it in conjuntos[0] if it.get("codigo")}
+        comunes = set(por_cod)
+        for items in conjuntos[1:]:
+            comunes &= {it.get("codigo") for it in items}
+        if completos:
+            # Con menos palabras la intersección es más amplia: avanzar no pierde nada.
+            ultima[frase] = _iso(ahora)
+        else:
+            resumen["truncados"].append(frase)
+        if len(completos) < len(ws):
+            resumen["frases_parciales"].append(frase)
+        agregar([por_cod[c] for c in comunes], frase)
+        return "ok"
 
     pos = cursor % len(rotativos) if rotativos else cursor
     try:
@@ -678,10 +812,11 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
                 if not queda_tiempo(reserva):
                     break
                 termino = rotativos[pos]
-                # Un rotativo que falla se salta; conserva su `ultima`, así la
-                # próxima vez busca desde antes y no deja hueco.
-                if procesar(termino):
-                    resumen["rotativos_ok"].append(termino)
+                # Un rotativo sin respuesta conserva su `ultima`, así la próxima
+                # vez busca desde antes y no deja hueco.
+                estado = rotativo(termino)
+                {"ok": resumen["rotativos_ok"], "pausa": resumen["rotativos_en_pausa"],
+                 "falla": resumen["rotativos_fallidos"]}[estado].append(termino)
                 pos = (pos + 1) % len(rotativos)
 
         for termino in pendientes:
@@ -705,4 +840,12 @@ def fetch_compra_agil(cursor=0, ultima: dict | None = None,
     )
     if resumen["diarios_fallidos"]:
         logger.warning(f"Compra Ágil: diarios sin respuesta: {', '.join(resumen['diarios_fallidos'])}")
+    for clave, texto in (("palabras_fallidas", "palabras sin respuesta (a pausa)"),
+                         ("palabras_en_pausa", "palabras saltadas por pausa"),
+                         ("frases_por_palabra", "rotativos que no respondieron como frase (por palabra)"),
+                         ("frases_parciales", "rotativos buscados sin todas sus palabras"),
+                         ("rotativos_fallidos", "rotativos sin ninguna palabra que respondiera"),
+                         ("rotativos_en_pausa", "rotativos con todas sus palabras en pausa")):
+        if resumen[clave]:
+            logger.info(f"Compra Ágil: {texto} ({len(resumen[clave])}): {', '.join(resumen[clave])}")
     return list(por_codigo.values()), resumen

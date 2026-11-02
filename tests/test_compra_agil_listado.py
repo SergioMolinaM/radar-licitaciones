@@ -220,5 +220,162 @@ class ListadoTest(unittest.TestCase):
         self.assertTrue(r["diarios_ok"])
 
 
+class RotativosPorPalabraTest(unittest.TestCase):
+    """Rotativos buscados palabra por palabra, con intersección y pausa por palabra (02-nov-2026)."""
+
+    def setUp(self):
+        self.rot = ca.terminos_rotativos()
+        diarios = set(ca.COMPRA_AGIL_TERMINOS_DIARIOS)
+        # Una frase de dos palabras y una de una, sin relación con los diarios.
+        self.frase = next(t for t in self.rot if len(ca._palabras(t)) == 2 and not set(ca._palabras(t)) & diarios)
+        self.w1, self.w2 = ca._palabras(self.frase)
+        self.sola = next(t for t in self.rot if len(ca._palabras(t)) == 1 and t not in diarios)
+        self.p = [
+            mock.patch.object(ca, "PAUSA_ENTRE_SOLICITUDES_S", 0),
+            mock.patch.object(ca, "tickets", lambda: [("principal", "T")]),
+            mock.patch.object(ca, "LISTADO_TRAMO", ca.timedelta(days=30)),
+        ]
+        for p in self.p:
+            p.start()
+
+    def tearDown(self):
+        for p in self.p:
+            p.stop()
+
+    def _correr(self, respuestas, pausa=None, frase_viva=False):
+        base = {(None, 1): _pagina([], 1)}
+        if not frase_viva:
+            base[(self.frase, 1)] = _Resp(504, {})
+        api = _API({**base, **respuestas})
+        with mock.patch.object(ca.requests, "get", api.get):
+            matches, r = ca.fetch_compra_agil(cursor=0, presupuesto_s=600, pausa=pausa)
+        return {m["codigo"] for m in matches}, r, api
+
+    def test_interseccion_de_las_palabras(self):
+        codigos, r, api = self._correr({
+            (self.w1, 1): _pagina([_item("1-1-COT26", "Servicio uno"), _item("1-2-COT26", "Servicio dos")], 1),
+            (self.w2, 1): _pagina([_item("1-2-COT26", "Servicio dos"), _item("1-3-COT26", "Servicio tres")], 1),
+        })
+        self.assertIn("1-2-COT26", codigos)
+        self.assertNotIn("1-1-COT26", codigos)
+        self.assertNotIn("1-3-COT26", codigos)
+        self.assertIn(self.frase, r["rotativos_ok"])
+        self.assertIn(self.frase, r["ultima"])
+        self.assertIn(self.frase, r["frases_por_palabra"])
+        self.assertEqual(r["pausa"][self.frase], {"fallas": 1, "saltar": 1})
+        self.assertNotIn(self.frase, r["palabras_fallidas"])  # la frase no va a la lista de palabras
+
+    def test_frase_que_responde_se_usa_entera_sin_pedir_palabras(self):
+        codigos, r, api = self._correr({
+            (self.frase, 1): _pagina([_item("1-1-COT26", "Servicio uno"), _item("1-3-COT26", "Servicio tres")], 1),
+        }, frase_viva=True)
+        self.assertEqual({"1-1-COT26", "1-3-COT26"} & codigos, {"1-1-COT26", "1-3-COT26"})  # la unión, como antes
+        self.assertNotIn((self.w1, 1), api.llamadas)
+        self.assertNotIn((self.w2, 1), api.llamadas)
+        self.assertIn(self.frase, r["ultima"])
+        self.assertNotIn(self.frase, r["frases_por_palabra"])
+
+    def test_frase_en_pausa_va_directo_a_las_palabras(self):
+        codigos, r, api = self._correr({
+            (self.frase, 1): _pagina([_item("9-9-COT26", "No debe pedirse")], 1),
+            (self.w1, 1): _pagina([_item("1-2-COT26", "Servicio dos")], 1),
+            (self.w2, 1): _pagina([_item("1-2-COT26", "Servicio dos")], 1),
+        }, pausa={self.frase: {"fallas": 2, "saltar": 2}}, frase_viva=True)
+        self.assertNotIn((self.frase, 1), api.llamadas)
+        self.assertIn("1-2-COT26", codigos)
+        self.assertNotIn("9-9-COT26", codigos)
+        self.assertEqual(r["pausa"][self.frase], {"fallas": 2, "saltar": 1})
+
+    def test_palabra_que_es_termino_diario_no_se_pausa(self):
+        frase = next((t for t in self.rot if len(ca._palabras(t)) > 1
+                      and set(ca._palabras(t)) & set(ca.COMPRA_AGIL_TERMINOS_DIARIOS)), None)
+        if frase is None:
+            self.skipTest("ningún rotativo contiene un término diario")
+        d = next(w for w in ca._palabras(frase) if w in ca.COMPRA_AGIL_TERMINOS_DIARIOS)
+        api = _API({(None, 1): _pagina([], 1), (frase, 1): _Resp(504, {}), (d, 1): _Resp(504, {})})
+        with mock.patch.object(ca.requests, "get", api.get):
+            _, r = ca.fetch_compra_agil(cursor=0, presupuesto_s=600)
+        self.assertNotIn(d, r["pausa"])
+
+    def test_palabra_caida_evalua_con_las_demas_y_entra_en_pausa(self):
+        codigos, r, api = self._correr({
+            (self.w1, 1): _pagina([_item("1-1-COT26", "Servicio uno")], 1),
+            (self.w2, 1): _Resp(504, {}),
+        })
+        self.assertIn("1-1-COT26", codigos)
+        self.assertIn(self.frase, r["frases_parciales"])
+        self.assertIn(self.frase, r["ultima"])  # más amplia: avanzar no pierde nada
+        self.assertEqual(r["pausa"][self.w2], {"fallas": 1, "saltar": 1})
+        self.assertEqual(r["palabras_fallidas"].count(self.w2), 1)
+        self.assertEqual(api.llamadas.count((self.w2, 1)), 1)  # una vez por corrida
+
+    def test_en_pausa_no_pide_y_descuenta_una_vez(self):
+        _, r, api = self._correr({}, pausa={self.w2: {"fallas": 2, "saltar": 2}})
+        self.assertNotIn((self.w2, 1), api.llamadas)
+        self.assertEqual(r["pausa"][self.w2], {"fallas": 2, "saltar": 1})
+        self.assertEqual(r["palabras_en_pausa"], [self.w2])
+
+    def test_pausa_crece_con_tope_y_el_exito_la_borra(self):
+        for previas, saltar in ((1, 2), (2, 4), (3, 8), (7, 8), (10 ** 9, 8)):
+            _, r, _ = self._correr({(self.w2, 1): _Resp(504, {})}, pausa={self.w2: {"fallas": previas, "saltar": 0}})
+            self.assertEqual(r["pausa"][self.w2]["saltar"], saltar, previas)
+            self.assertLessEqual(r["pausa"][self.w2]["fallas"], ca.PAUSA_FALLAS_MAX)
+        _, r, _ = self._correr({}, pausa={self.w2: {"fallas": 3, "saltar": 0}})
+        self.assertNotIn(self.w2, r["pausa"])
+
+    def test_frase_de_una_palabra_en_pausa(self):
+        w = ca._palabras(self.sola)[0]
+        _, r, _ = self._correr({}, pausa={w: {"fallas": 1, "saltar": 1}})
+        self.assertIn(self.sola, r["rotativos_en_pausa"])
+        self.assertNotIn(self.sola, r["ultima"])
+
+    def test_palabra_truncada_no_entra_en_la_interseccion(self):
+        respuestas = {(self.w1, 1): _pagina([_item("1-1-COT26", "Servicio uno"), _item("1-2-COT26", "Servicio dos")], 1)}
+        for pag in range(1, ca.MAX_PAGINAS_TERMINO + 1):
+            respuestas[(self.w2, pag)] = _pagina([_item("1-2-COT26", "Servicio dos")], 9)
+        codigos, r, _ = self._correr(respuestas)
+        self.assertTrue({"1-1-COT26", "1-2-COT26"} <= codigos)
+        self.assertIn(self.frase, r["frases_parciales"])
+        self.assertIn(self.frase, r["ultima"])
+
+    def test_solo_truncadas_marca_la_frase_truncada(self):
+        respuestas = {}
+        for w in (self.w1, self.w2):
+            for pag in range(1, ca.MAX_PAGINAS_TERMINO + 1):
+                respuestas[(w, pag)] = _pagina([_item("1-2-COT26", "Servicio dos")], 9)
+        codigos, r, _ = self._correr(respuestas)
+        self.assertIn("1-2-COT26", codigos)
+        self.assertIn(self.frase, r["truncados"])
+        self.assertNotIn(self.frase, r["ultima"])
+
+    def test_diarios_no_se_pausan(self):
+        d = ca.COMPRA_AGIL_TERMINOS_DIARIOS[0]
+        _, r, _ = self._correr({(d, 1): _Resp(504, {})})
+        self.assertNotIn(d, r["pausa"])
+        self.assertIn(d, r["diarios_fallidos"])
+
+    def test_pausa_corrupta_se_descarta(self):
+        w = self.w2
+        for pausa in ("x", {w: "x"}, {w: {"fallas": True, "saltar": 1}}, {w: {"fallas": 1, "saltar": "1"}},
+                      {w: {"fallas": 0, "saltar": 1}}, {w: {"fallas": 1, "saltar": -1}},
+                      {"palabra que no existe": {"fallas": 1, "saltar": 1}}):
+            _, r, api = self._correr({}, pausa=pausa)
+            self.assertEqual({k for k in r["pausa"] if k != self.frase}, set(), pausa)  # la frase cae en el montaje
+            self.assertIn((w, 1), api.llamadas, pausa)
+        _, r, _ = self._correr({}, pausa={w: {"fallas": 1, "saltar": 10 ** 9}})
+        self.assertEqual(r["pausa"][w]["saltar"], ca.PAUSA_SALTOS_MAX - 1)
+
+    def test_429_en_una_palabra_no_la_pausa(self):
+        _, r, _ = self._correr({(self.w1, 1): _Resp(429, {"errors": [{"mensaje": "límite"}]})})
+        self.assertNotIn(self.w1, r["pausa"])
+        self.assertIn("429", r["cortado"])
+
+    def test_listado_cortado_por_429_conserva_la_pausa(self):
+        api = _API({(None, 1): _Resp(429, {"errors": [{"mensaje": "límite"}]})})
+        with mock.patch.object(ca.requests, "get", api.get):
+            _, r = ca.fetch_compra_agil(cursor=0, presupuesto_s=600, pausa={self.w2: {"fallas": 1, "saltar": 1}})
+        self.assertEqual(r["pausa"], {self.w2: {"fallas": 1, "saltar": 1}})
+
+
 if __name__ == "__main__":
     unittest.main()

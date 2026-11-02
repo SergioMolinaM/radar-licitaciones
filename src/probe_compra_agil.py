@@ -314,7 +314,8 @@ def main() -> int:
 
         logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
         state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
-        matches, resumen = fetch_compra_agil(cursor=state.get("ca_cursor", 0), ultima=state.get("ca_ultima"))
+        matches, resumen = fetch_compra_agil(cursor=state.get("ca_cursor", 0), ultima=state.get("ca_ultima"),
+                                             pausa=state.get("ca_pausa"))
         print(f"--- {len(matches)} matches; resumen sin ultima: "
               f"{ {k: v for k, v in resumen.items() if k != 'ultima'} }")
         for m in sorted(matches, key=lambda m: m.get("fuente", ""))[:400]:

@@ -17,8 +17,24 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   reintento), rotativos 14 de 24 intentados.
 - Logs de 19 corridas (19-oct a 2-nov): 66 de 133 rotativos dieron 504 cada vez que se buscaron y nunca
   respondieron (sin fecha en `ca_ultima`); 11 más nunca se alcanzaron.
-- Pausa de rotativos que fallan (`state["ca_pausa"]`, 1/2/4/8 días; sin commit hasta que pase el verificador).
-- Sonda `--ventana` (commit aparte): términos muertos con ventanas de 3 d, 1 d, 6 h y 1 h.
+- Sonda `--palabras` (run 41520717922): de las 93 palabras de los 77 términos sin respuesta, 73 responden (200,
+  3-7 s) y 20 dan 504, todas comunes (servicios, gestión, diseño, datos, producción, educación, desarrollo…).
+- **Decisión:** el rotativo se pide como frase, igual que antes; si no responde, se pide palabra por palabra y
+  se queda con la intersección de las palabras que respondieron completas. Las frases y palabras que fallan entran
+  en pausa por apariciones (1/2/4/8, `state["ca_pausa"]`), no por días.
+  Se descartaron dos alternativas. La pausa por días: el verificador midió que con la rotación real vence antes de
+  que el término vuelva, así que no ahorraba nada en unas 2,5 semanas. Partir todos los rotativos en palabras con
+  unión: palabras como «municipal» o «programa» (10 a 14 páginas en 3 días) llenaban el correo de ruido.
+  Es mejor para el producto porque las frases que responden no cambian (ítems idénticos a HEAD, simulado) y las 77
+  que no traían nada recuperan cobertura de título y descripción.
+  Costo, no criterio: hasta 1,5 min más de búsqueda q por corrida (15,3 a 16,5 min contra 15 de presupuesto) y
+  ~26 min de job estimado.
+- Correo: el aviso distingue «no respondieron hoy» de «siguen en pausa y no se pidieron», y nombra los términos sin
+  ninguna palabra que respondiera. El aviso de truncados es verdadero también para los rotativos.
+- Verificador: FALLA (pausa por días; textos del correo), FALLA (textos del correo, doble solicitud de palabras de
+  diarios), FALLA (3 textos), PASA. 64 tests OK.
+- Términos que siguen sin cobertura de descripción porque todas sus palabras dan 504: gestión de medios, evaluación
+  de política(s), e-learning, gestión de datos. Sus títulos los revisa el listado.
 
 - Sonda `--ventana` (run 41517074064, 20:12 UTC): los 8 términos muertos dan 504 a los 29,5 s con ventanas de
   3 d, 1 d, 6 h y 1 h. La ventana no es la causa. Control «encuesta» con `publicado_hasta`: 200 con 0 ítems en las 4
@@ -27,8 +43,12 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   resultados. Datos Abiertos de Compra Ágil solo publica cotizaciones mensuales del mes anterior: no sirve.
 
 ### Pendiente
-- Sonda `--palabras`: cada palabra de los términos muertos por separado (q = unión de palabras).
-- Verificador sobre la pausa; commit.
+- Mar 3-nov 09:00: primera corrida con rotativos por palabra. En el log: «rotativos que no respondieron como
+  frase», «palabras sin respuesta», duración de la búsqueda q, que no haya 429, e ítems del correo.
+- El buscador web (`api.buscador.mercadopublico.cl`) responde lo que la API oficial no. Usarlo exige su credencial
+  embebida: no se hace sin autorización de ChileCompra; decide Sergio (requerimiento `INC-1408539-R5Z0W4`).
+- Siguen del 02-11: tope o resumen del correo, `--workflow scanner.yml` en el conteo del respaldo, rediseño de la
+  selección (clasificador).
 
 ## 2026-11-02 — primera corrida con listado completo de Compra Ágil
 

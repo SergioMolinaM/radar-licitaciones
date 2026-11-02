@@ -58,17 +58,21 @@ def run() -> int:
 
     matches_mp, universo_mp = fetch_licitaciones_dia()
     try:
-        matches_ca, resumen_ca = fetch_compra_agil(cursor=state.get("ca_cursor", 0), ultima=state.get("ca_ultima"))
+        matches_ca, resumen_ca = fetch_compra_agil(cursor=state.get("ca_cursor", 0), ultima=state.get("ca_ultima"),
+                                                   pausa=state.get("ca_pausa"))
     except Exception as e:
         logger.exception("Compra Ágil: error inesperado")
         matches_ca, resumen_ca = [], {
             "diarios_ok": [], "diarios_fallidos": [], "rotativos_ok": [], "rotativos_total": 0,
+            "rotativos_fallidos": [], "rotativos_en_pausa": [], "frases_parciales": [], "frases_por_palabra": [],
+            "palabras_fallidas": [], "palabras_en_pausa": [], "pausa": state.get("ca_pausa") or {},
             "truncados": [], "cursor": state.get("ca_cursor", 0),
             "ultima": state.get("ca_ultima"), "devueltas": 0, "cortado": f"error inesperado: {type(e).__name__}",
             "listado_ok": False, "listado_paginas": 0, "listado_total": None, "listado_desde": "",
             "listado_corte": "", "listado_hueco": "", "listado_pendiente": ""}
     state["ca_cursor"] = resumen_ca["cursor"]
     state["ca_ultima"] = resumen_ca["ultima"]
+    state["ca_pausa"] = resumen_ca["pausa"]
     universo_ca = resumen_ca["devueltas"]
     matches_undp, universo_undp = fetch_undp_notices()
     try:
@@ -135,9 +139,23 @@ def run() -> int:
         if resumen_ca["cortado"]:
             parciales.append(f"Compra Ágil cortada ({resumen_ca['cortado']}): los términos rotativos"
                              " que faltaban se buscan en la próxima corrida")
+    fallidas, en_pausa = resumen_ca["palabras_fallidas"], resumen_ca["palabras_en_pausa"]
+    if (fallidas or en_pausa) and (resumen_ca["diarios_ok"] or resumen_ca["listado_paginas"]):
+        partes = []
+        if fallidas:
+            partes.append("no respondieron hoy " + ", ".join(sorted(fallidas)) + " (quedan en pausa)")
+        if en_pausa:
+            partes.append("siguen en pausa y no se pidieron " + ", ".join(sorted(en_pausa)))
+        texto = ("Compra Ágil, búsqueda por palabra de términos rotativos: "
+                 + "; ".join(partes) + " (el término se evalúa con sus otras palabras)")
+        perdidos = resumen_ca["rotativos_fallidos"] + resumen_ca["rotativos_en_pausa"]
+        if perdidos:
+            texto += "; sin ninguna palabra que respondiera: " + ", ".join(perdidos)
+        parciales.append(texto)
     if resumen_ca["truncados"]:
-        parciales.append("Compra Ágil con más de 250 resultados para: " + ", ".join(resumen_ca["truncados"])
-                         + " (aparecen los primeros 250; pueden faltar los siguientes)")
+        parciales.append("Compra Ágil con resultados incompletos para: " + ", ".join(resumen_ca["truncados"])
+                         + " (una búsqueda trajo más de 250 y se cortó; pueden faltar ítems; el término se busca"
+                           " de nuevo desde el mismo punto cuando le vuelva a tocar)")
     if not cna_ok:
         parciales.append("Noticias de la CNA sin respuesta: hoy no se revisó si abrió un llamado a pares evaluadores")
     if empleos_fallas:
@@ -191,7 +209,9 @@ def run() -> int:
         stats["parciales"] = parciales
         stats["ca_terminos"] = (
             f"{len(resumen_ca['diarios_ok'])}/{len(resumen_ca['diarios_ok']) + len(resumen_ca['diarios_fallidos'])} diarios, "
-            f"{len(resumen_ca['rotativos_ok'])} de {resumen_ca['rotativos_total']} rotativos"
+            f"{len(resumen_ca['rotativos_ok'])} de {resumen_ca['rotativos_total']} rotativos, "
+            f"{len(set(resumen_ca['palabras_fallidas']))} palabras sin respuesta hoy, "
+            f"{len(set(resumen_ca['palabras_en_pausa']))} en pausa"
         )
         send_heartbeat(stats)
 
