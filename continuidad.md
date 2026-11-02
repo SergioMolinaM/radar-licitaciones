@@ -46,12 +46,17 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   diarios). «cadena de bloques» sigue rotativa: q la parte en «cadena» (20) y «bloques» (31), casi todo ajeno.
   Costo, no criterio: 4 solicitudes más por corrida (~30 s); Actions gratis por ser repo público.
 
+- Respaldo del cron (`scanner.yml`): el conteo de corridas de hoy filtra `--workflow scanner.yml`. Medido el
+  02-11: sin filtro 3 (radar + 2 sondas), con filtro 1. Antes, una sonda manual hacía saltar el respaldo.
+- CNA funciona: run 41441187390 leyó 40 noticias en /noticias/Paginas y 40 en /noticias/SiteAssets. El pendiente
+  `CERTIFICATE_VERIFY_FAILED` del 31-oct estaba resuelto desde `3a14b63` (30-oct).
+
 ### Pendiente
 - Mar 3-nov 09:00: primera corrida con rotativos por palabra. En el log: «rotativos que no respondieron como
   frase», «palabras sin respuesta», duración de la búsqueda q, que no haya 429, e ítems del correo.
 - El buscador web (`api.buscador.mercadopublico.cl`) responde lo que la API oficial no. Usarlo exige su credencial
   embebida: no se hace sin autorización de ChileCompra; decide Sergio (requerimiento `INC-1408539-R5Z0W4`).
-- Siguen del 02-11: tope o resumen del correo, `--workflow scanner.yml` en el conteo del respaldo, rediseño de la
+- Siguen del 02-11: tope o resumen del correo y rediseño de la
   selección (clasificador).
 
 ## 2026-11-02 — primera corrida con listado completo de Compra Ágil

@@ -28,8 +28,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           hoy=$(date -u +%F)
-          n=$(gh run list -R "$GITHUB_REPOSITORY" --event workflow_dispatch --created ">=$hoy" --json databaseId --jq length)
-          echo "Corridas por workflow_dispatch hoy: $n"
+          # Solo este workflow: una sonda manual (probe-compra-agil.yml) no cuenta como corrida del radar.
+          n=$(gh run list -R "$GITHUB_REPOSITORY" --workflow scanner.yml --event workflow_dispatch --created ">=$hoy" --json databaseId --jq length)
+          echo "Corridas del radar por workflow_dispatch hoy: $n"
           if [ "$n" -gt 0 ]; then echo "saltar=1" >> "$GITHUB_OUTPUT"; fi
 
       - name: Checkout
