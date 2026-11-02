@@ -42,6 +42,10 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 - Buscador web (`buscador.mercadopublico.cl/compra-agil`, otro backend): «diseño web» 30-oct a 2-nov = 61
   resultados. Datos Abiertos de Compra Ágil solo publica cotizaciones mensuales del mes anterior: no sirve.
 
+- Sergio, 02-11: «biometría», «biométrico», «biométrica» y «blockchain» pasan a términos diarios de q (16
+  diarios). «cadena de bloques» sigue rotativa: q la parte en «cadena» (20) y «bloques» (31), casi todo ajeno.
+  Costo, no criterio: 4 solicitudes más por corrida (~30 s); Actions gratis por ser repo público.
+
 ### Pendiente
 - Mar 3-nov 09:00: primera corrida con rotativos por palabra. En el log: «rotativos que no respondieron como
   frase», «palabras sin respuesta», duración de la búsqueda q, que no haya 429, e ítems del correo.

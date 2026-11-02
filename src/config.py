@@ -402,6 +402,14 @@ COMPRA_AGIL_TERMINOS_DIARIOS = [
     "infografía",
     "relator",
     "economía circular",
+    # 02-nov (Sergio): biometría y blockchain todos los días (Andrés Alberdi). Sonda
+    # --palabras (run 41520717922, 3 días): biométrico 2, biométrica 1, biometría 0,
+    # blockchain 0, todas 200. «cadena de bloques» sigue en la rotación: q la parte en
+    # «cadena» (20) y «bloques» (31), casi todo ajeno; el título lo revisa el listado.
+    "biometría",
+    "biométrico",
+    "biométrica",
+    "blockchain",
 ]
 # Exclusiones que NO se aplican a los resultados de la búsqueda q: en Compra
 # Ágil casi todo título empieza con «Adquisición de…» o «Compra de…» (14-oct:
