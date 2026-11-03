@@ -7,7 +7,7 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
-## 2026-11-02 (tarde) — 504 de q: pausa de rotativos y sonda de ventana
+## 2026-11-02 (tarde y noche, cierre) — 504 de q resuelto por palabra; clasificador medido; sonda del universo
 
 ### Hecho
 - `q=` no se apaga: de los 191 ítems que solo trajo hoy, 2 calzan (895072-133-COT26, 5952-109-COT26) y no
@@ -55,6 +55,9 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   de 6 h y lo sube como artefacto `universo` (retención 3 días). Probada sin red con la API simulada (4 tramos, 8
   ítems, completo=True).
 
+- Clasificador medido con Haiku, Sonnet y Opus 5.5 sobre el set de prueba, y parte 2 del diseño de selección
+  escrita: detalle en el repo privado (`privado/docs/SELECCION-RADAR-2026-11-02.md` §4-8, `privado/clasif/`).
+
 - Fuera de este repo, desde esta sesión: repos privados `gestor-documental` y `procesos-ia` creados en GitHub;
   respuestas del MINVU (AP001T0009186) y de CORFO (AH004T0008055) cotejadas en sus proyectos y aclaraciones
   ingresadas (AP001T0009436, AH004T0008155); `ESTADO.md` al día.
@@ -67,11 +70,14 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   frase», «palabras sin respuesta», duración de la búsqueda q, que no haya 429, e ítems del correo.
 - El buscador web (`api.buscador.mercadopublico.cl`) responde lo que la API oficial no. Usarlo exige su credencial
   embebida: no se hace sin autorización de ChileCompra; decisión pendiente (requerimiento `INC-1408539-R5Z0W4`).
-- Clasificador medido con Haiku, Sonnet y Opus 5.5 sobre el set de prueba, y parte 2 del diseño de selección
-  escrita: detalle en el repo privado (`privado/docs/SELECCION-RADAR-2026-11-02.md` §4-8). SDK `anthropic` 2.4.0
-  instalado en el PC para la medición.
-- Siguen del 02-11: tope o resumen del correo y rediseño de la
-  selección (clasificador).
+- Siguen del 02-11: tope o resumen del correo y clasificador dentro del radar; los dos dependen de la prueba del
+  universo (orden de construcción en `privado/docs/SELECCION-RADAR-2026-11-02.md` §8).
+- Subir el commit local de la raíz (`ESTADO.md`, corrección de filas del 02-11) con el próximo push del radar: el
+  guardia de push exige un cambio de esta continuidad antes de cada push.
+
+### Estado del repo
+`main` al día con `origin` tras este cierre. `privado/` al día con su remoto.
+Nada a medio camino. 64 tests OK. SDK `anthropic` 2.4.0 instalado en el PC (solo para `privado/clasif/`).
 
 ## 2026-11-02 — primera corrida con listado completo de Compra Ágil
 
