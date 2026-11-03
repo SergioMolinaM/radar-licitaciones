@@ -7,6 +7,41 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-03 — 429 en la corrida de las 09:00; prueba del universo; tope de la API
+
+### Hecho
+- Run 41632068088 (09:00): el listado de Compra Ágil recibió 429 a la 2.ª solicitud («límite de tasa», sin
+  Retry-After). Se cortó Compra Ágil entera (listado y q) como está programado; la marca quedó en
+  2026-11-02T12:00:38Z y la próxima corrida retoma desde 10:00:38Z (dentro del tope de 4 días). Correo con 10 ítems,
+  sin Compra Ágil. Ninguna otra corrida de este repo usó la API entre el 2-nov 20:36 UTC y el 3-nov 12:00 UTC.
+  Mismo patrón que el 27-oct (429 tras 3). Causa no verificada. La primera corrida con rotativos por palabra no
+  alcanzó a medirse.
+- Las 52 páginas del tramo 2-nov 10:00-16:00 UTC no son anomalía: el 30-oct 12-18 UTC fueron 34, y el 2-nov fue el
+  primer día hábil tras el fin de semana largo.
+- Sonda `--universo` (run 41676625042, 16:40 UTC): 24 h completas, 112 páginas, sin 429, **5.494 ítems**; 108 pasan
+  el filtro por título. El diseño suponía ~900 por día (promedio de 3 días con fin de semana).
+- API de Anthropic: la primera corrida de `privado/clasif/universo.py` falló con 400 «usage limits» (tope mensual
+  de la organización US$10, gastado US$10,10). El tope se subió a US$25 con autorización. El gasto sale del crédito
+  promocional (US$200 del 26-oct, **vence el 16-nov-2026**), que se consume primero. Recarga automática desactivada.
+- Diferencia sin explicar: ~US$8,3 de Opus que el contador de gasto incluye y el CSV de costos (hasta 3-nov 17:58
+  UTC) no muestra. Consulta a soporte, conversación 215476685979195: el bot no la resolvió.
+- Prueba del universo clasificada (US$7,62): 142 «calza», el filtro por título deja pasar 31; la cascada Haiku → Opus
+  pierde 1 de 142 y cuesta ~US$1,62/día hábil. Detalle en el repo privado.
+- Cascada en sombra construida por subagente en la rama `worktree-agent-a3f30267570d183b2` (commits `e7baa8d` y
+  `0ca0cdd`): `src/sombra.py`, lotes en paralelo (6 hilos), topes US$2,50/corrida, 12 min y fecha límite
+  2026-11-15 23:59 Chile; correo de sombra aparte; 84 tests OK en la rama. Diff leído; **sin merge**.
+
+### Pendiente
+- Verificador sobre la rama de la sombra, merge y push; secrets `ANTHROPIC_API_KEY` (lo pone Sergio con
+  `gh secret set`) y `RADAR_CLASIF_SISTEMA` (texto SISTEMA de `privado/clasif/clasificar.py`).
+- Exportar mañana el CSV de costos de Anthropic por clave (diferencia de ~US$8,3).
+- El cierre que trae la API de Compra Ágil puede no calzar con la ficha (2109-766: API 03-11 18:00, ficha 04-11
+  18:00): revisar `fecha_cierre` antes de usarla para ordenar o marcar «cierra hoy».
+- Primera corrida con rotativos por palabra sin medir (la de hoy cortó por 429): mirar el log del 04-11.
+
+### Estado del repo
+`main` con 2 commits del 02-11 más esta continuidad, sin push hasta el cierre. `privado/` con cambios sin commit.
+
 ## 2026-11-02 (tarde y noche, cierre) — 504 de q resuelto por palabra; clasificador medido; sonda del universo
 
 ### Hecho
