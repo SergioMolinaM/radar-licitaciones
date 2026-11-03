@@ -72,11 +72,9 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   embebida: no se hace sin autorización de ChileCompra; decisión pendiente (requerimiento `INC-1408539-R5Z0W4`).
 - Siguen del 02-11: tope o resumen del correo y clasificador dentro del radar; los dos dependen de la prueba del
   universo (orden de construcción en `privado/docs/SELECCION-RADAR-2026-11-02.md` §8).
-- Subir el commit local de la raíz (`ESTADO.md`, corrección de filas del 02-11) con el próximo push del radar: el
-  guardia de push exige un cambio de esta continuidad antes de cada push.
 
 ### Estado del repo
-`main` al día con `origin` tras este cierre. `privado/` al día con su remoto.
+`main`: el commit de cierre quedó sin push (lo frenó el clasificador de permisos; lo sube Sergio). `privado/` al día con su remoto.
 Nada a medio camino. 64 tests OK. SDK `anthropic` 2.4.0 instalado en el PC (solo para `privado/clasif/`).
 
 ## 2026-11-02 — primera corrida con listado completo de Compra Ágil
