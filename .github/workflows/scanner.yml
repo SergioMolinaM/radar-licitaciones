@@ -19,7 +19,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 50  # Compra Ágil: 18 min de listado + 20 de búsqueda q; no puede comerse las 6 h de GitHub
+    timeout-minutes: 70  # Compra Ágil: hasta 36 min de listado + ~17 de búsqueda q; no puede comerse las 6 h de GitHub
     steps:
       - name: Respaldo - saltar si cron-job.org ya disparó hoy
         id: respaldo
@@ -69,7 +69,7 @@ jobs:
           if [[ -n "$(git status --porcelain data/state.json)" ]]; then
             git add data/state.json
             git commit -m "chore(state): actualización automática $(date -u +%FT%TZ)"
-            # La corrida dura ~20 min: si en ese rato se subió otro commit (p. ej. una
+            # La corrida dura 35 a 55 min: si en ese rato se subió otro commit (p. ej. una
             # continuidad), el push sin rebase se rechaza y state.json no se guarda
             # (26-oct-2026: el correo del día siguiente repetía lo ya avisado).
             git pull --rebase --autostash

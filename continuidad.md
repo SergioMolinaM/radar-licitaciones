@@ -7,6 +7,39 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-04 — listado de Compra Ágil con presupuesto de 36 min
+
+### Hecho
+- Run 41825528757 (09:00): sin 429, 120 páginas en 18 min, 5.743 publicadas, correo con 382 ítems. El listado se
+  cortó por presupuesto en la pág 12 del tramo 03-11 16:00; quedó sin leer hasta 04-11 12:00 (marca
+  2026-11-03T16:00:38Z). Partió con un día de atraso por el 429 del 03-11.
+- Primera corrida con rotativos por palabra medida: 5 rotativos no respondieron como frase; `e-learning`, `datos` y
+  `gestión` a pausa; diario `digital` sin respuesta; diarios 15/16, rotativos 11/129.
+- **Decisión:** `PRESUPUESTO_LISTADO_S` de 18 a 36 min; `timeout-minutes` de `scanner.yml` y de
+  `probe-compra-agil.yml` de 50 a 70.
+  Se descartó dejar los 18 min: un día normal son ~134 páginas según el modelo del verificador (~112 más 2 h de
+  traslape) y 18 min leen 120, así que el listado se atrasa.
+  Es mejor para el producto porque un día perdido por 429 se recupera casi entero en una corrida y lo publicado se
+  lee antes de que cierre.
+  Costo, no criterio: la corrida dura ~36 min un día normal y hasta ~55 en el peor caso realista; Actions gratis por
+  ser repo público.
+- Verificador: FALLA por dos líneas (timeout de la sonda; comentario «~20 min» en `scanner.yml`), corregidas.
+  Simuló 429 en listado y en q: no se pierde marca, correo ni state. 64 tests OK. La API está modelada con el log: el
+  primer dato real es la corrida del 05-11.
+
+### Pendiente
+- 05-11: mirar el log. Modelo del verificador: ~208 páginas, corrida de ~47 min, correo ~09:47, ~250-275 solicitudes
+  (máximo sin 429 registrado: 214; la del 04-11 hizo 163). Sin plazo global en el scanner: si el job llegara a 70 min moriría antes
+  de enviar el correo y guardar state; cota teórica ~107 min, riesgo preexistente, y el respaldo no lo rescata.
+- Merge de la sombra: su rama trae `timeout-minutes: 65` en la misma línea; subirlo a ~80.
+- Textos viejos sin corregir: `compra_agil.py:26-28` (~800 ítems, ~16 páginas); tras 429 en el listado el correo
+  dice «sin respuesta» de diarios que no se pidieron; en `--universo` el corte dice 36 min y su límite es 40.
+- Siguen del 03-11: verificador, merge y secrets de la sombra (fecha límite 15-11); CSV de costos de Anthropic;
+  `fecha_cierre` de la API contra la ficha.
+
+### Estado del repo
+`main` con el cambio del listado subido. Rama de la sombra sin merge.
+
 ## 2026-11-03 — 429 en la corrida de las 09:00; prueba del universo; tope de la API
 
 ### Hecho

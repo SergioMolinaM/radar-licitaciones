@@ -61,7 +61,7 @@ MAX_PAGINAS = 80            # tope de seguridad del barrido completo (solo audit
 MAX_PAGINAS_TERMINO = 5     # una búsqueda q trae 1-19 resultados (medido 14-oct); 5 páginas = 250
 REINTENTOS_ESPERA_S = (20, 60)  # barrido completo: esperas entre intentos ante 5xx/red
 PRESUPUESTO_BARRIDO_S = 15 * 60  # tope del barrido completo (auditoría)
-PRESUPUESTO_BUSQUEDA_S = 15 * 60  # tope de la búsqueda q, después del listado (18 min); el job tiene timeout-minutes: 50
+PRESUPUESTO_BUSQUEDA_S = 15 * 60  # tope de la búsqueda q, después del listado (36 min); el job tiene timeout-minutes: 70
 RESERVA_POR_REINTENTO_S = 30  # un 504 tarda ~29 s; se aparta este tiempo por diario fallido
 # Listado completo sin q (30-oct-2026, sonda run 41081425045): 62 páginas de 1 día
 # respondieron todas, 0,9-7,3 s cada una, sin 429, con 5 s entre solicitudes. Esa
@@ -69,9 +69,12 @@ RESERVA_POR_REINTENTO_S = 30  # un 504 tarda ~29 s; se aparta este tiempo por di
 # dispararon («límite de tasa»): se espacia toda solicitud. No verificado que la
 # pausa sea la causa.
 PAUSA_ENTRE_SOLICITUDES_S = 4
-PRESUPUESTO_LISTADO_S = 18 * 60
+# Un día hábil son ~112 páginas a ~9 s (sonda --universo, 3-nov; corrida del 4-nov: 120 en
+# 18 min). 36 min leen dos días: un 429 que corta una corrida se recupera en la siguiente.
+# Un día normal termina antes y no usa el resto.
+PRESUPUESTO_LISTADO_S = 36 * 60
 LISTADO_TRASLAPE = timedelta(hours=2)   # la paginación se corre si entran publicaciones mientras se recorre
-LISTADO_DIAS_MAX = 4                    # más atrás no cabe en el presupuesto (~3.000 publicadas por día)
+LISTADO_DIAS_MAX = 4                    # más atrás no cabe en el presupuesto (~5.500 publicadas por día hábil)
 CLAVE_LISTADO = "__listado__"           # en state["ca_ultima"]: hasta dónde se leyó el listado sin hueco
 MAX_PAGINAS_LISTADO = 300               # tope de seguridad: un recorte deja el barrido incompleto
 # El listado viene de lo más nuevo a lo más viejo, con o sin ordenar_por (sonda --orden,
