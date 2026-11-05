@@ -7,6 +7,22 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-05 — 429 a la segunda solicitud; el presupuesto de 36 min sigue sin medirse
+
+### Hecho
+- Run 42023483040 (09:00): 49 s. Listado cortado por 429 tras 2 solicitudes (1/35 páginas, 50 publicadas, Retry-After
+  None). Marca sin mover: 2026-11-03T16:00:38Z; sin leer de 2026-11-03T14:00:38Z a 2026-11-05T12:00:34Z. Correo con 7
+  ítems, sin Compra Ágil. Mismo patrón que el 27-oct y el 3-nov. Causa no verificada.
+- El modelo de ~208 páginas y ~47 min no se probó: el cambio de 36 min no corrió con la API.
+- La lectura de adjuntos por `/v1/auth/publico` ya no basta: `listar` responde 403 con ese token solo.
+
+### Pendiente
+- Relanzar la corrida hoy (workflow_dispatch, sin costo): Sergio. Si pasa, medir páginas, duración y solicitudes.
+- El resto sigue del 04-11: merge de la sombra con `timeout-minutes` ~80, textos viejos, `fecha_cierre`, CSV de costos.
+
+### Estado del repo
+`main` en sync con origin, sin cambios de código. Rama de la sombra sin merge. `.claude/` sin seguimiento.
+
 ## 2026-11-04 — listado de Compra Ágil con presupuesto de 36 min
 
 ### Hecho
