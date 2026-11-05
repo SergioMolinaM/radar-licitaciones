@@ -13,11 +13,14 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 - Run 42023483040 (09:00): 49 s. Listado cortado por 429 tras 2 solicitudes (1/35 páginas, 50 publicadas, Retry-After
   None). Marca sin mover: 2026-11-03T16:00:38Z; sin leer de 2026-11-03T14:00:38Z a 2026-11-05T12:00:34Z. Correo con 7
   ítems, sin Compra Ágil. Mismo patrón que el 27-oct y el 3-nov. Causa no verificada.
-- El modelo de ~208 páginas y ~47 min no se probó: el cambio de 36 min no corrió con la API.
+- Run 42029420922 (relanzada por pedido de Sergio, 09:42): 18 min. 121 páginas, 5.900 publicadas, 121 con keyword en
+  título; 429 tras 122 solicitudes en la pág 55 de 62 del tramo 04-11 14:00. Marca 2026-11-04T14:00:38Z. Correo con 92
+  ítems. El presupuesto de 36 min sigue sin agotarse: la corrida cortó por 429 a los 18 min.
 - La lectura de adjuntos por `/v1/auth/publico` ya no basta: `listar` responde 403 con ese token solo.
 
 ### Pendiente
-- Relanzar la corrida hoy (workflow_dispatch, sin costo): Sergio. Si pasa, medir páginas, duración y solicitudes.
+- Sin leer de 2026-11-04T14:00:38Z en adelante: lo retoma la próxima corrida. Sin búsqueda q en la relanzada.
+- El 429 llegó a las 122 solicitudes; el 04-11 hubo 163 sin 429 y hoy a las 09:00 llegó a las 2. No hay umbral fijo a la vista; causa no verificada.
 - El resto sigue del 04-11: merge de la sombra con `timeout-minutes` ~80, textos viejos, `fecha_cierre`, CSV de costos.
 
 ### Estado del repo
