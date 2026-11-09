@@ -29,7 +29,10 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 
 ### Estado del repo
 `main` con esta entrada. Sin cambios de código. Cierre de la sesión de la tarde: sin cambios técnicos nuevos; lo
-comercial del día quedó en `privado/continuidad.md`.
+comercial del día quedó en `privado/continuidad.md`. Cierre de la noche: tampoco hay cambios de código. Adjuntos de
+Compra Ágil leídos en Chrome sin descargar: se captura el blob con `URL.createObjectURL` al hacer clic en el adjunto de
+la ficha y se extrae el texto con pdf.js 4.0.379 de cdnjs dentro de la página; `javascript_tool` corta la salida en
+~1.000 caracteres, así que se lee por tramos.
 
 ## 2026-11-05 — 429 a la segunda solicitud; el presupuesto de 36 min sigue sin medirse
 
