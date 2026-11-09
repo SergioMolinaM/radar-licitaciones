@@ -7,6 +7,25 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-09 — Compra Ágil responde 504 en todo
+
+### Hecho
+- Run 42613417488 (09:00) y run 42628768485 (relanzada 10:48 Chile): el listado de Compra Ágil dio 504 en la
+  primera página (dos intentos de ~33 s) y los 16 diarios de q también. 0 ítems de Compra Ágil; exit 3 por fuente
+  caída; correos con 8 y 3 ítems (Mercado Público y PNUD). Marca sin mover: 2026-11-05T18:00:38Z.
+- El 06-11 (run 42214348990) el listado leyó 145 páginas (7.058 publicadas) y cortó por 429 tras 146 solicitudes.
+- Se relanzó porque desde el 09-11 18:00:38Z el tope de 4 días (`LISTADO_DIAS_MAX`) deja sin leer lo publicado
+  entre la marca y el tope. No se cambió el código: lo de ese tramo probablemente ya cerró (no verificado).
+- Mercado Público: la página de adjuntos (ViewAttachment) carga un reCAPTCHA Enterprise invisible; fuera del
+  navegador llega sin la lista de archivos. En Chrome funciona, una pestaña nueva por licitación.
+
+### Pendiente
+- 10-11: ver si la API de Compra Ágil vuelve. Hueco esperado 2026-11-05T18:00:38Z a ~2026-11-06T12:00Z.
+- Sigue lo del 05-11 y el 04-11 (sombra, textos viejos, `fecha_cierre`, CSV de costos; sombra vence el 15-11).
+
+### Estado del repo
+`main` con esta entrada. Sin cambios de código.
+
 ## 2026-11-05 — 429 a la segunda solicitud; el presupuesto de 36 min sigue sin medirse
 
 ### Hecho
