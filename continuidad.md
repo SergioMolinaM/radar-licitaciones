@@ -19,6 +19,10 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 - Mercado Público: la página de adjuntos (ViewAttachment) carga un reCAPTCHA Enterprise invisible; fuera del
   navegador llega sin la lista de archivos. En Chrome funciona, una pestaña nueva por licitación.
 
+- Respaldo con la API caída: barrido manual del buscador web (`buscador.mercadopublico.cl/compra-agil`, Estado
+  «Publicada», desde la fecha de la marca) en Chrome, término por término. Resultados en 10-16 s; `page_number` en la
+  URL vuelve a la pág. 1 (se pagina con los botones); sin captcha. 16 términos en ~26 min.
+
 ### Pendiente
 - 10-11: ver si la API de Compra Ágil vuelve. Hueco esperado 2026-11-05T18:00:38Z a ~2026-11-06T12:00Z.
 - Sigue lo del 05-11 y el 04-11 (sombra, textos viejos, `fecha_cierre`, CSV de costos; sombra vence el 15-11).
