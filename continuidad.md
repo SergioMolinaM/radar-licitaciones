@@ -28,7 +28,8 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 - Sigue lo del 05-11 y el 04-11 (sombra, textos viejos, `fecha_cierre`, CSV de costos; sombra vence el 15-11).
 
 ### Estado del repo
-`main` con esta entrada. Sin cambios de código.
+`main` con esta entrada. Sin cambios de código. Cierre de la sesión de la tarde: sin cambios técnicos nuevos; lo
+comercial del día quedó en `privado/continuidad.md`.
 
 ## 2026-11-05 — 429 a la segunda solicitud; el presupuesto de 36 min sigue sin medirse
 
