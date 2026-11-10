@@ -7,6 +7,25 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-10 — Términos del socio tecnológico
+
+### Hecho
+- `src/config.py`: 66 términos nuevos en `KEYWORDS_INCLUDE` (agentes de IA y WhatsApp, automatización y flujos,
+  gestión documental, firma e identidad, pagos y recaudación, nube, analítica y BI, monitoreo de redes, atención
+  ciudadana, desarrollo de sistemas, ciberseguridad), 8 siglas en `KEYWORDS_INCLUDE_PALABRA` (bpm, ocr, crm, rpa, api,
+  nube, aws, app), 20 en `KEYWORDS_INCLUDE_EN` y 3 diarios de Compra Ágil (chatbot, whatsapp, automatización).
+  «hosting» salió de `KEYWORDS_EXCLUDE`. Motivo comercial en `privado/continuidad.md`.
+- Ruido medido contra `data/audit-2026-07-08.csv` (4.030 títulos): pocos calces; se evitó «cloud» y «mensajería»
+  sueltas (Adobe Creative Cloud, mensajería-estafeta). Queda «automatización portón» como ruido aceptado.
+- `python -m unittest discover -s tests`: 64 OK. Prueba del filtro con 12 títulos de muestra.
+
+### Pendiente
+- Ver en las próximas corridas si la rotación de Compra Ágil se alarga demasiado o sube el 429 con los términos nuevos.
+- Lo del 09-11 sigue.
+
+### Estado del repo
+`main` con el cambio de `src/config.py` y esta entrada, sin push hasta revisar si el push dispara algún workflow.
+
 ## 2026-11-09 — Compra Ágil responde 504 en todo
 
 ### Hecho

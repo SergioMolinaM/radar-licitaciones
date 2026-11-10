@@ -176,6 +176,77 @@ KEYWORDS_INCLUDE = [
     "biométrica",
     "blockchain",
     "cadena de bloques",
+    # 10-nov-2026 (Sergio): capacidades del socio tecnológico (detalle en privado):
+    # agentes de IA y WhatsApp, automatización y flujos, gestión documental, identidad
+    # y firma, pagos y recaudación, nube, analítica, monitoreo de redes, atención
+    # ciudadana y desarrollo de sistemas. Contra audit-2026-07-08.csv (4.030 títulos)
+    # suman pocos y casi todos en el perfil; ruido visto: «Adobe Creative Cloud»
+    # (por eso no «cloud» suelta), «mensajería-estafeta» (por eso no «mensajería»),
+    # «automatización portón». Criterio: recall antes que costo; más términos alargan
+    # la rotación de Compra Ágil.
+    "chatbot",
+    "chatbots",
+    "asistente virtual",
+    "agente virtual",
+    "agentes virtuales",
+    "agente de ia",
+    "agentes de ia",
+    "whatsapp",
+    "mensajería instantánea",
+    "automatización",
+    "flujo de trabajo",
+    "flujos de trabajo",
+    "workflow",
+    "gestión de procesos",
+    "bpmn",
+    "gestión documental",
+    "gestor documental",
+    "expediente electrónico",
+    "cero papel",
+    "firma electrónica",
+    "firma digital",
+    "identidad digital",
+    "reconocimiento facial",
+    "autenticación",
+    "enrolamiento",
+    "reconocimiento de documentos",
+    "pago electrónico",
+    "pagos electrónicos",
+    "pagos en línea",
+    "pasarela de pago",
+    "botón de pago",
+    "recaudación",
+    "migración a la nube",
+    "servicios en la nube",
+    "computación en la nube",
+    "google cloud",
+    "big data",
+    "machine learning",
+    "aprendizaje automático",
+    "analítica",
+    "inteligencia de negocios",
+    "business intelligence",
+    "tablero de control",
+    "power bi",
+    "looker",
+    "scraping",
+    "monitoreo de redes",
+    "escucha social",
+    "monitoreo de medios",
+    "mesa de ayuda",
+    "centro de contacto",
+    "atención ciudadana",
+    "omnicanal",
+    "aplicación móvil",
+    "aplicaciones móviles",
+    "aplicación web",
+    "sistema informático",
+    "desarrollo de software",
+    "desarrollo de sistema",
+    "interoperabilidad",
+    "integración de sistemas",
+    "ciberseguridad",
+    "seguridad de la información",
 ]
 
 # Keywords de inclusión que deben calzar como PALABRA COMPLETA (no prefijo).
@@ -190,6 +261,15 @@ KEYWORDS_INCLUDE_PALABRA = [
     # videoconferencia y videovigilancia.
     "video",
     "videos",
+    # 10-nov-2026: socio tecnológico. Siglas cortas como palabra completa.
+    "bpm",
+    "ocr",
+    "crm",
+    "rpa",
+    "api",
+    "nube",
+    "aws",
+    "app",
 ]
 
 # Keywords de exclusión: si aparecen, descarta (ruido típico observado).
@@ -216,7 +296,7 @@ KEYWORDS_EXCLUDE = [
     "equipamiento deportivo",
     "equipamiento recreativo",
     "proyectores",
-    "hosting",
+    # «hosting» salió el 10-nov-2026: con el socio tecnológico (nube) es servicio que se puede dar.
     "telefonía",
     # Obras públicas e infraestructura física
     "obra civil",
@@ -318,6 +398,12 @@ KEYWORDS_INCLUDE_EN = [
     "data", "dashboard", "information system", "digital platform", "web platform",
     "website", "web portal", "software development", "artificial intelligence",
     "machine learning",
+    # 10-nov-2026: socio tecnológico.
+    "chatbot", "virtual assistant", "whatsapp", "automation", "workflow",
+    "document management", "digital identity", "biometric", "e-signature",
+    "electronic signature", "digital payment", "payment system", "cloud",
+    "data analytics", "business intelligence", "interoperability", "cybersecurity",
+    "blockchain", "mobile app",
     "citizen participation", "public participation", "consultation", "stakeholder",
     "engagement", "dialogue", "governance", "capacity building", "training",
     "workshop", "facilitation",
@@ -410,6 +496,10 @@ COMPRA_AGIL_TERMINOS_DIARIOS = [
     "biométrico",
     "biométrica",
     "blockchain",
+    # 10-nov-2026: socio tecnológico (chatbots y WhatsApp, automatización).
+    "chatbot",
+    "whatsapp",
+    "automatización",
 ]
 # Exclusiones que NO se aplican a los resultados de la búsqueda q: en Compra
 # Ágil casi todo título empieza con «Adquisición de…» o «Compra de…» (14-oct:
