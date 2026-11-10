@@ -7,6 +7,23 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-10 (tarde) — Compra Ágil con 504 de nuevo; respaldo por el buscador web
+
+### Hecho
+- Run 42812057365 (10-11 09:00): Compra Ágil 504 en el listado y en los 16 diarios (29 solicitudes, 0 devueltas);
+  exit 3; correo con 12 ítems (Mercado Público 11, ChileCompra 1). El ticket solo vive en los secretos del repo: la API
+  no se probó desde el equipo.
+- Respaldo manual por `buscador.mercadopublico.cl/compra-agil` (publicadas 09 y 10-11, 19 términos): funcionó sin
+  captcha. Las bases en formato nuevo de licitaciones bajaron por curl con el postback `descargar_pdf_baseFirmada`.
+- Propuesta (no aplicada, la decide Sergio): lanzar el barrido web sin esperar pedido cuando el correo diga «Fuente
+  caída: Compra Ágil».
+
+### Pendiente
+- Ver si la API vuelve en la corrida del 11-11. Lo de las entradas anteriores sigue.
+
+### Estado del repo
+`main` con esta entrada, sin cambios de código.
+
 ## 2026-11-10 — Términos del socio tecnológico
 
 ### Hecho
