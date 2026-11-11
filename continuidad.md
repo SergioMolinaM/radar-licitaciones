@@ -34,7 +34,7 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
 - Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
 
 ### Estado del repo
-`main` con `ab51d4f` y esta entrada; push en este cierre.
+`main` con `ab51d4f` y esta entrada, subidos. Nada a medio camino.
 
 ## 2026-11-10 (tarde) — Compra Ágil con 504 de nuevo; respaldo por el buscador web
 
