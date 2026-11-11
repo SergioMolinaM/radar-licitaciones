@@ -7,6 +7,35 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-11 — Compra Ágil con 429 tras 7 solicitudes; exclusión de recaudación con POS o tarjetas
+
+### Hecho
+- Run 43016589355 (11-11 09:00, 1 min 42 s, success): el listado de Compra Ágil leyó 6 páginas (58 publicadas, 0 con
+  keyword) y cortó por 429 tras 7 solicitudes (Retry-After None). Marca 2026-11-09T00:00:43Z; sin leer de ahí a
+  2026-11-11T12:00:43Z. Hueco por el tope de 4 días: 2026-11-05T18:00:38Z a 2026-11-07T12:00:43Z. Los diarios de q no
+  respondieron. Correo con 25 ítems (Mercado Público 22, ChileCompra 1, PNUD 1, empleo PNUD 1).
+- Respaldo manual por el buscador web (subagente, publicadas 10 y 11-11, 22 términos): sin 403 ni captcha; el buscador
+  da «No ha sido posible obtener el listado» intermitente y se resuelve reintentando o buscando por día. 356 fichas.
+  Fichas escaneadas leídas con Tesseract.js dentro de la página.
+- `src/config.py`: `KEYWORDS_EXCLUDE` suma «máquinas pos», «máquina pos», «terminales pos», «terminal pos», «tarjetas
+  bancarias», «tarjeta bancaria» (aprobado por Sergio el 11-11). Motivo: la recaudación con POS exige ser adquirente o
+  subadquirente inscrito en la CMF (1561-28-LP26 bases p. 9 §3.6; 5416-51-LP26 p. 41 §2.1).
+  Se descartó «pos» suelto: el patrón corta al inicio de palabra y no al final, y excluía «postulación», «posgrado» y
+  «posicionamiento». También «equipos pos»: excluía «EQUIPOS POSTA» en el audit del 08-07.
+  Es mejor para el producto porque saca del correo procesos que TL no puede ofertar sin perder ninguno que sí.
+  Costo, no criterio: nada.
+  Medido: 0 títulos excluidos de más en `data/audit-2026-07-08.csv` (4.029); los dos títulos del 11-11 quedan
+  excluidos. `python -m unittest discover -s tests`: 64 OK. Commit `ab51d4f`.
+- La búsqueda de texto de Claude Code (Grep) dio 0 sobre `tercera-letra\` en un término que está en un archivo
+  (control positivo falló): no se usó para afirmar ausencias.
+
+### Pendiente
+- 12-11: ver si la API de Compra Ágil vuelve o sigue el 429 temprano (09-11 504, 10-11 504, 11-11 429).
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con `ab51d4f` y esta entrada; push en este cierre.
+
 ## 2026-11-10 (tarde) — Compra Ágil con 504 de nuevo; respaldo por el buscador web
 
 ### Hecho
