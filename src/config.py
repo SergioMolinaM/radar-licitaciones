@@ -377,6 +377,16 @@ KEYWORDS_EXCLUDE = [
     "videoportero",
     "cámara de video",
     "cámaras de video",
+    # 11-nov-2026: recaudación con POS o tarjetas exige ser adquirente o subadquirente
+    # inscrito en la CMF (1561-28-LP26 bases p. 9 §3.6; 5416-51-LP26 p. 41 §2.1).
+    # Frases y no «pos» suelto: el patrón corta al inicio de palabra pero no al
+    # final, y «pos» excluiría «postulación», «posgrado» o «posicionamiento».
+    "máquinas pos",
+    "máquina pos",
+    "terminales pos",
+    "terminal pos",
+    "tarjetas bancarias",
+    "tarjeta bancaria",
 ]
 
 # Estados de Mercado Público a incluir (publicada = abierta para postular)
