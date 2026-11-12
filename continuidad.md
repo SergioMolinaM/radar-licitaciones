@@ -7,6 +7,23 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-12 — sin cambios de código; sesión de ofertas
+
+### Hecho
+- Sin cambios en `src/` ni en los workflows. La sesión armó y envió una Compra Ágil y avanzó una licitación (detalle
+  en `privado/continuidad.md` y en las carpetas de `postulaciones/`).
+- Ficha pública de Compra Ágil (`buscador.mercadopublico.cl/ficha?code=…`): los campos de descripción, plazo y
+  presupuesto cargan vacíos; el adjunto baja por `GET servicios-compra-agil.mercadopublico.cl/v1/adjuntos-compra-agil/
+  descargar/<GUID>` sin sesión (medido el 12-11 con Invoke-WebRequest, 190.356 bytes). El formulario
+  `resumen-cotizacion` pierde los campos al recargar pero conserva los adjuntos, que aparecen tarde.
+
+### Pendiente
+- No se revisó la corrida del 12-11 (si la API de Compra Ágil volvió o siguió el 429).
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código.
+
 ## 2026-11-11 — Compra Ágil con 429 tras 7 solicitudes; exclusión de recaudación con POS o tarjetas
 
 ### Hecho
