@@ -17,12 +17,26 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   descargar/<GUID>` sin sesión (medido el 12-11 con Invoke-WebRequest, 190.356 bytes). El formulario
   `resumen-cotizacion` pierde los campos al recargar pero conserva los adjuntos, que aparecen tarde.
 
+- Run 43213982753 (12-11 09:00): Compra Ágil 429 a la **1.ª** solicitud (Retry-After None); exit 3; correo con 10
+  ítems (MP 5.106 escaneadas, PNUD 553, ChileCompra 5). Ninguna otra corrida usó la API ese día. Cuarto día seguido
+  sin Compra Ágil (09 y 10-11 504; 11 y 12-11 429). El respaldo de las 19:35 UTC saltó bien (1 corrida del día).
+- Run 43298566921 (relanzada por Sergio, 20:15 UTC): listado leyó 199 páginas, 9.428 publicadas, 198 con keyword en
+  título, desde 2026-11-08T22:00:43Z; 429 tras 200 solicitudes en la pág. 31/41 del último tramo. Marca
+  **2026-11-12T16:00:43Z**; sin leer 16:00:43Z a 20:16:10Z (lo retoma la corrida del 13-11). Correo con 203 ítems.
+  No se perdió nada por `LISTADO_DIAS_MAX`. El 429 de la mañana y los 200 de la tarde siguen sin umbral a la vista.
+
 ### Pendiente
-- No se revisó la corrida del 12-11 (si la API de Compra Ágil volvió o siguió el 429).
+- 13-11: ver si la corrida de las 09:00 vuelve a dar 429 temprano tras la relanzada de la tarde (posible efecto de
+  ventana del límite; no verificado).
+- Propuesta (no aplicada, decide Sergio): relanzar sola una vez a media tarde cuando la de las 09:00 corte por 429
+  en las primeras solicitudes; hoy la relanzada de las 17:15 Chile funcionó.
 - Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
 
+- Fuera de este repo (sin cambios de código del radar): `postulaciones/_kit/compra-agil/oferta.py` suma dos
+  `CondPageBreak` (títulos que no quedan solos al pie y tabla de cotización entera), por el verificador.
+
 ### Estado del repo
-`main` con esta entrada; sin cambios de código.
+`main` con esta entrada; sin cambios de código. `.claude/` sin seguimiento, como antes. Nada a medio camino.
 
 ## 2026-11-11 — Compra Ágil con 429 tras 7 solicitudes; exclusión de recaudación con POS o tarjetas
 
