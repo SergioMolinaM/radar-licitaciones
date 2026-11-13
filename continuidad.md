@@ -7,6 +7,35 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-13 — filtro de tiers en empleos PNUD; Compra Ágil 429 a la 4.ª solicitud
+
+### Hecho
+- Run 43421530977 (13-11 09:00, 1 min 42 s): Compra Ágil 429 tras 4 solicitudes (3/67 páginas del tramo
+  2026-11-12T14:00:43Z, Retry-After None), así que la relanzada de la tarde del 12-11 no evitó el 429 temprano.
+  Marca sigue en 2026-11-12T16:00:43Z; sin leer de 14:00:43Z al 13-11 12:00:57Z. Correo con 2 ítems
+  (1076403-15-LE26 y el empleo PNUD 38051). Quinto día seguido sin Compra Ágil por la mañana.
+- `src/sources/undp_empleos.py`: nueva `_tiers()`. El empleo 38051 «Open to Tier 0 & 1 & 2» pasaba porque el
+  filtro buscaba el texto «tier 1». Ahora un aviso queda fuera si el título restringe a tiers sin el 3 (el portal:
+  «Tier 3 or no tier indicated: … other external candidates»), también en Chile. Lee rangos, «Tier X & Tier 3»,
+  «or», «through», romanos, «Tier(s)» y números de vacantes. Ante una palabra que no conoce, o con «external» o
+  «above», deja pasar el aviso.
+  Se descartó la regla de lista negra por patrón (primera versión): el verificador midió que con «Tiers 1-3»,
+  «Tier 2 and Tier 3» o «1, 2 and external» escondía avisos postulables.
+  Es mejor para el producto porque el correo deja de mostrar empleos internos y un aviso abierto no se pierde
+  por una redacción nueva.
+  Costo, no criterio: nada.
+  Medido: 64 tests OK. Portal real: 7 remotos, pasa solo el 36167; los 23 títulos con tier de los 106 vigentes se
+  leen bien. Quedan 4 variantes sintéticas que dejan pasar un aviso no postulable («Tier 3 Support Analyst (Open
+  to Tier 1 & 2)», «Tier 1 & 2, Ref 3»), aceptadas. Verificador: FALLA, FALLA (redacciones con palabra
+  desconocida), corregido; la tercera pasada la corrí con sus scripts (46 variantes, 42 bien).
+
+### Pendiente
+- Compra Ágil: la propuesta de relanzar sola a media tarde tras un 429 temprano sigue sin decisión de Sergio.
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con el cambio del filtro y esta entrada.
+
 ## 2026-11-12 — solo configuración (sesión de la raíz)
 
 - `.gitignore`: se agrega `.claude/worktrees/` (copias de trabajo de subagentes que aparecían sin seguimiento). Sin cambios de código.

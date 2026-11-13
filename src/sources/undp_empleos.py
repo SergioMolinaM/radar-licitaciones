@@ -68,18 +68,70 @@ def _cierre_chile(iso: str | None) -> str:
         return ""
 
 
+_ROMANOS = {"i": 1, "ii": 2, "iii": 3}
+_ENLACES_TIER = {"tier", "tiers", "and", "or", "&", ",", "/", "+", ":"}
+_RANGO_TIER = {"-", "–", "—", "to", "through", "thru"}
+# Palabras con que termina una cláusula restringida conocida. Cualquier otra palabra
+# deja la cláusula como no entendida y el aviso pasa al correo (perder un aviso
+# postulable es peor que mostrar uno que no lo es).
+_FIN_TIER = {"applicants", "applicant", "only", "staff", "personnel"}
+# «3 positions», «2 posts»: el número es de vacantes, no de tier, y cierra la cláusula.
+_VACANTES = ("position", "post", "opening", "vacanc", "seat")
+
+
+def _tiers(titulo: str) -> set[int] | None:
+    """Tiers a los que el título restringe, o None si no restringe o no se entiende.
+    Lee la cláusula desde la primera «tier» hasta el «)» o «]» que la cierra:
+    «Tier 0, 1 & 2» -> {0,1,2}; «Tiers 1-3», «1 through 3» -> {1,2,3}; «Tier 1 & Tier 3»
+    -> {1,3}; «Tier1», «Tier(s) 1 & 2», «Tier I & II». «external» o «above» en la
+    cláusula -> incluye a los externos (Tier 3)."""
+    t = titulo.replace("tier(s)", "tiers")
+    m = re.search(r"\btiers?(?=[\s\-\d:]|$)[^)\]]*", t)
+    if not m:
+        return None
+    tokens = re.findall(r"\d+|[a-z]+|[&,/+:\-–—]", m.group(0))
+    if "external" in tokens or "above" in tokens:
+        return {3}
+    nums: list[int] = []
+    rango = False
+    for i, tok in enumerate(tokens):
+        if tok in _ENLACES_TIER:
+            continue
+        if tok in _RANGO_TIER:
+            rango = True
+            continue
+        if tok in _FIN_TIER:
+            break
+        n = int(tok) if tok.isdigit() else _ROMANOS.get(tok)
+        if n is None:
+            return None
+        if i + 1 < len(tokens) and tokens[i + 1].startswith(_VACANTES):
+            break
+        if rango and nums:
+            nums.extend(range(nums[-1] + 1, n + 1))
+        else:
+            nums.append(n)
+        rango = False
+    return set(nums) or None
+
+
 def _postulable(req: dict, det: dict) -> bool:
-    """Lo de Chile pasa siempre. Lo remoto, solo si un externo en Chile puede postular:
-    fuera los contratos nacionales de otro país, los restringidos a nacionales o a
-    personal interno (Tier 1 y 2) y las pasantías. Medido el 26-oct-2026: de 7 remotos
-    pasaba 1 (IPSA, abierto a externos)."""
+    """Solo lo que un externo en Chile puede postular. Fuera, en todo país: lo restringido
+    a personal interno (Tier 0, 1 y 2 sin Tier 3; el portal dice «Tier 3 or no tier
+    indicated: … other external candidates»). Lo de Chile pasa en lo demás. Lo remoto,
+    además, sin contratos nacionales de otro país, restringidos a nacionales ni pasantías.
+    Medido el 26-oct-2026: de 7 remotos pasaba 1 (IPSA, abierto a externos)."""
+    titulo = (req.get("Title") or "").lower()
+    # «Open to Tier 0 & 1 & 2» pasaba con el antiguo «"tier 1" in titulo» (aviso 38051, 13-nov-2026).
+    tiers = _tiers(titulo)
+    if tiers is not None and 3 not in tiers:
+        return False
     if req.get("PrimaryLocationCountry") == "CL":
         return True
     flex = {f.get("Prompt"): f.get("Value") for f in (det.get("requisitionFlexFields") or [])}
-    titulo = (req.get("Title") or "").lower()
     tipo = (flex.get("Vacancy Type") or det.get("RequisitionType") or "").lower()
     # «intern» con borde de palabra: sin él, «Open to internal and external» quedaba fuera.
-    if "nationals of" in titulo or "tier 1" in titulo or re.search(r"\bintern(ship)?\b", titulo):
+    if "nationals of" in titulo or re.search(r"\bintern(ship)?\b", titulo):
         return False
     return not tipo.startswith(("national", "internship"))
 

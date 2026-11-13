@@ -60,6 +60,8 @@ class EmpleosPnud(unittest.TestCase):
         from src.sources.undp_empleos import _postulable
         req = {"Title": "Asistente de Edición - UCE - NPSA5", "PrimaryLocationCountry": "CL"}
         self.assertTrue(_postulable(req, self._det("National Personnel Service Agreement")))
+        req = {"Title": "Asistente (Open to Tier 0, 1 & 2 applicants)", "PrimaryLocationCountry": "CL"}
+        self.assertFalse(_postulable(req, self._det("National Personnel Service Agreement")))
 
     def test_remotos(self):
         from src.sources.undp_empleos import _postulable
@@ -68,6 +70,30 @@ class EmpleosPnud(unittest.TestCase):
              "[Open to internal and external candidates]", "International Personnel Services Agreement", True),
             ("Procurement Analyst (Open to Nationals of Kenya or with Kenyan work permit)", "Fixed Term", False),
             ("Communications and Research Analyst [Open to Tier 1 & 2 Applicants]", "Fixed Term", False),
+            ("Inclusive Value Chains Analyst (Open to Tier 0 & 1 & 2 applicants)",
+             "International Personnel Service Agreement", False),
+            ("Programme Analyst (Open to Tier 0, 1, 2 and 3 applicants)",
+             "International Personnel Service Agreement", True),
+            ("Data Specialist [Tier 3]", "International Personnel Service Agreement", True),
+            ("Policy Specialist (Open to Tiers 1-3)", "International Personnel Service Agreement", True),
+            ("Policy Specialist (Tiers 1 to 3)", "International Personnel Service Agreement", True),
+            ("Policy Specialist (Open to Tier 1 & Tier 3)", "International Personnel Service Agreement", True),
+            ("Policy Specialist (Tier 2 or 3)", "International Personnel Service Agreement", True),
+            ("Policy Specialist (Tier1 & 2)", "International Personnel Service Agreement", False),
+            ("Policy Specialist (Tier I & II)", "International Personnel Service Agreement", False),
+            ("Policy Specialist (Tier 1 & 2, 3 positions)", "International Personnel Service Agreement", False),
+            ("Policy Specialist (Tier 1 & 2) - 3 positions", "International Personnel Service Agreement", False),
+            ("Frontier Markets Analyst P3 - 2026 SDG 13", "International Personnel Service Agreement", True),
+            ("Analyst (Open to Tier 1, 2 and external candidates)", "International Personnel Service Agreement",
+             True),
+            ("Analyst (Tier 2 and above)", "International Personnel Service Agreement", True),
+            ("Analyst (Tier 1 through 3)", "International Personnel Service Agreement", True),
+            ("Analyst (Tier 1 & 2 - 3 posts)", "International Personnel Service Agreement", False),
+            ("Analyst (Tier(s) 1 & 2)", "International Personnel Service Agreement", False),
+            ("Analyst (Tier: 1 & 2)", "International Personnel Service Agreement", False),
+            ("Analyst [Open to Tier 0, 1 & 2 applicants]]", "International Personnel Service Agreement", False),
+            ("Specialist (Tier 1 and 2 applicants only)", "International Personnel Service Agreement", False),
+            ("Analyst (Tier 1 & 2 colleagues in Asia)", "International Personnel Service Agreement", True),
             ("SDG Finance and Private Sector Development Research Intern - 36124 (Home Based)", "Internship", False),
             ("National Technical Specialist Roster - Sustainable human development",
              "National Personnel Service Agreement", False),
