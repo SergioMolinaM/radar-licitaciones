@@ -13,3 +13,6 @@ triage/bases-*/
 
 # Notas de negocio en repo privado anidado (31-oct-2026)
 privado/
+
+# Copias de trabajo de subagentes de Claude Code
+.claude/worktrees/
