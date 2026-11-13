@@ -7,6 +7,10 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-12 — solo configuración (sesión de la raíz)
+
+- `.gitignore`: se agrega `.claude/worktrees/` (copias de trabajo de subagentes que aparecían sin seguimiento). Sin cambios de código.
+
 ## 2026-11-12 — sin cambios de código; sesión de ofertas
 
 ### Hecho
