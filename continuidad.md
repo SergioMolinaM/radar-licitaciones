@@ -7,6 +7,23 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-16 — Compra Ágil 429 a la 9.ª solicitud (sexto día); barrido web como respaldo
+
+### Hecho
+- Run 43862655108 (16-11 09:00, 1 min 47 s): listado 8/24 páginas del tramo 2026-11-12T14:00:43Z y 429 tras 9
+  solicitudes (Retry-After None). Marca sigue en 2026-11-12T16:00:43Z; sin leer hasta 2026-11-16T12:00:35Z. Correo
+  con 9 ítems (8 Mercado Público, 1 empleo PNUD). Sexto día seguido sin Compra Ágil por la API.
+- Respaldo por el buscador web (subagente, publicadas 12 al 16-11): 350 fichas, sin 403 ni captcha. Sin cambios de
+  código del radar.
+
+### Pendiente
+- Con el tope de 4 días, la corrida del 17-11 deja sin leer 2026-11-12T14:00Z a ~13-11 12:00Z (casi todo ya cerró).
+- La propuesta de relanzar sola a media tarde tras un 429 temprano sigue sin decisión de Sergio.
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código.
+
 ## 2026-11-13 — filtro de tiers en empleos PNUD; Compra Ágil 429 a la 4.ª solicitud
 
 ### Hecho
