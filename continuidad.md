@@ -7,6 +7,27 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-17 — Compra Ágil 429 a la 10.ª solicitud (séptimo día); barrido web cortado por el buscador
+
+### Hecho
+- Run 44079068418 (17-11 09:00, 2 min 2 s): listado 9/17 páginas del tramo 2026-11-13T12:00:44Z, 450 publicadas, 5
+  con keyword; 429 tras 10 solicitudes (Retry-After None). Marca sigue en 2026-11-12T16:00:43Z. Hueco definitivo por
+  el tope de 4 días: 2026-11-12T16:00:43Z a 2026-11-13T12:00:44Z. Sin leer: 13-11 12:00Z a 17-11 12:00Z. Correo con 16
+  ítems (Compra Ágil 5, Mercado Público 11). Diarios de q sin respuesta (19 términos). Séptimo día seguido.
+- Respaldo por el buscador web (subagente, publicadas 16 y 17-11): 41 fichas; desde ~13:30 el buscador falló en casi
+  todos los términos («No ha sido posible obtener el listado»); quedaron sin buscar ~20 términos. Sin 403 ni captcha.
+- La ficha `compra-agil.mercadopublico.cl/resumen-cotizacion/<código>` sin sesión redirige a `mercadopublico.cl/Home`;
+  con sesión carga el formulario. Tras enviar, la URL pasa a `cotizacion-publicada?quote=<código>`.
+- Sin cambios de código.
+
+### Pendiente
+- Relanzar sola a media tarde tras un 429 temprano: sigue sin decisión de Sergio (recomendado el 17-11).
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código. `firestore-debug.log`, `node_modules/` y `package.json` sin
+seguimiento, de otra sesión: no tocados.
+
 ## 2026-11-16 — Compra Ágil 429 a la 9.ª solicitud (sexto día); barrido web como respaldo
 
 ### Hecho
