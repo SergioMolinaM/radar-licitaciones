@@ -7,6 +7,24 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-18 — Compra Ágil 429 a la 2.ª solicitud (octavo día); respaldo por el buscador web
+
+### Hecho
+- Run 44299778514 (18-11 09:00): Compra Ágil respondió 429 tras 2 solicitudes. Octavo día seguido. El tope
+  `LISTADO_DIAS_MAX` (4 días) sigue dejando huecos definitivos mientras dure el 429.
+- Respaldo por buscador.mercadopublico.cl para las publicadas del día.
+- Adjuntos de Compra Ágil: `GET servicios-compra-agil.mercadopublico.cl/v1/adjuntos-compra-agil/descargar/<GUID>`
+  es público (sin sesión) y baja el archivo con `curl -L -o`.
+- Sin cambios de código.
+
+### Pendiente
+- Relanzar sola a media tarde tras un 429 temprano: sigue sin decisión de Sergio (recomendado el 17-11).
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código. `firestore-debug.log`, `node_modules/` y `package.json` sin
+seguimiento, de otra sesión: no tocados.
+
 ## 2026-11-17 — Compra Ágil 429 a la 10.ª solicitud (séptimo día); barrido web cortado por el buscador
 
 ### Hecho
