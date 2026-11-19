@@ -7,6 +7,32 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-19 — Compra Ágil 429 (noveno día); relanzada a mano por la tarde; mantención anunciada de la API
+
+### Hecho
+- Run 44519833120 (19-11 09:00, 2 min 10 s): listado 9 páginas desde 2026-11-15T12:00:39Z, 293 publicadas, 1 con
+  keyword; 429 tras 10 solicitudes (Retry-After None). Hueco definitivo por el tope de 4 días: 2026-11-14T18:00:38Z a
+  2026-11-15T12:00:39Z. Correo con 12 ítems. Noveno día seguido.
+- Run 44580442971 (relanzada a mano, 17:44 UTC, 15 min 47 s; decisión de Sergio del 18-11): 119 páginas, 5.632
+  publicadas, 117 con keyword; 429 tras 120 solicitudes. Marca 2026-11-18T16:00:39Z; sin leer de ahí a
+  2026-11-19T17:44:57Z. Correo con 120 ítems. Igual que el 12-11: la corrida de la tarde lee mucho más que la de las 09:00.
+- Aviso de ChileCompra en la portada de Mercado Público (19-11): la API de Compra Ágil «podría presentar
+  indisponibilidades» desde las 20:00 del 19-11 hasta ~08:00 del 20-11 por mantención programada.
+- Respaldo por el buscador web (subagentes, publicadas 18 y 19-11). Los GUID de los adjuntos de Compra Ágil se ven en el
+  registro de recursos de la página al hacer clic en cada archivo de la ficha; luego `curl -L -o` al endpoint público.
+- Formulario `resumen-cotizacion`: si la página se recarga antes de enviar, se pierden los campos y los adjuntos
+  reaparecen tarde y se duplican al resubir (medido en una oferta del 19-11).
+- Sin cambios de código.
+
+### Pendiente
+- Programar el relanzamiento automático a media tarde cuando la corrida de las 09:00 corte por 429 en las primeras
+  solicitudes (decidido por Sergio el 18-11; hoy se hizo a mano). Es el primer trabajo técnico del 20-11.
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código. `firestore-debug.log`, `node_modules/` y `package.json` sin
+seguimiento, de otra sesión: no tocados.
+
 ## 2026-11-18 — Compra Ágil 429 a la 2.ª solicitud (octavo día); respaldo por el buscador web
 
 ### Hecho
