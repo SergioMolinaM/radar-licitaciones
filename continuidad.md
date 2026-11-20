@@ -7,6 +7,25 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-20 — Corrida sin 429 (37 min, 145 páginas); sesión de triage y ofertas
+
+### Hecho
+- Run 44732153388 (20-11 09:00, 37 min 39 s): listado de Compra Ágil sin 429, 145 páginas desde
+  2026-11-18T14:00:39Z, 6.896 publicadas, 141 con keyword en el título, marca 2026-11-20T12:00:44Z; q 'municipal'
+  cortada a 5 páginas; correo con 328 ítems. Primera corrida sin 429 desde el 11-11 (después de la mantención de la
+  API anunciada para la noche del 19-11; relación no verificada).
+- Sin cambios de código. El triage, las ofertas y sus decisiones van en `privado/continuidad.md`.
+- Chrome: subagentes en paralelo comparten el grupo de pestañas de Claude; una sesión puede navegar o cerrar el grupo de
+  otra (visto el 20-11). Las pestañas que quedan fuera del grupo no se pueden cerrar con `tabs_close_mcp`.
+
+### Pendiente
+- Relanzamiento automático a media tarde tras un 429 temprano (decidido el 18-11): sin hacer; hoy no hizo falta.
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código. `firestore-debug.log`, `node_modules/` y `package.json` sin
+seguimiento, de otra sesión: no tocados.
+
 ## 2026-11-19 — Compra Ágil 429 (noveno día); relanzada a mano por la tarde; mantención anunciada de la API
 
 ### Hecho
