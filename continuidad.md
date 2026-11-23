@@ -7,6 +7,33 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-23 — Corrida sin 429 (29 min, 81 páginas, 215 ítems); sesión de ofertas
+
+### Hecho
+- Run 45170208649 (23-11 09:00, 29 min 26 s): listado de Compra Ágil sin 429, 81 páginas desde 2026-11-20T10:00:44Z,
+  3.604 publicadas, 83 con keyword en el título, marca 2026-11-23T12:00:57Z. Correo con 215 ítems (Compra Ágil por
+  título 78, Mercado Público 13, por palabra suelta 124). Diarios «digital» y «audiovisual» sin respuesta; rotativos
+  electrónica, papel y trabajo en pausa. Segunda corrida seguida sin 429.
+- Sin cambios de código. Las ofertas del día y sus decisiones van en `privado/continuidad.md`.
+- Adjuntos de Compra Ágil sin descarga a Descargas: en la ficha `resumen-cotizacion/<código>` se anula
+  `HTMLAnchorElement.prototype.click` y `window.open` por JS y se dispara `dispatchEvent(new MouseEvent('click'))` sobre el
+  enlace; el GUID queda en `performance.getEntriesByType('resource')` (`comprador/descargar?id=<GUID>`) y el archivo se
+  baja con `curl -L` a `servicios-compra-agil.mercadopublico.cl/v1/adjuntos-compra-agil/descargar/<GUID>`. Subir
+  `performance.setResourceTimingBufferSize(2000)` antes: con el búfer lleno no aparece la entrada.
+- Chrome: hacer clic real en varios adjuntos seguidos dispara el aviso de «descargar varios archivos» y la pestaña deja
+  de responder (timeouts de 30 s); el tabId de la pestaña cambia tras cada recarga: releer `tabs_context_mcp`.
+- Docx de anexos con casilla de control de contenido (`w14:checkbox`): se marca poniendo `w14:checked w14:val="1"` y el
+  texto `☒`; Word (COM) convierte docx a PDF en este equipo (no hay docx2pdf ni pdftoppm).
+
+### Pendiente
+- Triage escrito del 23-11 (`privado/triage/2026-11-23-*.md`): no se escribió; quedan 151 ítems abiertos del correo.
+- Relanzamiento automático a media tarde tras un 429 temprano (decidido el 18-11): sin hacer; hoy no hizo falta.
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código. `firestore-debug.log`, `node_modules/` y `package.json` sin
+seguimiento, de otra sesión: no tocados.
+
 ## 2026-11-20 — Corrida sin 429 (37 min, 145 páginas); sesión de triage y ofertas
 
 ### Hecho
