@@ -24,9 +24,14 @@ La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Ent
   de responder (timeouts de 30 s); el tabId de la pestaña cambia tras cada recarga: releer `tabs_context_mcp`.
 - Docx de anexos con casilla de control de contenido (`w14:checkbox`): se marca poniendo `w14:checked w14:val="1"` y el
   texto `☒`; Word (COM) convierte docx a PDF en este equipo (no hay docx2pdf ni pdftoppm).
+- Sesión de la noche (sin cambios de código): en pwsh 7 no existe `[Runtime.InteropServices.Marshal]::GetActiveObject`;
+  para ver o cerrar un documento abierto en Word se llama a `powershell.exe` (5.1). El grupo de pestañas de Claude en
+  Chrome desapareció entre dos turnos («tab group no longer exists»): `tabs_context_mcp` con `createIfEmpty` y pestaña
+  nueva. Los adjuntos de Compra Ágil se suben con `file_upload` sobre el input oculto, uno por llamada.
 
 ### Pendiente
-- Triage escrito del 23-11 (`privado/triage/2026-11-23-*.md`): no se escribió; quedan 151 ítems abiertos del correo.
+- Triage del 23-11: escrito solo lo que cerraba el 24-11 (`privado/triage/2026-11-23-compra-agil.md`); quedan 151
+  ítems abiertos del correo.
 - Relanzamiento automático a media tarde tras un 429 temprano (decidido el 18-11): sin hacer; hoy no hizo falta.
 - Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
 
