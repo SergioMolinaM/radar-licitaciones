@@ -7,6 +7,27 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-24 — Compra Ágil 429 tras 6 solicitudes; sesión de ofertas
+
+### Hecho
+- Run 45389350675 (24-11 09:00, 1 min 49 s): listado de Compra Ágil cortado por 429 tras 6 solicitudes (Retry-After
+  None); lo publicado de 2026-11-23T10:00:57Z a 2026-11-24T12:00:40Z queda para la próxima corrida. Diarios de q sin
+  respuesta (19 términos). Correo con 16 ítems (Compra Ágil 7, Mercado Público 6, PNUD Bolivia 2, PNUD Chile 1).
+- Sin cambios de código. Ofertas y decisiones en `privado/continuidad.md`.
+- Ficha pública `buscador.mercadopublico.cl/ficha?code=` carga los campos con 20-30 s de demora; los adjuntos se ven y
+  el GUID sale por `dispatchEvent` igual que en `resumen-cotizacion`. Sin sesión, `resumen-cotizacion` redirige a Home.
+- Formulario de Compra Ágil: si el grupo de pestañas de Claude desaparece, el formulario a medio llenar se pierde; al
+  reabrir, los adjuntos del intento anterior reaparecen y se duplican (se eliminan con JS sobre el enlace «Eliminar»).
+- `python -I` ignora `PYTHONIOENCODING`: para imprimir UTF-8 en pwsh se usa `python -I -X utf8`.
+
+### Pendiente
+- Relanzar a media tarde por el 429 temprano (decisión del 18-11).
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código. `firestore-debug.log`, `node_modules/` y `package.json` sin
+seguimiento, de otra sesión: no tocados.
+
 ## 2026-11-23 — Corrida sin 429 (29 min, 81 páginas, 215 ítems); sesión de ofertas
 
 ### Hecho
