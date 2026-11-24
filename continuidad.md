@@ -7,6 +7,27 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-24 (tarde) — relanzada sin 429: 148 páginas, 533 ítems
+
+### Hecho
+- Run 45443988622 (relanzada por Sergio con `gh workflow run scanner.yml -R SergioMolinaM/radar-licitaciones`,
+  17:02 UTC, 34 min): listado de Compra Ágil sin 429, 148 páginas desde 2026-11-23T10:00:57Z, 7.174 publicadas, 159 con
+  keyword en el título, marca 2026-11-24T17:02:19Z. Palabras sin respuesta a pausa: «electrónicos», «servicios».
+  Correo con 533 ítems (Compra Ágil por título 156, por palabra suelta 373, Mercado Público 2, PNUD 1, ChileCompra 1).
+- Relanzar desde Claude Code lo frenó el clasificador de permisos; Sergio lo corre con `!`. El `!` usa bash: la
+  sintaxis de PowerShell `(git … )` falla; usar el repo literal.
+- Guardias: un comando de PowerShell con caracteres no ASCII (Á, ·) dentro de `python -c` hace fallar
+  `guard-antecedentes.py` con UnicodeEncodeError (falla cerrado); escribir el script a un .py en el scratchpad.
+- Sin cambios de código. Ofertas y triage en `privado/`.
+
+### Pendiente
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+- Relanzamiento automático tras 429 temprano (decisión del 18-11): sigue a mano.
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código. `firestore-debug.log`, `node_modules/`, `package.json` y dos `.der`
+sin seguimiento, de otra sesión: no tocados.
+
 ## 2026-11-24 — Compra Ágil 429 tras 6 solicitudes; sesión de ofertas
 
 ### Hecho
