@@ -7,6 +7,24 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-25 — Compra Ágil 429 tras 11 solicitudes; filtro de tiers deja pasar «Tier 1 y Tier 2»
+
+### Hecho
+- Run 45609619850 (25-11 09:00, 2 min 20 s): listado de Compra Ágil cortado por 429 tras 11 solicitudes (Retry-After
+  None); lo publicado desde 2026-11-24T15:02:19Z queda para la próxima corrida. Correo con 20 ítems (Compra Ágil 11,
+  Mercado Público 8, empleo PNUD 1). Sin cambios de código. Ofertas y triage en `privado/`.
+- El empleo PNUD 38261 «[Abierto a candidatos/as de las categorías Tier 1 y Tier 2]» pasó el filtro de
+  `src/sources/undp_empleos.py` `_tiers()`: no lee la conjunción «y» en español.
+
+### Pendiente
+- `_tiers()`: aceptar «y» como «&»/«and» (con test del título del 38261); no hecho hoy.
+- Relanzar a media tarde por el 429 (decisión del 18-11; Sergio con `!`).
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código. Los archivos sueltos de otra sesión (`node_modules/`, `package.json`
+de un npm init, `firestore-debug.log`, dos `.der` de munipunitaqui.cl) van a `.gitignore`; no se borraron.
+
 ## 2026-11-24 (tarde) — relanzada sin 429: 148 páginas, 533 ítems
 
 ### Hecho

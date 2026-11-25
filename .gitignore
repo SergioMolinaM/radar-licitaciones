@@ -16,3 +16,9 @@ privado/
 
 # Copias de trabajo de subagentes de Claude Code
 .claude/worktrees/
+
+# Restos de otras sesiones (25-11-2026): npm init suelto, logs del emulador, certificados bajados
+node_modules/
+/package.json
+*.log
+*.der
