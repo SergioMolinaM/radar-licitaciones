@@ -69,12 +69,19 @@ def _cierre_chile(iso: str | None) -> str:
 
 
 _ROMANOS = {"i": 1, "ii": 2, "iii": 3}
-_ENLACES_TIER = {"tier", "tiers", "and", "or", "&", ",", "/", "+", ":"}
-_RANGO_TIER = {"-", "–", "—", "to", "through", "thru"}
+# Conjunciones en inglés, español y francés: «Tier 1 y Tier 2» (empleo 38261, 25-11-2026) pasaba
+# porque «y» no se conocía.
+_ENLACES_TIER = {"tier", "tiers", "and", "or", "&", ",", "/", "+", ":", "y", "e", "o", "u", "et", "ou"}
+_RANGO_TIER = {"-", "–", "—", "to", "through", "thru", "a", "al", "hasta"}
 # Palabras con que termina una cláusula restringida conocida. Cualquier otra palabra
 # deja la cláusula como no entendida y el aviso pasa al correo (perder un aviso
 # postulable es peor que mostrar uno que no lo es).
-_FIN_TIER = {"applicants", "applicant", "only", "staff", "personnel"}
+_FIN_TIER = {"applicants", "applicant", "candidates", "candidate", "only", "staff", "personnel", "candidatos",
+             "candidatas", "postulantes"}
+# Lo único que puede seguir a una palabra de fin sin abrir la cláusula («candidatos/as internos»).
+_COLA_TIER = _FIN_TIER | {"internal", "internos", "internas", "interno", "interna", "as", "os", "/"}
+# Externos en la cláusula = incluye Tier 3.
+_EXTERNOS_TIER = {"external", "above", "externos", "externas", "externo", "externa", "externes"}
 # «3 positions», «2 posts»: el número es de vacantes, no de tier, y cierra la cláusula.
 _VACANTES = ("position", "post", "opening", "vacanc", "seat")
 
@@ -89,8 +96,16 @@ def _tiers(titulo: str) -> set[int] | None:
     m = re.search(r"\btiers?(?=[\s\-\d:]|$)[^)\]]*", t)
     if not m:
         return None
+    # Solo una cláusula entre ( ) o [ ]: «Analista de proveedores tier 1 y 2» no restringe a nadie
+    # (los 21 títulos reales con «tier» del 26-11-2026 la traen entre paréntesis o corchetes).
+    antes = t[:m.start()]
+    if max(antes.rfind("("), antes.rfind("[")) <= max(antes.rfind(")"), antes.rfind("]")):
+        return None
+    # Otra «tier» o externos después de la cláusula («(Tier 1 y 2) y externos en convocatoria posterior»).
+    if re.search(r"\btier|\bextern", t[m.end():]):
+        return None
     tokens = re.findall(r"\d+|[a-z]+|[&,/+:\-–—]", m.group(0))
-    if "external" in tokens or "above" in tokens:
+    if _EXTERNOS_TIER.intersection(tokens):
         return {3}
     nums: list[int] = []
     rango = False
@@ -100,12 +115,18 @@ def _tiers(titulo: str) -> set[int] | None:
         if tok in _RANGO_TIER:
             rango = True
             continue
+        # Una palabra de fin o un número de vacantes cierran la cláusula, salvo que quede un rango
+        # abierto o vuelva a aparecer «tier» («Tier 1 y 2 candidatos y Tier 3»): entonces no se entiende.
         if tok in _FIN_TIER:
+            if rango or not set(tokens[i + 1:]) <= _COLA_TIER:
+                return None
             break
         n = int(tok) if tok.isdigit() else _ROMANOS.get(tok)
         if n is None:
             return None
         if i + 1 < len(tokens) and tokens[i + 1].startswith(_VACANTES):
+            if {"tier", "tiers"}.intersection(tokens[i + 1:]):
+                return None
             break
         if rango and nums:
             nums.extend(range(nums[-1] + 1, n + 1))

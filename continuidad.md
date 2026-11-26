@@ -7,6 +7,32 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-26 — `_tiers()` lee español y francés y no corta antes de un Tier 3
+
+### Hecho
+- `src/sources/undp_empleos.py` `_tiers()`: conjunciones «y», «e», «o», «u», «et», «ou»; rangos «a», «al», «hasta»;
+  fin de cláusula «candidates», «candidatos», «candidatas», «postulantes»; externos «externos/as», «externes». Tras
+  una palabra de fin solo se acepta una lista blanca (`_COLA_TIER`: «internal», «internos», «/as»…); cualquier otra
+  palabra, otra «tier» o un rango abierto dejan la cláusula como no entendida (pasa al correo). La «tier» tiene que
+  estar dentro de `( )` o `[ ]`, y si después de la cláusula aparece otra «tier» o «extern…», pasa.
+  Se eligió lista blanca después del corte en vez de solo sumar «y» a los enlaces.
+  Se descartó la primera versión (solo sumar palabras): el verificador midió que con «Tier 1 y 2 candidatos y Tier 3»
+  o «candidates, then open to all» escondía avisos postulables.
+  Es mejor para el producto porque el correo deja de mostrar empleos internos en español sin esconder ninguno abierto.
+  Costo, no criterio: nada.
+  Medido: 64 tests OK (15 títulos nuevos en `test_remotos`). Portal real del 26-11 (130 avisos, 21 con «tier»): cambian
+  solo 38261 (CL, None → {1,2}), 38133 y 38134 (CF y CD, «candidates only», None → {0,1,2}). 73 títulos inventados sin
+  falsos negativos. Verificador: FALLA, FALLA, PASA.
+- Quedan pasando siendo internos (ruido del lado seguro): «únicamente», «solamente», «uniquement», «candidats», títulos
+  sin paréntesis ni corchetes, corchetes anidados.
+
+### Pendiente
+- Relanzar a media tarde por el 429 (decisión del 18-11; Sergio con `!`).
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con el cambio de `_tiers()`, sus tests y esta entrada.
+
 ## 2026-11-25 — Compra Ágil 429 tras 11 solicitudes; filtro de tiers deja pasar «Tier 1 y Tier 2»
 
 ### Hecho
