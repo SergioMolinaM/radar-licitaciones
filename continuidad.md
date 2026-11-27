@@ -7,6 +7,37 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-27 — CNA migró a WordPress: la fuente lee wp-json
+
+### Hecho
+- Run 45995021153 (27-11 09:00, 16 min 37 s): Compra Ágil sin 429, listado completo desde 2026-11-26T21:17:22Z (7
+  páginas, 282 publicadas, 6 con keyword en el título), marca 2026-11-27T12:00:45Z. Correo con 93 ítems (Compra Ágil
+  por título 5, Mercado Público 1, por palabra suelta 87). Triage en `privado/`.
+- CNA: desde la relanzada del 26-11 23:49 UTC las listas de SharePoint (`/noticias/_api/web/GetList(...)`) dan 404; el
+  26-11 12:01 UTC respondían. El sitio pasó a WordPress (`/noticias/Paginas/default.aspx` redirige a `/noticias/`).
+  `src/sources/cna.py` lee `/wp-json/wp/v2/posts` y `/wp/v2/media` con `after=` (ventana de 14 días), paginado de a
+  100 siguiendo `X-WP-TotalPages` (tope 30 páginas; sin la cabecera o sobre el tope, ok=False). Un archivo se salta
+  solo si su entrada avisó en la misma corrida. Fecha del aviso en hora de Chile desde `date_gmt` (el sitio está en
+  Europe/Madrid). En archivos, la fecha es la más antigua entre la subida y el fin del mes de su carpeta.
+  Se eligió leer la API pública wp-json.
+  Se descartó leer el HTML de `/noticias/`: depende del maquetado (Bricks) y no trae los archivos sin noticia.
+  Es mejor para el producto porque vigila entradas y archivos con fecha y paginación declaradas por el sitio.
+  Costo, no criterio: 2 a 5 solicitudes más por corrida.
+  Medido contra el sitio real: 14 días, 3 entradas y 143 archivos, 0 avisos, ok=True; 60 días, 8 y 890, 0 avisos;
+  330-400 días, avisa la entrada 739 («CNA-Chile abre Concurso Público para integrar el Registro de Pares
+  Evaluadores…», 16/01/2026) y media da ok=False por el tope. 64 tests OK. Verificador: FALLA (sin paginar, comentarios
+  falsos), FALLA (archivos con `post` sin vigilar, página vacía y cabecera ausente con ok=True, hora de Madrid), PASA.
+- Clasificador de permisos: frenó un `curl -k` a la CNA y un `fetch` por JS dentro de su página; no se rodeó. El
+  certificado de la CNA valida ahora sin `-k`.
+
+### Pendiente
+- Riesgos aceptados (verificador): un archivo histórico subido de nuevo sin entrada avisaría; si caen las entradas un
+  día, el mismo llamado puede avisar dos veces; las páginas del registro (ids 1926, 1438, 1010) no se vigilan.
+- Lo de las entradas anteriores sigue (relanzamiento tras 429, sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con el cambio de `src/sources/cna.py` y esta entrada.
+
 ## 2026-11-26 (noche) — relanzada sin 429: 160 páginas, 735 ítems
 
 ### Hecho

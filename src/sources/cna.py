@@ -1,15 +1,23 @@
 """CNA: aviso cuando se abre un llamado al Registro de Pares Evaluadores.
 
 Pedido de David (16-oct-2026): saber cuándo se abre para postular. La CNA no tiene
-RSS; el sitio es SharePoint y sus listas responden por API. Se miran dos:
-- noticias (/noticias/Paginas): los llamados de 2015, 2016, 2017 y ene-2026 salieron
-  como noticia («CNA busca pares evaluadores de pregrado», «CNA-Chile abre Concurso
-  Público para integrar el Registro de Pares Evaluadores…»);
-- archivos (/noticias/SiteAssets): las bases institucionales de dic-2015 y de 2020
-  (el concurso que renovó el registro) están ahí y no tienen noticia.
-Cursos, jornadas y talleres son para pares ya inscritos: no son llamados.
+RSS. Desde el 26-nov-2026 el sitio es WordPress (antes SharePoint: las listas
+/noticias/Paginas y /noticias/SiteAssets dan 404 y /noticias/Paginas/default.aspx
+redirige a /noticias/). Se miran dos colecciones de la API pública wp-json:
+- entradas (/wp/v2/posts): en SharePoint los llamados de 2015, 2016, 2017 y ene-2026
+  salieron como noticia; en WordPress la entrada más antigua es de jul-2020 y está la
+  del 16-01-2026 («CNA-Chile abre Concurso Público para integrar el Registro de Pares
+  Evaluadores…», id 739; verificador, 27-11-2026);
+- archivos (/wp/v2/media): en SharePoint las bases de dic-2015 y de 2020 se subieron
+  sin noticia. En WordPress no están (verificador, 27-11), pero un llamado nuevo puede
+  volver a salir así, también colgado de una página o de un tipo propio del sitio
+  (`documento`, `investigacion`…: 432 de los 709 archivos con `post`). Solo se salta el
+  archivo cuya entrada ya avisó en la misma corrida, para no avisar dos veces.
+Cursos, jornadas y talleres son para pares ya inscritos: no son llamados. Las páginas
+de WordPress sobre el registro (ids 1926, 1438, 1010) no se miran, igual que antes.
 """
 
+import html
 import logging
 import re
 import socket
@@ -19,18 +27,29 @@ import unicodedata
 import warnings
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import unquote
 
 import certifi
 import requests
 
 logger = logging.getLogger(__name__)
 
-API = "https://www.cnachile.cl/noticias/_api/web/GetList('{lista}')/items?$select={campos}&$orderby=Created%20desc&$top=40"
+# Solo lo publicado dentro de la ventana (after=), paginado de a 100 (máximo de WordPress). La migración
+# subió hasta 2.976 archivos en un día y el lunes junta tres días: 40 sin paginar dejaba bases sin ver
+# (verificador, 27-11-2026: 132 archivos en la ventana, el último en la posición 139).
+API = ("https://www.cnachile.cl/wp-json/wp/v2/{coleccion}?per_page=100&page={pagina}&after={desde}"
+       "&orderby=date&order=desc&_fields={campos}")
+MAX_PAGINAS = 30  # 3.000 ítems; si no alcanza, la revisión queda parcial (ok=False)
 LISTAS = (
-    ("/noticias/Paginas", "Title,Created,ArticleStartDate,FileRef"),
-    ("/noticias/SiteAssets", "Created,FileRef"),
+    ("posts", "id,date,date_gmt,link,title"),
+    ("media", "id,date,date_gmt,source_url,title,post"),
 )
+# La carpeta /uploads/AAAA/MM/ es casi siempre el mes de subida (4.370 de 4.509 archivos, verificador
+# 27-11), pero la migración dejó algunos con subida 26-11 en una carpeta anterior
+# (RESOLUCION-EXENTA-RACL-N°0113-26 en /uploads/2026/10/). Se toma la fecha más antigua de las dos. No
+# protege de un archivo histórico subido de nuevo hoy: ese avisaría (ruido del lado seguro).
+_CARPETA = re.compile(r"/wp-content/uploads/(\d{4})/(\d{2})/")
+_DOMINIO = re.compile(r"^https://(www\.)?cnachile\.cl/")
 TIMEOUT = 30
 VENTANA_DIAS = 14  # solo lo reciente: el histórico no debe avisar como nuevo
 
@@ -128,32 +147,85 @@ def es_convocatoria_pares(texto: str) -> bool:
     return bool(_PARES.search(t) and _LLAMADO.search(t) and not _NO_ES_LLAMADO.search(t))
 
 
-def _fecha(n: dict):
-    """La más reciente entre creación y publicación; None si no hay fecha legible."""
-    fechas = []
-    for f in (n.get("Created"), n.get("ArticleStartDate")):
-        try:
-            d = datetime.fromisoformat(str(f).replace("Z", "+00:00"))
-            fechas.append(d if d.tzinfo else d.replace(tzinfo=timezone.utc))
-        except ValueError:
-            continue
-    return max(fechas) if fechas else None
-
-
-def _aviso(n: dict, desde):
-    ref = n.get("FileRef")
-    if not isinstance(ref, str) or not ref:
+def _fecha(n: dict, link: str):
+    """Fecha de publicación (date_gmt, UTC); en archivos, acotada al fin del mes de su carpeta.
+    None si no hay fecha legible."""
+    try:
+        d = datetime.fromisoformat(str(n.get("date_gmt")).replace("Z", "+00:00"))
+    except ValueError:
         return None
-    titulo = (n.get("Title") or "").strip() or ref.rsplit("/", 1)[-1]
-    fecha = _fecha(n)
-    if not fecha or fecha < desde or not es_convocatoria_pares(f"{titulo} {ref.rsplit('/', 1)[-1]}"):
+    d = d if d.tzinfo else d.replace(tzinfo=timezone.utc)
+    m = _CARPETA.search(link)
+    if m:
+        anio, mes = int(m.group(1)), int(m.group(2))
+        if 1 <= mes <= 12 and 1 <= anio < 9999:
+            sig = datetime(anio + (mes == 12), mes % 12 + 1, 1, tzinfo=timezone.utc)
+            d = min(d, sig - timedelta(seconds=1))
+    return d
+
+
+def _fecha_chile(d: datetime) -> str:
+    """dd/mm/aaaa en hora de Chile. El campo `date` de WordPress no sirve: el sitio está en
+    Europe/Madrid (gmt_offset 1, verificador 27-11). Sin base de zonas horarias, la UTC."""
+    try:
+        from zoneinfo import ZoneInfo
+        d = d.astimezone(ZoneInfo("America/Santiago"))
+    except Exception:
+        pass
+    return d.strftime("%d/%m/%Y")
+
+
+def _titulo(n: dict) -> str:
+    t = n.get("title")
+    t = t.get("rendered") if isinstance(t, dict) else t
+    return html.unescape(re.sub(r"<[^>]+>", "", t or "")).strip()
+
+
+def _aviso(n: dict, desde, avisadas=frozenset()):
+    if n.get("post") and n.get("post") in avisadas:  # su entrada ya avisó en esta corrida
+        return None
+    link = n.get("link") or n.get("source_url")
+    if not isinstance(link, str) or not _DOMINIO.match(link):
+        return None
+    archivo = unquote(link.rstrip("/").rsplit("/", 1)[-1])
+    titulo = _titulo(n) or archivo
+    fecha = _fecha(n, link)
+    if not fecha or fecha < desde or not es_convocatoria_pares(f"{titulo} {archivo}"):
         return None
     return {
-        "id": "CNA:" + ref,
+        "id": "CNA:wp:" + str(n.get("id") or link),
         "titulo": titulo,
-        "fecha": fecha.strftime("%d/%m/%Y"),
-        "link": "https://www.cnachile.cl" + quote(ref),
+        "fecha": _fecha_chile(fecha),
+        "link": link,
     }
+
+
+def _leer(lista: str, campos: str, desde: datetime, bundle: str) -> list:
+    """Todas las páginas de la colección publicadas desde `desde`. Lanza si falla o no alcanza."""
+    items = []
+    for pagina in range(1, MAX_PAGINAS + 1):
+        resp = requests.get(
+            API.format(coleccion=lista, pagina=pagina, desde=desde.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                       campos=campos),
+            headers={"Accept": "application/json", "User-Agent": "Mozilla/5.0"},
+            timeout=TIMEOUT,
+            verify=bundle,
+        )
+        resp.raise_for_status()
+        lote = resp.json()
+        if not isinstance(lote, list):
+            raise ValueError("la respuesta no es lista")
+        items += lote
+        # Una página puede traer menos de 100, o ninguno, sin ser la última: WordPress cuenta archivos
+        # que no lista (4.675 contados, 4.509 listados, 27-11). Se sigue solo X-WP-TotalPages; sin esa
+        # cabecera no se sabe si se leyó todo y la revisión queda parcial.
+        try:
+            total = int(resp.headers["X-WP-TotalPages"])
+        except (KeyError, ValueError):
+            raise ValueError("sin X-WP-TotalPages legible")
+        if pagina >= total:
+            return items
+    raise ValueError(f"más de {MAX_PAGINAS} páginas en la ventana")
 
 
 def fetch_convocatorias_pares():
@@ -161,6 +233,7 @@ def fetch_convocatorias_pares():
     un fallo de la CNA no puede tumbar el correo de licitaciones."""
     desde = datetime.now(timezone.utc) - timedelta(days=VENTANA_DIAS)
     avisos, ok = [], True
+    avisadas = set()  # ids de entradas que avisaron (LISTAS lee posts antes que media)
     try:
         bundle = _bundle()
     except Exception as e:  # disco: se informa como revisión parcial
@@ -168,16 +241,7 @@ def fetch_convocatorias_pares():
         return [], False
     for lista, campos in LISTAS:
         try:
-            resp = requests.get(
-                API.format(lista=lista, campos=campos),
-                headers={"Accept": "application/json;odata=nometadata", "User-Agent": "Mozilla/5.0"},
-                timeout=TIMEOUT,
-                verify=bundle,
-            )
-            resp.raise_for_status()
-            items = resp.json()["value"]
-            if not isinstance(items, list):
-                raise ValueError("value no es lista")
+            items = _leer(lista, campos, desde, bundle)
         except Exception as e:  # red, SSL, JSON, disco: se informa como revisión parcial
             logger.error(f"CNA {lista}: sin respuesta ({e})")
             ok = False
@@ -185,12 +249,14 @@ def fetch_convocatorias_pares():
         n_avisos = 0
         for n in items:
             try:
-                a = _aviso(n, desde) if isinstance(n, dict) else None
+                a = _aviso(n, desde, avisadas if lista == "media" else frozenset()) if isinstance(n, dict) else None
             except Exception as e:
                 logger.warning(f"CNA {lista}: entrada ilegible ({e})")
                 continue
             if a:
                 avisos.append(a)
                 n_avisos += 1
+                if lista == "posts":
+                    avisadas.add(n.get("id"))
         logger.info(f"CNA {lista}: {len(items)} leídas, {n_avisos} llamados a pares recientes")
     return avisos, ok
