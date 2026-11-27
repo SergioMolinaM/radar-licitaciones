@@ -7,6 +7,25 @@ los triages (`privado/triage/`), el diseño del agente (`privado/docs/`) y los r
 
 La historia completa hasta el 31-oct-2026 está en `privado/continuidad.md`. Entradas de la más nueva a la más vieja.
 
+## 2026-11-26 (noche) — relanzada sin 429: 160 páginas, 735 ítems
+
+### Hecho
+- Run 45815604852 (26-11 09:00, 1 min 11 s): Compra Ágil 429 tras 2 solicitudes; correo con 12 ítems (Mercado Público
+  11, ChileCompra 1).
+- Run 45910018872 (relanzada por Sergio con `!`, 23:17 UTC, ~32 min): listado sin 429, 160 páginas desde
+  2026-11-24T15:02:19Z, 7.764 publicadas, 136 con keyword en el título, marca 2026-11-26T23:17:22Z. Correo con 735
+  ítems (Compra Ágil por título 128, por palabra suelta 597, Mercado Público 10); 295 cerraban antes del 27-11 14:00.
+- Sin cambios de código. Triage y ofertas en `privado/`.
+- Grep de Claude Code sobre la raíz `tercera-letra\` volvió a dar 0 en un código que sí está (3895-51-COT26 en
+  `privado/triage/`): buscar carpeta por carpeta (igual que el 11-11).
+
+### Pendiente
+- Relanzamiento automático tras 429 temprano (decisión del 18-11): sigue a mano.
+- Lo de las entradas anteriores sigue (sombra, textos viejos, `fecha_cierre`, CSV de costos).
+
+### Estado del repo
+`main` con esta entrada; sin cambios de código.
+
 ## 2026-11-26 — `_tiers()` lee español y francés y no corta antes de un Tier 3
 
 ### Hecho
